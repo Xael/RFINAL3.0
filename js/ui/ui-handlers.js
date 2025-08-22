@@ -19,6 +19,7 @@ import { announceEffect } from '../core/sound.js';
 import { playCard } from '../game-logic/player-actions.js';
 import { advanceToNextPlayer } from '../game-logic/turn-manager.js';
 import { setLanguage } from '../core/i18n.js';
+import { showSplashScreen } from './splash-screen.js';
 
 /**
  * Gets the ID of the local human player.
