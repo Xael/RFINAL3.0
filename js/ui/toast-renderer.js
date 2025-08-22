@@ -1,4 +1,5 @@
 import * as dom from '../core/dom.js';
+import { t } from '../core/i18n.js';
 
 /**
  * Shows a toast notification for an unlocked achievement.
@@ -7,7 +8,10 @@ import * as dom from '../core/dom.js';
  * @param {string} [overrideDescription=''] - An optional override for the description text.
  */
 export const showAchievementNotification = (achievementData, overrideDescription = '') => {
-    dom.toastText.textContent = `${achievementData.name}: ${overrideDescription || achievementData.description}`;
+    const name = t(achievementData.nameKey);
+    const description = overrideDescription || t(achievementData.descriptionKey);
+
+    dom.toastText.textContent = t('achievements.unlocked_toast', { name, description });
     dom.achievementUnlockedToast.classList.remove('hidden');
 
     // Automatically hide after the CSS animation completes.

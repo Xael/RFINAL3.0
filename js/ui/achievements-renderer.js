@@ -1,6 +1,7 @@
 import * as dom from '../core/dom.js';
 import * as config from '../core/config.js';
 import { getState } from '../core/state.js';
+import { t } from '../core/i18n.js';
 
 /**
  * Renders the content of the achievements modal.
@@ -13,15 +14,11 @@ export function renderAchievementsModal() {
         const achievement = allAchievements[id];
         const isUnlocked = achievements.has(id);
         
-        const name = isUnlocked ? achievement.name : '???';
-        let description = isUnlocked 
-            ? achievement.description 
-            : (config.ACHIEVEMENT_HINTS[id] || 'Dica secreta...');
+        const name = isUnlocked ? t(achievement.nameKey) : '???';
+        const description = isUnlocked 
+            ? t(achievement.descriptionKey) 
+            : t(config.ACHIEVEMENT_HINTS[id]);
         
-        if (id === '120%_unlocked' && isUnlocked) {
-            description = 'O segredo do segredo, a senha é "Final"';
-        }
-
         return `
             <div class="achievement-card ${isUnlocked ? 'unlocked' : ''}">
                 <div class="achievement-icon">🏆</div>
