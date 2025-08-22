@@ -37,18 +37,22 @@ export function initializeGoogleSignIn() {
             callback: handleCredentialResponse
         });
         
-        // Ensure correct initial visibility before rendering the button
-        dom.googleSignInContainer.classList.remove('hidden');
-        dom.userProfileDisplay.classList.add('hidden');
+        // Explicitly check login state to set visibility
+        const { isLoggedIn } = getState();
+        dom.googleSignInContainer.classList.toggle('hidden', isLoggedIn);
+        dom.userProfileDisplay.classList.toggle('hidden', !isLoggedIn);
 
-        const signInButton = document.getElementById('google-signin-button');
-        if (signInButton) {
-            google.accounts.id.renderButton(
-                signInButton,
-                { theme: "outline", size: "large", type: "standard" } 
-            );
-        } else {
-            console.error("Google Sign-In button container not found.");
+        // Only render the button if the user is NOT logged in.
+        if (!isLoggedIn) {
+            const signInButton = document.getElementById('google-signin-button');
+            if (signInButton) {
+                google.accounts.id.renderButton(
+                    signInButton,
+                    { theme: "outline", size: "large", type: "standard" } 
+                );
+            } else {
+                console.error("Google Sign-In button container not found.");
+            }
         }
     };
     

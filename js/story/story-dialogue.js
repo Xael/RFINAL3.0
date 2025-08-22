@@ -6,7 +6,6 @@ import { showSplashScreen } from '../ui/splash-screen.js';
 export const storyDialogue = {
     'start_necroverso': {
         character: 'Necroverso', image: 'necroverso.png',
-        music: 'interlude.ogg',
         text: 'Olá forasteiro... seja bem vindo! Você está no Inversus e eu sou o Necroverso. Se quiser voltar ao seu mundo deverá desafiar os soberanos deste lugar...',
         options: [{ text: 'Desafiar...?', next: 'pre_tutorial_prompt' }]
     },

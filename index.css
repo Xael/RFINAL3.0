@@ -1378,7 +1378,7 @@ body.screen-shaking {
 
 
 /* --- MODALS & OVERLAYS --- */
-.modal-overlay, .turn-announce-overlay, .effect-announcer-overlay {
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -1390,6 +1390,10 @@ body.screen-shaking {
     align-items: center;
     z-index: 1000;
     backdrop-filter: blur(5px);
+}
+#splash-screen.modal-overlay {
+    background: transparent;
+    backdrop-filter: none;
 }
 .modal-content {
     background: var(--bg-panel);
