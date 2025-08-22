@@ -45,6 +45,11 @@ export function connectToServer() {
         console.error('Login failed:', message);
         alert(`Erro de login: ${message}`);
     });
+
+    socket.on('roomCreated', (roomId) => {
+        console.log(`Room created by server with ID: ${roomId}. Joining...`);
+        emitJoinRoom(roomId); // Automatically join the room just created.
+    });
     
     socket.on('rankingData', (ranking) => {
         renderRanking(ranking);

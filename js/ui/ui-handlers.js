@@ -18,8 +18,9 @@ import { createCosmicGlowOverlay, shatterImage } from './animations.js';
 import { announceEffect } from '../core/sound.js';
 import { playCard } from '../game-logic/player-actions.js';
 import { advanceToNextPlayer } from '../game-logic/turn-manager.js';
-import { setLanguage } from '../core/i18n.js';
+import { setLanguage, t } from '../core/i18n.js';
 import { showSplashScreen } from './splash-screen.js';
+import { renderProfile } from './profile-renderer.js';
 
 /**
  * Gets the ID of the local human player.
@@ -282,6 +283,53 @@ export function initializeUiHandlers() {
     });
 
     dom.eventButton.addEventListener('click', () => {
+        const currentMonth = new Date().getMonth();
+        const eventData = config.MONTHLY_EVENTS[currentMonth];
+
+        if (eventData) {
+            // Populate the modal with the current month's event data
+            dom.eventCharacterImage.src = `./${eventData.image}`;
+            dom.eventCharacterName.textContent = t(eventData.characterNameKey);
+            dom.eventAbilityDescription.textContent = t(eventData.abilityKey);
+            dom.eventRewardText.textContent = t('event.reward_text_placeholder', { rewardName: t(eventData.rewardTitleKey) });
+            
+            // For now, we assume the player can challenge. Daily lock logic would go here.
+            dom.challengeEventButton.disabled = false;
+            dom.eventStatusText.textContent = '';
+
+            // This trick removes any old listeners and adds a fresh one, preventing duplicates.
+            const oldButton = dom.challengeEventButton;
+            const newButton = oldButton.cloneNode(true);
+            oldButton.parentNode.replaceChild(newButton, oldButton);
+            
+            newButton.addEventListener('click', () => {
+                const gameOptions = {
+                    story: { // Use story mode infrastructure for events
+                        battle: `event_${eventData.ai}`,
+                        eventData: {
+                            name: t(eventData.nameKey),
+                            ai: eventData.ai
+                        },
+                        playerIds: ['player-1', 'player-2'],
+                        overrides: {
+                            'player-2': {
+                                name: t(eventData.characterNameKey),
+                                aiType: eventData.ai
+                            }
+                        }
+                    }
+                };
+                initializeGame('solo', gameOptions);
+            });
+
+        } else {
+            // Fallback if no event is configured for the current month
+            dom.eventCharacterImage.src = '';
+            dom.eventCharacterName.textContent = 'Nenhum Evento Ativo';
+            dom.eventAbilityDescription.textContent = 'Volte mais tarde para novos desafios.';
+            dom.challengeEventButton.disabled = true;
+        }
+
         dom.eventModal.classList.remove('hidden');
     });
     
@@ -628,11 +676,22 @@ export function initializeUiHandlers() {
     const langPtBrButton = document.getElementById('lang-pt-BR');
     const langEnUsButton = document.getElementById('lang-en-US');
 
+    const handleLanguageChange = async (lang) => {
+        await setLanguage(lang);
+        const { userProfile } = getState();
+        // If profile modal is open, re-render it with the new language
+        if (!dom.profileModal.classList.contains('hidden') && userProfile) {
+            renderProfile(userProfile);
+            // Also re-render achievements if that tab is active
+            renderAchievementsModal();
+        }
+    };
+
     if (langPtBrButton) {
-        langPtBrButton.addEventListener('click', () => setLanguage('pt-BR'));
+        langPtBrButton.addEventListener('click', () => handleLanguageChange('pt-BR'));
     }
     if (langEnUsButton) {
-        langEnUsButton.addEventListener('click', () => setLanguage('en-US'));
+        langEnUsButton.addEventListener('click', () => handleLanguageChange('en-US'));
     }
 
 

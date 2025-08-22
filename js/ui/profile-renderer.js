@@ -16,7 +16,7 @@ export function renderProfile(profileData) {
     }
     
     dom.userAvatar.src = profileData.avatar_url || '';
-    dom.userName.textContent = profileData.username || 'Jogador';
+    dom.userName.textContent = profileData.username || t('game.you');
     dom.userLevel.textContent = profileData.level || 1;
 
     const currentLevelXp = xpForLevel(profileData.level);
