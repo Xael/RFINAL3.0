@@ -1,3 +1,5 @@
+// js/core/achievements.js
+
 
 
 import * as dom from './dom.js';
@@ -48,9 +50,6 @@ export function loadAchievements() {
             const unlockedIds = new Set(unlockedData);
             updateState('achievements', unlockedIds);
 
-            if (unlockedIds.size > 0) {
-                 dom.achievementsButton.classList.remove('hidden');
-            }
             checkAndShowSpecialFeatures();
         } else {
             // If no data, initialize with an empty set. This is the normal case for a new player.
@@ -62,8 +61,6 @@ export function loadAchievements() {
         // data from local storage and start fresh. This makes the app self-healing.
         localStorage.removeItem(ACHIEVEMENTS_KEY);
         updateState('achievements', new Set());
-        // Ensure the button is hidden if achievements are reset
-        dom.achievementsButton.classList.add('hidden');
     }
 }
 
@@ -103,11 +100,6 @@ export function grantAchievement(id) {
     }
 
     if (!achievements.has(id) && config.ACHIEVEMENTS[id]) {
-        // Show achievements button on first unlock
-        if (achievements.size === 0) {
-            dom.achievementsButton.classList.remove('hidden');
-        }
-        
         achievements.add(id);
         const achievementData = config.ACHIEVEMENTS[id];
         console.log(`Achievement Unlocked: ${achievementData.name}`);

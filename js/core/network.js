@@ -37,7 +37,6 @@ export function connectToServer() {
         dom.googleSignInContainer.classList.add('hidden');
         dom.userProfileDisplay.classList.remove('hidden');
         renderProfile(userProfile); // Renderiza o perfil completo, incluindo a barra de XP
-        dom.profileButton.classList.remove('hidden');
         dom.rankingButton.classList.remove('hidden'); 
         dom.eventButton.classList.remove('hidden');
     });
