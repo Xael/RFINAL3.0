@@ -37,7 +37,5 @@ export const showSplashScreen = () => {
     // Show/hide event button based on login status
     dom.eventButton.classList.toggle('hidden', !isLoggedIn);
     
-    // Check for saved game to enable/disable continue button
-    checkForSavedGame();
     checkAndShowSpecialFeatures();
 };

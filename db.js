@@ -1,11 +1,26 @@
 // db.js - Adaptador de Banco de Dados PostgreSQL para Reversus
 const { Pool } = require('pg');
 
+// A configuração do pool agora usará apenas a connectionString.
+// O modo SSL será determinado pelo parâmetro `sslmode` na própria URL.
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Descomente a linha abaixo se seu provedor de nuvem exigir SSL
-  ssl: { rejectUnauthorized: false } 
 });
+
+// --- FUNÇÃO DE TESTE DE CONEXÃO ---
+async function testConnection() {
+  let client;
+  try {
+    client = await pool.connect();
+    console.log("Conexão com o banco de dados bem-sucedida!");
+  } catch (err) {
+    console.error("ERRO DE CONEXÃO COM O BANCO DE DADOS:", err.stack);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+}
 
 // --- ESTRUTURA DE DADOS ---
 
@@ -271,5 +286,6 @@ module.exports = {
   getTopTenPlayers,
   getUserProfile,
   checkAndGrantTitles,
-  grantTitleByCode
+  grantTitleByCode,
+  testConnection
 };

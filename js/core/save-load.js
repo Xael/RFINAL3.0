@@ -38,7 +38,6 @@ export const saveGameState = () => {
         localStorage.setItem(SAVE_KEY, JSON.stringify(dataToSave));
         updateLog("Jogo salvo com sucesso!");
         dom.saveGameConfirmModal.classList.add('hidden');
-        checkForSavedGame();
     } catch (error) {
         console.error("Erro ao salvar o jogo:", error);
         updateLog("Falha ao salvar o jogo. O armazenamento pode estar cheio.");
@@ -59,7 +58,6 @@ export const loadGameState = () => {
         console.error("Erro ao carregar o jogo salvo:", error);
         updateLog("O arquivo salvo está corrompido e não pôde ser carregado.");
         localStorage.removeItem(SAVE_KEY);
-        checkForSavedGame();
         return;
     }
     
@@ -128,14 +126,10 @@ export const loadGameState = () => {
 };
 
 export const checkForSavedGame = () => {
-    if (localStorage.getItem(SAVE_KEY)) {
-        dom.continueButton.disabled = false;
-    } else {
-        dom.continueButton.disabled = true;
-    }
+    // This function is now just a check, it doesn't touch the DOM.
+    return !!localStorage.getItem(SAVE_KEY);
 };
 
 export const deleteSavedGame = () => {
     localStorage.removeItem(SAVE_KEY);
-    checkForSavedGame();
 };

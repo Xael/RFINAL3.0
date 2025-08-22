@@ -1,6 +1,6 @@
 // js/ui/profile-renderer.js
 import * as dom from '../core/dom.js';
-import { t } from '../core/i18n.js';
+import { t, getCurrentLanguage } from '../core/i18n.js';
 
 function xpForLevel(level) {
     if (level <= 1) return 0;
@@ -29,7 +29,8 @@ export function renderProfile(profileData) {
     dom.xpBarText.textContent = `${profileData.xp} / ${nextLevelXp} XP`;
 
     // --- 2. Renderizar o Modal de Perfil Detalhado ---
-    const joinDate = new Date(profileData.created_at).toLocaleDateString('pt-BR');
+    const lang = getCurrentLanguage();
+    const joinDate = new Date(profileData.created_at).toLocaleDateString(lang);
 
     const titlesByLine = (profileData.titles || []).reduce((acc, title) => {
         if (!acc[title.line]) {
@@ -53,7 +54,7 @@ export function renderProfile(profileData) {
             <li>
                 <span class="${outcomeClass}">${t(outcomeKey)}</span>
                 <span>${match.mode}</span>
-                <span>${new Date(match.date).toLocaleDateString('pt-BR')}</span>
+                <span>${new Date(match.date).toLocaleDateString(lang)}</span>
             </li>
         `;
     }).join('');
@@ -100,5 +101,5 @@ export function renderProfile(profileData) {
         </div>
     `;
 
-    dom.profileContainer.innerHTML = profileHTML;
+    dom.profileDataContainer.innerHTML = profileHTML;
 }

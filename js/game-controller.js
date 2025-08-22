@@ -164,6 +164,7 @@ export const initializeGame = async (mode, options) => {
 
     dom.gameSetupModal.classList.add('hidden');
     dom.storyModeModalEl.classList.add('hidden');
+    dom.storyStartOptionsModal.classList.add('hidden');
     dom.eventModal.classList.add('hidden');
     dom.pvpRoomListModal.classList.add('hidden');
     dom.pvpLobbyModal.classList.add('hidden');

@@ -10,7 +10,6 @@ export const splashScreenEl = document.getElementById('splash-screen');
 export const splashAnimationContainerEl = document.getElementById('splash-animation-container');
 export const quickStartButton = document.getElementById('quick-start-button');
 export const storyModeButton = document.getElementById('story-mode-button');
-export const continueButton = document.getElementById('continue-button');
 export const pvpModeButton = document.getElementById('pvp-mode-button');
 export const infoButton = document.getElementById('info-button');
 export const infoModal = document.getElementById('info-modal');
@@ -128,14 +127,17 @@ export const saveGameNoButton = document.getElementById('save-game-no-button');
 export const exitGameConfirmModal = document.getElementById('exit-game-confirm-modal');
 export const exitGameYesButton = document.getElementById('exit-game-yes-button');
 export const exitGameNoButton = document.getElementById('exit-game-no-button');
-export const achievementsButton = document.getElementById('achievements-button');
-export const achievementsModal = document.getElementById('achievements-modal');
-export const achievementsGrid = document.getElementById('achievements-grid');
-export const closeAchievementsButton = document.getElementById('close-achievements-button');
 export const inversusModeButton = document.getElementById('inversus-mode-button');
 export const scalableContainer = document.getElementById('scalable-container');
 export const achievementUnlockedToast = document.getElementById('achievement-unlocked-toast');
 export const toastText = document.getElementById('toast-text');
+
+// Story Start Options Modal
+export const storyStartOptionsModal = document.getElementById('story-start-options-modal');
+export const storyNewGameButton = document.getElementById('story-new-game-button');
+export const storyContinueGameButton = document.getElementById('story-continue-game-button');
+export const storyOptionsCloseButton = document.getElementById('story-options-close-button');
+
 
 // Field Effect Target Modal
 export const fieldEffectTargetModal = document.getElementById('field-effect-target-modal');
@@ -186,13 +188,13 @@ export const chatSendButton = document.getElementById('chat-send-button');
 
 // PVP / Auth
 export const rankingButton = document.getElementById('ranking-button');
-export const profileButton = document.getElementById('profile-button');
-export const rankingModal = document.getElementById('ranking-modal');
-export const closeRankingButton = document.getElementById('close-ranking-button');
 export const profileModal = document.getElementById('profile-modal');
 export const closeProfileButton = document.getElementById('close-profile-button');
+export const profileDataContainer = document.getElementById('profile-data-container');
+export const achievementsGrid = document.getElementById('achievements-grid');
+export const rankingModal = document.getElementById('ranking-modal');
+export const closeRankingButton = document.getElementById('close-ranking-button');
 export const rankingContainer = document.getElementById('ranking-container');
-export const profileContainer = document.getElementById('profile-container');
 export const googleSignInContainer = document.getElementById('google-signin-container');
 export const userProfileDisplay = document.getElementById('user-profile-display');
 export const userAvatar = document.getElementById('user-avatar');

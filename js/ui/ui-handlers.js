@@ -264,12 +264,10 @@ export function initializeUiHandlers() {
     
     dom.storyModeButton.addEventListener('click', () => {
         sound.initializeMusic();
-        startStoryMode();
-    });
-
-    dom.continueButton.addEventListener('click', () => {
-        sound.initializeMusic();
-        saveLoad.loadGameState();
+        // Check for saved game and update the continue button
+        const hasSave = localStorage.getItem('reversus-story-save');
+        dom.storyContinueGameButton.disabled = !hasSave;
+        dom.storyStartOptionsModal.classList.remove('hidden');
     });
 
     dom.pvpModeButton.addEventListener('click', () => {
@@ -282,24 +280,57 @@ export function initializeUiHandlers() {
         dom.splashScreenEl.classList.add('hidden');
         dom.pvpRoomListModal.classList.remove('hidden');
     });
+
+    dom.eventButton.addEventListener('click', () => {
+        dom.eventModal.classList.remove('hidden');
+    });
     
     dom.rankingButton.addEventListener('click', () => {
         network.emitGetRanking();
         dom.rankingModal.classList.remove('hidden');
     });
 
-    dom.profileButton.addEventListener('click', () => {
-        network.emitGetProfile();
-        dom.profileModal.classList.remove('hidden');
+    // Story Start Options Modal Handlers
+    dom.storyNewGameButton.addEventListener('click', () => {
+        dom.storyStartOptionsModal.classList.add('hidden');
+        startStoryMode();
+    });
+
+    dom.storyContinueGameButton.addEventListener('click', () => {
+        dom.storyStartOptionsModal.classList.add('hidden');
+        saveLoad.loadGameState();
+    });
+
+    dom.storyOptionsCloseButton.addEventListener('click', () => {
+        dom.storyStartOptionsModal.classList.add('hidden');
     });
     
     dom.inversusModeButton.addEventListener('click', () => {
         initializeGame('inversus', {});
     });
 
-    // Ranking and Profile Modal Close Buttons
+    // Profile & Achievements via User Display
+    dom.userProfileDisplay.addEventListener('click', () => {
+        network.emitGetProfile(); // This will trigger profile rendering
+        renderAchievementsModal(); // Also render achievements
+        dom.profileModal.classList.remove('hidden');
+    });
+
+    // Ranking, Profile, and Event Modal Close Buttons
     dom.closeRankingButton.addEventListener('click', () => dom.rankingModal.classList.add('hidden'));
     dom.closeProfileButton.addEventListener('click', () => dom.profileModal.classList.add('hidden'));
+    dom.closeEventButton.addEventListener('click', () => dom.eventModal.classList.add('hidden'));
+
+    // Tab handlers for Profile/Achievements Modal
+    dom.profileModal.querySelectorAll('.profile-tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.dataset.tab;
+            dom.profileModal.querySelectorAll('.profile-tab-button').forEach(btn => btn.classList.remove('active'));
+            dom.profileModal.querySelectorAll('.info-tab-content').forEach(content => content.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(`${tabId}-tab-content`).classList.add('active');
+        });
+    });
 
     // Info Modal Handlers
     dom.infoButton.addEventListener('click', () => dom.infoModal.classList.remove('hidden'));
@@ -625,14 +656,7 @@ export function initializeUiHandlers() {
         window.location.reload();
     });
     dom.exitGameNoButton.addEventListener('click', () => dom.exitGameConfirmModal.classList.add('hidden'));
-
-    // Achievements Modal
-    dom.achievementsButton.addEventListener('click', () => {
-        renderAchievementsModal();
-        dom.achievementsModal.classList.remove('hidden');
-    });
-    dom.closeAchievementsButton.addEventListener('click', () => dom.achievementsModal.classList.add('hidden'));
-
+    
     // Story Event Listeners (dispatched from other modules)
     document.addEventListener('startStoryGame', (e) => initializeGame(e.detail.mode, e.detail.options));
     document.addEventListener('showSplashScreen', showSplashScreen);
@@ -821,6 +845,10 @@ export function initializeUiHandlers() {
                 dom.lobbyChatInput.value = '';
             }
         }
+    });
+
+    dom.pvpCreateRoomButton.addEventListener('click', () => {
+        network.emitCreateRoom();
     });
 
     dom.pvpRoomListCloseButton.addEventListener('click', () => {
