@@ -197,6 +197,9 @@ export const googleSignInContainer = document.getElementById('google-signin-cont
 export const userProfileDisplay = document.getElementById('user-profile-display');
 export const userAvatar = document.getElementById('user-avatar');
 export const userName = document.getElementById('user-name');
+export const userLevel = document.getElementById('user-level');
+export const xpBarFill = document.getElementById('xp-bar-fill');
+export const xpBarText = document.getElementById('xp-bar-text');
 export const pvpUsernameModal = document.getElementById('pvp-username-modal'); // Kept for potential future use
 export const pvpCreateRoomButton = document.getElementById('pvp-create-room-button');
 
