@@ -1,6 +1,36 @@
 import * as dom from '../core/dom.js';
 import { getState } from '../core/state.js';
 import { t } from '../core/i18n.js';
+import * as network from '../core/network.js';
+
+export const renderRoomList = (rooms) => {
+    if (!dom.pvpRoomGridEl) return;
+    if (rooms.length === 0) {
+        dom.pvpRoomGridEl.innerHTML = `<p style="text-align: center; width: 100%;">${t('pvp.no_rooms')}</p>`;
+        return;
+    }
+
+    const modeKeyMap = {
+        'solo-2p': 'pvp.mode_2p',
+        'solo-3p': 'pvp.mode_3p',
+        'solo-4p': 'pvp.mode_4p',
+        'duo': 'pvp.mode_duo'
+    };
+
+    dom.pvpRoomGridEl.innerHTML = rooms.map((room, index) => {
+        const colorClass = `color-${(index % 4) + 1}`;
+        const modeText = t(modeKeyMap[room.mode] || room.mode);
+        return `
+            <div class="room-card ${colorClass}">
+                <h3>${room.name}</h3>
+                <p>${t('pvp.room_card_mode', { mode: modeText })}</p>
+                <p>${t('pvp.room_card_players', { count: room.playerCount })}</p>
+                <button class="control-button join-room-button" data-room-id="${room.id}">${t('pvp.enter')}</button>
+            </div>
+        `;
+    }).join('');
+};
+
 
 export const renderRanking = (rankingData) => {
     if (!rankingData) {

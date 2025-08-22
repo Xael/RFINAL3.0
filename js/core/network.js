@@ -2,7 +2,7 @@
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver } from '../ui/ui-renderer.js';
-import { renderRanking } from '../ui/lobby-renderer.js';
+import { renderRanking, updateLobbyUi, renderRoomList } from '../ui/lobby-renderer.js';
 import { renderProfile } from '../ui/profile-renderer.js';
 import { showSplashScreen } from '../ui/splash-screen.js';
 import { updateLog } from './utils.js';
@@ -66,11 +66,53 @@ export function connectToServer() {
     });
 
     socket.on('roomList', (rooms) => {
-        // Esta função agora está em lobby-renderer.js, mas mantemos o listener.
-        // A lógica de renderização de salas PvP será chamada quando necessário.
+        renderRoomList(rooms);
+    });
+    
+    socket.on('lobbyUpdate', (roomData) => {
+        updateState('currentRoomId', roomData.id);
+        dom.pvpRoomListModal.classList.add('hidden');
+        dom.pvpLobbyModal.classList.remove('hidden');
+        updateLobbyUi(roomData);
     });
 
-    // ... (restante da lógica de conexão e jogo PvP)
+    socket.on('gameStarted', (initialGameState) => {
+        console.log('Game is starting!');
+        updateState('gameState', initialGameState);
+
+        const { userProfile } = getState();
+        updateState('playerId', userProfile.playerId);
+        
+        dom.pvpLobbyModal.classList.add('hidden');
+        dom.appContainerEl.classList.remove('hidden');
+
+        const state = getState();
+        if (state.gameTimerInterval) clearInterval(state.gameTimerInterval);
+        updateState('gameStartTime', Date.now());
+        updateGameTimer();
+        updateState('gameTimerInterval', setInterval(updateGameTimer, 1000));
+        
+        renderAll();
+    });
+
+    socket.on('gameStateUpdate', (gameState) => {
+        updateState('gameState', gameState);
+        renderAll();
+    });
+
+    socket.on('gameOver', ({ message, winnerId }) => {
+        const { gameState } = getState();
+        if (gameState) {
+             emitGameFinished(winnerId, [], gameState.gameMode);
+        }
+        showGameOver(message, "Fim de Jogo!", { action: 'menu' });
+    });
+
+
+    socket.on('error', (message) => {
+        console.error('Server Error:', message);
+        alert(`Erro do Servidor: ${message}`);
+    });
 }
 
 // --- EMISSORES DE EVENTOS ---

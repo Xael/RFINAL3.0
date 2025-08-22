@@ -86,6 +86,11 @@ export const renderPlayerArea = (player) => {
             'xael': { src: './xaeldesafio.png', class: 'player-area-character-portrait xael-glow' },
             'inversus': { src: './inversum1.png', class: 'inversus-character-portrait', id: 'inversus-character-portrait' }
         };
+        
+        // Dynamically add event boss portraits
+        config.MONTHLY_EVENTS.forEach(event => {
+            portraitMap[event.ai] = { src: `./${event.image}`, class: 'player-area-character-portrait' };
+        });
 
         const portraitInfo = portraitMap[player.aiType];
 

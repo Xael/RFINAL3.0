@@ -10,6 +10,7 @@ import { initiateGameStartSequence } from './game-logic/turn-manager.js';
 import { generateBoardPaths } from './game-logic/board.js';
 import { executeAiTurn } from './ai/ai-controller.js';
 import { createSpiralStarryBackground, clearInversusScreenEffects } from './ui/animations.js';
+import { t } from './core/i18n.js';
 
 
 /**
@@ -105,7 +106,6 @@ export const initializeGame = async (mode, options) => {
         numPlayers = 2;
         playerIdsInGame = config.MASTER_PLAYER_IDS.slice(0, numPlayers);
         modeText = 'Modo Inversus';
-        dom.splashScreenEl.classList.add('hidden');
         playStoryMusic('inversus.ogg');
     } else if (options.story) { // Covers both Story Mode and Events
         isStoryMode = true; // We use the story mode flag to handle shared logic like win/loss events.
@@ -161,7 +161,8 @@ export const initializeGame = async (mode, options) => {
         await showFullscreenAnnounce("Nem mesmo com ajuda da Versatrix poderá me derrotar, eu dominarei o Inversum e consumirei TUDO", 'necroversorevelado.png');
     }
 
-
+    // Universal UI cleanup for starting any game
+    dom.splashScreenEl.classList.add('hidden');
     dom.gameSetupModal.classList.add('hidden');
     dom.storyModeModalEl.classList.add('hidden');
     dom.storyStartOptionsModal.classList.add('hidden');
@@ -203,10 +204,14 @@ export const initializeGame = async (mode, options) => {
 
     const players = Object.fromEntries(
         playerIdsInGame.map((id, index) => {
+            const playerConfig = config.PLAYER_CONFIG[id];
+            const playerName = playerConfig.name || (playerConfig.nameKey ? t(playerConfig.nameKey) : `Player ${index + 1}`);
+
             const playerObject = {
-                ...config.PLAYER_CONFIG[id],
+                ...playerConfig,
+                name: playerName,
                 id,
-                aiType: config.PLAYER_CONFIG[id].aiType || 'default',
+                aiType: playerConfig.aiType || 'default',
                 pathId: isInversusMode ? -1 : index,
                 position: 1,
                 hand: [],

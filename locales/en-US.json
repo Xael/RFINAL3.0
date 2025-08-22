@@ -190,7 +190,8 @@
         "lobby_title": "Room Lobby: {roomName}",
         "waiting_player": "Waiting...",
         "room_card_mode": "Mode: {mode}",
-        "room_card_players": "Players: {count}/4"
+        "room_card_players": "Players: {count}/4",
+        "no_rooms": "No rooms available. Create one!"
     },
     "menu": {
         "title": "Match Menu",

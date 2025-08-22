@@ -190,7 +190,8 @@
         "lobby_title": "Lobby da Sala: {roomName}",
         "waiting_player": "Aguardando...",
         "room_card_mode": "Modo: {mode}",
-        "room_card_players": "Jogadores: {count}/4"
+        "room_card_players": "Jogadores: {count}/4",
+        "no_rooms": "Nenhuma sala disponível. Crie uma!"
     },
     "menu": {
         "title": "Menu da Partida",

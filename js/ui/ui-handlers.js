@@ -711,8 +711,13 @@ export function initializeUiHandlers() {
     dom.saveGameYesButton.addEventListener('click', saveLoad.saveGameState);
     dom.saveGameNoButton.addEventListener('click', () => dom.saveGameConfirmModal.classList.add('hidden'));
     dom.exitGameYesButton.addEventListener('click', () => {
-        // This is a more robust way to exit, ensuring a clean state.
-        window.location.reload();
+        dom.exitGameConfirmModal.classList.add('hidden');
+        const { gameState } = getState();
+        if (gameState && gameState.isPvp) {
+            network.emitLeaveRoom();
+        } else {
+            showSplashScreen();
+        }
     });
     dom.exitGameNoButton.addEventListener('click', () => dom.exitGameConfirmModal.classList.add('hidden'));
     
@@ -910,6 +915,15 @@ export function initializeUiHandlers() {
         network.emitCreateRoom();
     });
 
+    dom.pvpRoomGridEl.addEventListener('click', (e) => {
+        if (e.target.classList.contains('join-room-button')) {
+            const roomId = e.target.dataset.roomId;
+            if (roomId) {
+                network.emitJoinRoom(roomId);
+            }
+        }
+    });
+
     dom.pvpRoomListCloseButton.addEventListener('click', () => {
         dom.pvpRoomListModal.classList.add('hidden');
         showSplashScreen();
@@ -923,5 +937,7 @@ export function initializeUiHandlers() {
         network.emitChangeMode(e.target.value);
     });
     
-    // ... more handlers
+    dom.lobbyStartGameButton.addEventListener('click', () => {
+        network.emitStartGame();
+    });
 }
