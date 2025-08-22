@@ -1,85 +1,83 @@
-
-
 import { getState } from '../core/state.js';
 import { showSplashScreen } from '../ui/splash-screen.js';
 
 export const storyDialogue = {
     'start_necroverso': {
         character: 'Necroverso', image: 'necroverso.png',
-        text: 'Olá forasteiro... seja bem vindo! Você está no Inversus e eu sou o Necroverso. Se quiser voltar ao seu mundo deverá desafiar os soberanos deste lugar...',
-        options: [{ text: 'Desafiar...?', next: 'pre_tutorial_prompt' }]
+        text: 'story_dialogue.start_necroverso_text',
+        options: [{ text: 'story_dialogue.start_necroverso_option_1', next: 'pre_tutorial_prompt' }]
     },
     'pre_tutorial_prompt': {
         character: 'Necroverso', image: 'necroverso.png',
         music: 'interlude.ogg',
-        text: 'Sim, através de um duelo! Eles jogam um jogo de cartas e tabuleiro chamado REVERSUS. Quer que eu te ensine o básico numa partida?',
+        text: 'story_dialogue.pre_tutorial_prompt_text',
         options: [
-            { text: 'Sim, por favor.', next: 'tutorial_explain_1' },
-            { text: 'Não, eu me viro.', next: 'tutorial_skip' }
+            { text: 'story_dialogue.pre_tutorial_prompt_option_1', next: 'tutorial_explain_1' },
+            { text: 'story_dialogue.pre_tutorial_prompt_option_2', next: 'tutorial_skip' }
         ]
     },
     'tutorial_skip': {
         character: 'Necroverso', image: 'necroverso.png',
         music: 'interlude.ogg',
-        text: 'Provavelmente você é um prodígio... Boa sorte então. Enfrente então o Contravox.',
+        text: 'story_dialogue.tutorial_skip_text',
         isContinue: true,
         next: 'pre_contravox_intro'
     },
     'tutorial_explain_1': {
         character: 'Necroverso', image: 'necroverso.png',
         music: 'interlude.ogg',
-        text: 'Ótimo. A regra principal é: tenha a maior pontuação no final da rodada para avançar no tabuleiro. Simples, certo?',
+        text: 'story_dialogue.tutorial_explain_1_text',
         next: 'tutorial_explain_2', isContinue: true
     },
     'tutorial_explain_2': {
         character: 'Necroverso', image: 'necroverso.png',
         music: 'interlude.ogg',
-        text: 'Sua pontuação é a soma de duas cartas de VALOR que você joga. Se tiver 2 ou mais cartas de valor, você DEVE jogar uma. Se tiver só uma, ela permanece para a próxima rodada, a sua última carta jogada será seu "Resto".',
+        text: 'story_dialogue.tutorial_explain_2_text',
         next: 'tutorial_explain_3', isContinue: true
     },
     'tutorial_explain_3': {
         character: 'Necroverso', image: 'necroverso.png',
         music: 'interlude.ogg',
-        text: 'As cartas de EFEITO podem mudar tudo! "Mais" e "Menos" usam o valor do seu "Resto" para aumentar ou diminuir sua pontuação. "Sobe", "Desce" e "Pula"  movem seu peão.',
+        text: 'story_dialogue.tutorial_explain_3_text',
         next: 'tutorial_explain_4', isContinue: true
     },
     'tutorial_explain_4': {
         character: 'Necroverso', image: 'necroverso.png',
         music: 'interlude.ogg',
-        text: 'As cartas "Reversus" e "Reversus Total" são mais complexas e podem virar o jogo. Você aprenderá o poder delas na prática.',
+        text: 'story_dialogue.tutorial_explain_4_text',
         next: 'tutorial_explain_5', isContinue: true
     },
     'tutorial_explain_5': {
         character: 'Necroverso', image: 'necroverso.png',
         music: 'interlude.ogg',
-        text: 'Chega de papo. Vamos jogar. Não pense em vencer, apenas em aprender as regras.',
+        text: 'story_dialogue.tutorial_explain_5_text',
         isEndStory: true,
         startGame: { battle: 'tutorial_necroverso' }
     },
     'tutorial_loss': {
         character: 'Necroverso', image: 'necroverso.png',
-        text: 'Parece que você ainda não está pronto. Lembre-se, o objetivo é aprender. Vamos tentar de novo.',
+        text: 'story_dialogue.tutorial_loss_text',
         next: 'tutorial_explain_5', isContinue: true
     },
     'post_tutorial': {
         character: 'Necroverso', image: 'necroverso.png',
-        text: 'E com isso finalizamos o tutorial... espero que tenha entendido tudo. Seu primeiro desafio real te aguarda.',
-        options: [{ text: "Entendi!", next: 'pre_contravox_intro' }]
+        text: 'story_dialogue.post_tutorial_text',
+        options: [{ text: "story_dialogue.post_tutorial_option_1", next: 'pre_contravox_intro' }]
     },
     'pre_contravox_intro': {
         character: 'Necroverso', image: 'necroverso3.png',
-        text: 'Vou te contar dois segredos sobre o Contravox para te ajudar no seu duelo...',
-        options: [{ text: 'Dica é bom', next: 'pre_contravox_hint' }, { text: 'Não quero dicas', next: 'pre_contravox_hint' }]
+        text: 'story_dialogue.pre_contravox_intro_text',
+        options: [{ text: 'story_dialogue.pre_contravox_intro_option_1', next: 'pre_contravox_hint' }, { text: 'story_dialogue.pre_contravox_intro_option_2', next: 'pre_contravox_hint' }]
     },
     'pre_contravox_hint': {
         character: 'Necroverso', image: 'necroverso3.png',
-        text: 'Como eu sou legal vou te contar... Contravox é o mais fraco dos três... e ele tem uma habilidade especial... cuidado com ela!',
-        options: [{ text: 'Isso era pra ser um segredo?', next: 'start_contravox' }, { text: 'Obrigado', next: 'start_contravox' }]
+        text: 'story_dialogue.pre_contravox_hint_text',
+        options: [{ text: 'story_dialogue.pre_contravox_hint_option_1', next: 'start_contravox' }, { text: 'story_dialogue.pre_contravox_hint_option_2', next: 'start_contravox' }]
     },
     'start_contravox': {
         character: 'Contravox', image: 'contravox.png',
-        text: '!recnev em áriugesnoc siamaj êcoV',
-        options: [{ text: 'Zatanna?', next: 'contravox_end' }, { text: 'Não entendi nada...', next: 'contravox_end' }, { text: 'É hora do duelo!', next: 'contravox_end' }]
+        text: 'story_dialogue.start_contravox_text',
+        options: [{ text: 'story_dialogue.start_contravox_option_1', next: 'contravox_end' }, { text: 'story_dialogue.start_contravox_option_2', next: 'contravox_end' }, { text: 'story_dialogue.start_contravox_option_3', next: 'contravox_end' }]
     },
     'contravox_end': {
         isEndStory: true,
@@ -87,29 +85,29 @@ export const storyDialogue = {
     },
     'post_contravox_victory': {
         character: 'Necroverso', image: 'necroverso.png',
-        text: "Incrível... realmente você venceu o Contravox... faltam só mais dois agora, a próxima é Versatrix, mas cuidado... nem tudo é o que parece.",
+        text: "story_dialogue.post_contravox_victory_text",
         next: 'pre_versatrix_intro', isContinue: true
     },
     'pre_versatrix_intro': {
         character: 'Necroverso', image: 'necroverso3.png',
-        text: 'A Versatrix é do signo de gêmeos... e ela é... valiosa!',
-        options: [{ text: 'Certo... signos...', next: 'start_versatrix_dialogue' }, { text: 'Defina valiosa...', next: 'start_versatrix_dialogue' }]
+        text: 'story_dialogue.pre_versatrix_intro_text',
+        options: [{ text: 'story_dialogue.pre_versatrix_intro_option_1', next: 'start_versatrix_dialogue' }, { text: 'story_dialogue.pre_versatrix_intro_option_2', next: 'start_versatrix_dialogue' }]
     },
     'start_versatrix_dialogue': {
         character: 'Versatrix', image: 'versatrix.png',
         text: () => {
             const { achievements } = getState();
             return achievements.has('versatrix_card_collected') 
-                ? "Eu tenhoa impressão que já nos encontramos em outra vida..."
-                : "Eu não quero perder... mas caso me vença... ainda assim eu te ajudarei...";
+                ? "story_dialogue.start_versatrix_dialogue_text_1"
+                : "story_dialogue.start_versatrix_dialogue_text_2";
         },
         options: () => {
              const { achievements } = getState();
              return achievements.has('versatrix_card_collected')
-                ? [{ text: "Talvez...", next: 'versatrix_end_game' }]
+                ? [{ text: "story_dialogue.start_versatrix_dialogue_option_1", next: 'versatrix_end_game' }]
                 : [
-                    { text: "Isto é ouro?", next: 'versatrix_sinto_muito' }, 
-                    { text: "Você é solteira?", next: 'versatrix_solteira' }
+                    { text: "story_dialogue.start_versatrix_dialogue_option_2", next: 'versatrix_sinto_muito' }, 
+                    { text: "story_dialogue.start_versatrix_dialogue_option_3", next: 'versatrix_solteira' }
                   ];
         }
     },
@@ -118,38 +116,38 @@ export const storyDialogue = {
     },
     'versatrix_sinto_muito': {
         character: 'Versatrix', image: 'versatrix.png',
-        text: "Talvez ;)",
+        text: "story_dialogue.versatrix_sinto_muito_text",
         isEndStory: true, startGame: { battle: 'versatrix' }
     },
     'versatrix_solteira': {
         character: 'Versatrix', image: 'versatrix.png',
-        text: "Ah... seu interesseiro, vamos duelar logo!",
+        text: "story_dialogue.versatrix_solteira_text",
         isEndStory: true, startGame: { battle: 'versatrix' }
     },
     'post_versatrix_victory': {
         character: 'Necroverso', image: 'necroverso.png',
-        text: "Agora só falta o mais difícil...",
-        options: [{ text: "Quando eu venço eles... o que acontece?", next: 'post_versatrix_ask_return' }]
+        text: "story_dialogue.post_versatrix_victory_text",
+        options: [{ text: "story_dialogue.post_versatrix_victory_option_1", next: 'post_versatrix_ask_return' }]
     },
     'post_versatrix_defeat': {
         character: 'Versatrix', image: 'versatrix.png',
-        text: "Não se preocupe... eu vou te ajudar quando chegar o momento certo",
-        options: [{ text: "Não entendi... eu perdi?", next: 'post_versatrix_victory' }, { text: "Eu ganhei?", next: 'post_versatrix_victory' }, { text: "Não entendi nada", next: 'post_versatrix_victory' }]
+        text: "story_dialogue.post_versatrix_defeat_text",
+        options: [{ text: "story_dialogue.post_versatrix_defeat_option_1", next: 'post_versatrix_victory' }, { text: "story_dialogue.post_versatrix_defeat_option_2", next: 'post_versatrix_victory' }, { text: "story_dialogue.post_versatrix_defeat_option_3", next: 'post_versatrix_victory' }]
     },
     'post_versatrix_ask_return': {
         character: 'Necroverso', image: 'necroverso.png',
-        text: "Você fica mais próximo de voltar ao seu mundo...\nVença o Rei Reversum e eu te darei a chance de retornar ao seu mundo",
+        text: "story_dialogue.post_versatrix_ask_return_text",
         next: 'pre_reversum_intro', isContinue: true
     },
     'pre_reversum_intro': {
         character: 'Necroverso', image: 'necroverso3.png',
-        text: 'Duas informações valiosas... ele é o mais poderoso e ele é imune ao vermelho!',
-        options: [{ text: 'Isso deveria me ajudar?', next: 'start_reversum' }, { text: 'Espero que isso acabe logo', next: 'start_reversum' }]
+        text: 'story_dialogue.pre_reversum_intro_text',
+        options: [{ text: 'story_dialogue.pre_reversum_intro_option_1', next: 'start_reversum' }, { text: 'story_dialogue.pre_reversum_intro_option_2', next: 'start_reversum' }]
     },
     'start_reversum': {
         character: 'Reversum', image: 'reversum.png',
-        text: "EU SOU REX REVERSUM TOTEM! CURVE-SE DIANTE DO SEU REI!",
-        options: [{ text: "Rex? tipo um cachorro?", next: 'reversum_end' }, { text: "Só quero zerar o jogo...", next: 'reversum_end' }, { text: "Leônidas?", next: 'reversum_end' }]
+        text: "story_dialogue.start_reversum_text",
+        options: [{ text: "story_dialogue.start_reversum_option_1", next: 'reversum_end' }, { text: "story_dialogue.start_reversum_option_2", next: 'reversum_end' }, { text: "story_dialogue.start_reversum_option_3", next: 'reversum_end' }]
     },
     'reversum_end': {
         isEndStory: true,
@@ -157,21 +155,21 @@ export const storyDialogue = {
     },
     'post_reversum_victory': {
         character: 'Necroverso', image: 'necroversorevelado.png',
-        text: "Finalmente com eles derrotados o Inversus me pertence.",
-        options: [{ text: "Certo... e nosso acordo?", next: 'final_confrontation_1' }]
+        text: "story_dialogue.post_reversum_victory_text",
+        options: [{ text: "story_dialogue.post_reversum_victory_option_1", next: 'final_confrontation_1' }]
     },
     'final_confrontation_1': {
         character: 'Necroverso', image: 'necroversorevelado.png',
-        text: "Eu não menti, darei a chance que retorne... porém, se me derrotar.",
+        text: "story_dialogue.final_confrontation_1_text",
         options: [{ 
-            text: "Estava fácil demais...", 
+            text: "story_dialogue.final_confrontation_1_option_1", 
             next: () => getState().storyState.lostToVersatrix ? 'versatrix_warning_1' : 'necroverso_king_battle_intro' 
         }]
     },
     'necroverso_king_battle_intro': {
         character: 'Necroverso', image: 'necroversorevelado.png',
-        text: "Hahaha! Graças a você, eu tenho controle total sobre os reis que derrotou! E eles lutarão por mim! Mas, para ser justo, vou explicar as regras: neste combate, quem tiver a menor pontuação na rodada, perde um coração. Perca todos... e você será eliminado para sempre!",
-        options: [{ text: "Isso não parece justo!", next: 'necroverso_king_battle' }]
+        text: "story_dialogue.necroverso_king_battle_intro_text",
+        options: [{ text: "story_dialogue.necroverso_king_battle_intro_option_1", next: 'necroverso_king_battle' }]
     },
     'necroverso_king_battle': {
         isEndStory: true,
@@ -179,7 +177,7 @@ export const storyDialogue = {
     },
     'post_necroverso_king_victory': {
         character: 'Necroverso', image: 'necroverso2.png',
-        text: "Você... me derrotou? Impossível! Por agora, você está livre. Mas saiba que este não é o fim. Eu retornarei...",
+        text: "story_dialogue.post_necroverso_king_victory_text",
         isContinue: true,
         next: 'return_to_menu_from_kings'
     },
@@ -189,18 +187,18 @@ export const storyDialogue = {
     },
     'versatrix_warning_1': {
         character: 'Versatrix', image: 'versatrix.png',
-        text: "Espere! Antes de enfrenta-lo fique sabendo, ele não pode ser vencido chegando apenas ao centro do tabuleiro primeiro... e não se deixe tocar por sua escuridão...",
-        options: [{ text: "Escuridão...", next: 'versatrix_warning_2' }, { text: "Eu não sei o que fazer...", next: 'versatrix_warning_2' }]
+        text: "story_dialogue.versatrix_warning_1_text",
+        options: [{ text: "story_dialogue.versatrix_warning_1_option_1", next: 'versatrix_warning_2' }, { text: "story_dialogue.versatrix_warning_1_option_2", next: 'versatrix_warning_2' }]
     },
     'versatrix_warning_2': {
         character: 'Versatrix', image: 'versatrix.png',
-        text: "Eu vou te ajudar... juntos venceremos!",
-        options: [{ text: "Vamos!", next: 'pre_final_battle' }]
+        text: "story_dialogue.versatrix_warning_2_text",
+        options: [{ text: "story_dialogue.versatrix_warning_2_option_1", next: 'pre_final_battle' }]
     },
     'pre_final_battle': {
         character: 'Necroverso', image: 'necroverso3.png',
-        text: 'Duas dicas pra você... seu tempo acabou e não existe escapatória!',
-        options: [{ text: 'Isso não me pareceu uma dica...', next: 'final_battle_final' }, { text: 'Ah saquei!', next: 'final_battle_final' }]
+        text: 'story_dialogue.pre_final_battle_text',
+        options: [{ text: 'story_dialogue.pre_final_battle_option_1', next: 'final_battle_final' }, { text: 'story_dialogue.pre_final_battle_option_2', next: 'final_battle_final' }]
     },
     'final_battle_final': {
         isEndStory: true,
@@ -209,7 +207,7 @@ export const storyDialogue = {
     'xael_challenge_intro': {
         character: 'Xael',
         image: 'xaeldesafio.png',
-        text: 'Então você aceita meu desafio! As regras aqui são diferentes. O objetivo é chegar à casa 10 com MAIS estrelas do que eu. Colete-as no tabuleiro e use seus efeitos com sabedoria. Pronto?',
+        text: 'story_dialogue.xael_challenge_intro_text',
         next: 'start_xael_challenge',
         isContinue: true
     },

@@ -287,22 +287,37 @@ export function initializeUiHandlers() {
         const eventData = config.MONTHLY_EVENTS[currentMonth];
 
         if (eventData) {
-            // Populate the modal with the current month's event data
+            // Populate the modal with the current month's event data, using translations
             dom.eventCharacterImage.src = `./${eventData.image}`;
             dom.eventCharacterName.textContent = t(eventData.characterNameKey);
             dom.eventAbilityDescription.textContent = t(eventData.abilityKey);
             dom.eventRewardText.textContent = t('event.reward_text_placeholder', { rewardName: t(eventData.rewardTitleKey) });
-            
-            // For now, we assume the player can challenge. Daily lock logic would go here.
-            dom.challengeEventButton.disabled = false;
-            dom.eventStatusText.textContent = '';
 
+            // Check if the player has already attempted the challenge today
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            const lastAttemptDate = localStorage.getItem('reversus-event-attempt-date');
+            const hasAttemptedToday = lastAttemptDate === today;
+
+            if (hasAttemptedToday) {
+                dom.challengeEventButton.disabled = true;
+                dom.eventStatusText.textContent = t('event.status_wait');
+            } else {
+                dom.challengeEventButton.disabled = false;
+                dom.eventStatusText.textContent = '';
+            }
+            
             // This trick removes any old listeners and adds a fresh one, preventing duplicates.
             const oldButton = dom.challengeEventButton;
             const newButton = oldButton.cloneNode(true);
             oldButton.parentNode.replaceChild(newButton, oldButton);
             
             newButton.addEventListener('click', () => {
+                // If button is somehow clicked while disabled, do nothing.
+                if (newButton.disabled) return;
+                
+                // Set the local storage flag to lock the event for today
+                localStorage.setItem('reversus-event-attempt-date', today);
+
                 const gameOptions = {
                     story: { // Use story mode infrastructure for events
                         battle: `event_${eventData.ai}`,
@@ -427,7 +442,10 @@ export function initializeUiHandlers() {
             { name: 'Contravox', aiType: 'contravox', image: './contravox.png' },
             { name: 'Versatrix', aiType: 'versatrix', image: './versatrix.png' },
             { name: 'Rei Reversum', aiType: 'reversum', image: './reversum.png' },
-            { name: 'Inversus', aiType: 'inversus', image: './inversum1.png' }
+            { name: 'Inversus', aiType: 'inversus', image: './INVERSUM1.png' },
+            { name: 'Xael', aiType: 'xael', image: './xaeldesafio.png' },
+            { name: 'Narrador', aiType: 'narrador', image: './narrador.png' },
+            { name: 'Necroverso Final', aiType: 'necroverso_final', image: './necroverso2.png' }
         ];
 
         let spinnerInterval;
@@ -445,6 +463,7 @@ export function initializeUiHandlers() {
                 selectedOpponent = opponents[Math.floor(Math.random() * opponents.length)];
                 dom.opponentSpinnerImage.src = selectedOpponent.image;
                 dom.opponentSpinnerName.textContent = selectedOpponent.name;
+                sound.playSoundEffect('escolhido');
                 resolve();
             }, 3000);
         });

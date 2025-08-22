@@ -81,12 +81,19 @@
         "end_turn": "End Turn",
         "your_turn": "Your Turn",
         "you": "You",
+        "none": "None",
         "score_header": "Score",
         "resto_header": "Rest",
         "path_header": "Path",
         "house_header": "Space",
         "effect_header": "Effect",
-        "field_effect_indicator": "Field"
+        "score_header_title": "Current round score",
+        "resto_header_title": "Rest card for the next round",
+        "path_header_title": "Current path on the board",
+        "house_header_title": "Position on the path",
+        "effect_header_title": "Active card effects",
+        "field_effect_indicator": "Field",
+        "field_effect_indicator_title": "Active field effect: {effectName}"
     },
     "setup": {
         "title": "Game Mode",
@@ -247,7 +254,7 @@
         "reward_title": "Exclusive Reward",
         "reward_text_placeholder": "Title: \"{rewardName}\"",
         "challenge_button": "Challenge!",
-        "status_wait": "Come back tomorrow for a new challenge.",
+        "status_wait": "You have already attempted the challenge today. Come back tomorrow!",
         "status_completed": "Challenge complete! Play again whenever you want this month."
     },
     "log": {

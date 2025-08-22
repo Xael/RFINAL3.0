@@ -1,8 +1,10 @@
 
+
 import * as dom from '../core/dom.js';
 import * as config from '../core/config.js';
 import { getState } from '../core/state.js';
 import { getCardImageUrl, renderCard } from './card-renderer.js';
+import { t } from '../core/i18n.js';
 
 /**
  * Renders a single player's entire area, including header, hand, and play zone.
@@ -84,7 +86,7 @@ export const renderPlayerArea = (player) => {
             'necroverso_final': { src: './necroverso2.png', class: 'player-area-character-portrait final-boss-glow' },
             'narrador': { src: './narrador.png', class: 'player-area-character-portrait effect-glitch' },
             'xael': { src: './xaeldesafio.png', class: 'player-area-character-portrait xael-glow' },
-            'inversus': { src: './inversum1.png', class: 'inversus-character-portrait', id: 'inversus-character-portrait' }
+            'inversus': { src: './INVERSUM1.png', class: 'inversus-character-portrait', id: 'inversus-character-portrait' }
         };
         
         // Dynamically add event boss portraits
@@ -118,7 +120,7 @@ function renderPlayerHeader(player) {
     const effectText = [player.effects.score, player.effects.movement]
         .filter(Boolean) // Remove null/undefined effects
         .map(e => e.toUpperCase())
-        .join(' / ') || 'Nenhum';
+        .join(' / ') || t('game.none');
     
     const restoValue = player.resto ? player.resto.value : 'N/A';
 
@@ -144,9 +146,9 @@ function renderPlayerHeader(player) {
     }
 
     const fieldEffectHTML = activeFieldEffect ? `
-        <div class="field-effect-indicator" title="Efeito de campo ativo: ${activeFieldEffect.name}" data-player-id="${player.id}">
+        <div class="field-effect-indicator" title="${t('game.field_effect_indicator_title', { effectName: activeFieldEffect.name })}" data-player-id="${player.id}">
             <div class="field-effect-square" style="background-color: ${activeFieldEffect.type === 'positive' ? 'var(--accent-blue)' : 'var(--accent-red)'};"></div>
-            <span>Campo</span>
+            <span>${t('game.field_effect_indicator')}</span>
         </div>
     ` : '';
 
@@ -162,11 +164,11 @@ function renderPlayerHeader(player) {
                  </div>
             </div>
             <div class="player-stats">
-                 <span class="stat-item" title="Pontuação atual na rodada">Pontuação: <strong>${player.liveScore || 0}</strong></span>
-                 <span class="stat-item" title="Carta de Resto para a próxima rodada">Resto: <strong>${restoValue}</strong></span>
-                 <span class="stat-item" title="Caminho atual no tabuleiro">Caminho: <strong>${pathDisplay}</strong></span>
-                 <span class="stat-item" title="Posição no caminho">Casa: <strong>${player.position}</strong></span>
-                 <span class="stat-item" title="Efeitos de carta ativos">Efeito: <strong>${effectText}</strong></span>
+                 <span class="stat-item" title="${t('game.score_header_title')}">${t('game.score_header')}: <strong>${player.liveScore || 0}</strong></span>
+                 <span class="stat-item" title="${t('game.resto_header_title')}">${t('game.resto_header')}: <strong>${restoValue}</strong></span>
+                 <span class="stat-item" title="${t('game.path_header_title')}">${t('game.path_header')}: <strong>${pathDisplay}</strong></span>
+                 <span class="stat-item" title="${t('game.house_header_title')}">${t('game.house_header')}: <strong>${player.position}</strong></span>
+                 <span class="stat-item" title="${t('game.effect_header_title')}">${t('game.effect_header')}: <strong>${effectText}</strong></span>
                  ${fieldEffectHTML}
             </div>
         </div>

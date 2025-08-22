@@ -6,6 +6,7 @@ import { shatterImage, createStarryBackground, initializeFloatingItemsAnimation 
 import { storyDialogue } from './story-dialogue.js';
 import { initializeGame } from '../game-controller.js';
 import { updateLog } from '../core/utils.js';
+import { t } from '../core/i18n.js';
 
 const typewriter = (element, text, onComplete) => {
     let { typewriterTimeout } = getState();
@@ -141,21 +142,23 @@ export const renderStoryNode = (nodeId) => {
         dom.storyCharacterImageEl.style.opacity = 1;
     }
 
-    const textContent = typeof node.text === 'function' ? node.text() : node.text;
-    const options = typeof node.options === 'function' ? node.options() : node.options;
+    const textContentKey = typeof node.text === 'function' ? node.text() : node.text;
+    const textContent = t(textContentKey);
+    const optionsSource = typeof node.options === 'function' ? node.options() : node.options;
+
 
     const onTypewriterComplete = () => {
         dom.storyDialogueOptionsEl.innerHTML = ''; // Clear previous options
         if (node.isContinue) {
             const button = document.createElement('button');
-            button.textContent = 'Continuar...';
+            button.textContent = t('common.continue') + '...';
             button.className = 'control-button';
             button.onclick = () => renderStoryNode(node.next);
             dom.storyDialogueOptionsEl.appendChild(button);
-        } else if (options) {
-            options.forEach(option => {
+        } else if (optionsSource) {
+            optionsSource.forEach(option => {
                 const button = document.createElement('button');
-                button.textContent = option.text;
+                button.textContent = t(option.text);
                 button.className = 'control-button';
                 button.onclick = () => renderStoryNode(option.next);
                 dom.storyDialogueOptionsEl.appendChild(button);
@@ -194,10 +197,10 @@ export async function playEndgameSequence() {
 
     const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
-    const typeDialogue = (text) => {
+    const typeDialogue = (textKey) => {
         return new Promise(resolve => {
             dialogueTextEl.textContent = ''; // Clear previous text
-            typewriter(dialogueTextEl, text, resolve);
+            typewriter(dialogueTextEl, t(textKey), resolve);
         });
     };
 
@@ -209,7 +212,7 @@ export async function playEndgameSequence() {
     characterContainer.appendChild(versatrixImg);
 
     versatrixImg.style.opacity = '1';
-    await typeDialogue("Nós conseguimos! Você o derrotou!");
+    await typeDialogue("story_dialogue.endgame_dialogue_1");
     await sleep(2000);
 
     const necroversoImg = document.createElement('img');
@@ -218,27 +221,27 @@ export async function playEndgameSequence() {
     necroversoImg.style.opacity = '0';
     characterContainer.appendChild(necroversoImg);
 
-    await typeDialogue("...");
+    await typeDialogue("story_dialogue.endgame_dialogue_2");
     await sleep(1000);
 
     necroversoImg.style.opacity = '1';
-    await typeDialogue("Mesmo que me derrote... o Inversus... nunca deixará de existir.");
+    await typeDialogue("story_dialogue.endgame_dialogue_3");
     await sleep(2000);
 
-    await typeDialogue("E com o tempo... um novo Necroverso irá surgir.");
+    await typeDialogue("story_dialogue.endgame_dialogue_4");
     await sleep(2000);
 
     await shatterImage(necroversoImg);
     characterContainer.removeChild(necroversoImg);
 
-    await typeDialogue("Ele se foi... por agora. Você nos salvou. Obrigado.");
+    await typeDialogue("story_dialogue.endgame_dialogue_5");
     await sleep(3000);
 
-    await typeDialogue("Acho que é hora de você voltar para casa, não é? Ou... se quiser, pode ficar. A escolha é sua.");
+    await typeDialogue("story_dialogue.endgame_dialogue_6");
 
     dialogueOptionsEl.innerHTML = `
-        <button id="endgame-choice-return" class="control-button">Voltar para casa</button>
-        <button id="endgame-choice-stay" class="control-button secondary">Ficar no Inversus</button>
+        <button id="endgame-choice-return" class="control-button">${t('story_dialogue.endgame_option_return')}</button>
+        <button id="endgame-choice-stay" class="control-button secondary">${t('story_dialogue.endgame_option_stay')}</button>
     `;
 
     const handleChoice = async () => {

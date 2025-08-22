@@ -202,19 +202,16 @@ async function checkAndGrantTitles(googleId) {
     if (!userRes.rows[0]) return;
     const user = userRes.rows[0];
 
-    const achievementsRes = await pool.query(
-      `SELECT a.code FROM user_achievements ua JOIN achievements a ON ua.achievement_id = a.id WHERE ua.user_id = $1`,
-      [user.id]
-    );
-    const userAchievements = new Set(achievementsRes.rows.map(r => r.code));
+    // NOTA: A verificação de conquistas foi removida. O servidor não pode verificar
+    // conquistas que são armazenadas apenas no lado do cliente (localStorage).
+    // A concessão de títulos agora se baseia apenas em critérios do lado do servidor (nível, vitórias).
 
     for (const [code, titleData] of Object.entries(TITLES)) {
         if (!titleData.unlocks) continue; // Pula títulos de evento
-        const { level, victories, achievement } = titleData.unlocks;
+        const { level, victories } = titleData.unlocks;
         let meetsCriteria = true;
         if (level && user.level < level) meetsCriteria = false;
         if (victories && user.victories < victories) meetsCriteria = false;
-        if (achievement && !userAchievements.has(achievement)) meetsCriteria = false;
 
         if (meetsCriteria) {
             await grantTitleByCode(user.id, code);

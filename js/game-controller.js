@@ -5,9 +5,9 @@ import { renderAll } from './ui/ui-renderer.js';
 import { showSplashScreen } from './ui/splash-screen.js';
 import { playStoryMusic, stopStoryMusic } from './core/sound.js';
 import { updateLog, shuffle } from './core/utils.js';
-import { createDeck } from './game-logic/deck.js';
-import { initiateGameStartSequence } from './game-logic/turn-manager.js';
-import { generateBoardPaths } from './game-logic/board.js';
+import { createDeck } from '../game-logic/deck.js';
+import { initiateGameStartSequence } from '../game-logic/turn-manager.js';
+import { generateBoardPaths } from '../game-logic/board.js';
 import { executeAiTurn } from './ai/ai-controller.js';
 import { createSpiralStarryBackground, clearInversusScreenEffects } from './ui/animations.js';
 import { t } from './core/i18n.js';
@@ -328,7 +328,7 @@ export const initializeGame = async (mode, options) => {
         const { inversusAnimationInterval } = getState();
         if (inversusAnimationInterval) clearInterval(inversusAnimationInterval); // Clear old one before starting new
 
-        const inversusImages = ['inversum1.png', 'inversum2.png', 'inversum3.png'];
+        const inversusImages = ['INVERSUM1.png', 'INVERSUM2.png', 'INVERSUM3.png'];
         let imageIndex = 0;
         const intervalId = setInterval(() => {
             const imgEl = document.getElementById('inversus-character-portrait');
