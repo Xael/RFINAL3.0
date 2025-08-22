@@ -132,13 +132,13 @@ export const announceEffect = (text, type = 'default', duration = 1500) => {
  * @param {string} track - The filename of the music track.
  * @param {boolean} [loop=true] - Whether the track should loop.
  */
-export const playStoryMusic = (track, loop = true) => {
+export const playStoryMusic = async (track, loop = true) => {
     if (dom.musicPlayer.src && dom.musicPlayer.src.endsWith(track)) return;
 
     dom.musicPlayer.src = track;
     dom.musicPlayer.loop = loop;
     dom.nextTrackButton.disabled = true;
-    updateMusic();
+    await updateMusic();
 };
 
 /**
@@ -154,13 +154,17 @@ export const stopStoryMusic = () => {
 /**
  * Updates the music player's state (playing/paused, volume) based on the global sound state.
  */
-export const updateMusic = () => {
+export const updateMusic = async () => {
     const { soundState, isMusicInitialized } = getState();
     if (soundState.muted) {
         dom.musicPlayer.pause();
     } else {
         if (isMusicInitialized) {
-            dom.musicPlayer.play().catch(e => console.error("Music play failed:", e));
+            try {
+                await dom.musicPlayer.play();
+            } catch(e) {
+                console.error("Music play failed:", e);
+            }
         }
     }
     dom.musicPlayer.volume = soundState.volume;

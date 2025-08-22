@@ -29,7 +29,7 @@ export function renderProfile(profileData) {
     dom.xpBarText.textContent = `${profileData.xp} / ${nextLevelXp} XP`;
 
     // --- 2. Renderizar o Modal de Perfil Detalhado ---
-    const lang = getCurrentLanguage();
+    const lang = getCurrentLanguage().replace('_', '-');
     const joinDate = new Date(profileData.created_at).toLocaleDateString(lang);
 
     const titlesByLine = (profileData.titles || []).reduce((acc, title) => {
@@ -62,7 +62,7 @@ export function renderProfile(profileData) {
     const profileHTML = `
         <div class="profile-grid">
             <div class="profile-sidebar">
-                <img src="${profileData.avatar_url}" alt="Avatar" class="profile-avatar">
+                <img src="${profileData.avatar_url}" alt="${t('profile.avatar_alt')}" class="profile-avatar">
                 <h2 class="profile-username">${profileData.username}</h2>
                 <p class="profile-joindate">${t('profile.since', { date: joinDate })}</p>
             </div>

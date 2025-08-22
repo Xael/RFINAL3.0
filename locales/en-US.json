@@ -235,7 +235,8 @@
         "match_history": "Match History",
         "no_history": "No matches recorded.",
         "outcome_win": "Victory",
-        "outcome_loss": "Defeat"
+        "outcome_loss": "Defeat",
+        "avatar_alt": "User avatar"
     },
     "event": {
         "title": "Monthly Event",

@@ -106,7 +106,7 @@ export const initializeGame = async (mode, options) => {
         numPlayers = 2;
         playerIdsInGame = config.MASTER_PLAYER_IDS.slice(0, numPlayers);
         modeText = 'Modo Inversus';
-        playStoryMusic('inversus.ogg');
+        await playStoryMusic('inversus.ogg');
     } else if (options.story) { // Covers both Story Mode and Events
         isStoryMode = true; // We use the story mode flag to handle shared logic like win/loss events.
         storyBattle = options.story.battle;
@@ -116,7 +116,7 @@ export const initializeGame = async (mode, options) => {
             modeText = `Evento: ${eventData.name}`;
             playerIdsInGame = ['player-1', 'player-2'];
             numPlayers = 2;
-            playStoryMusic(`${eventData.ai}.ogg`);
+            await playStoryMusic(`${eventData.ai}.ogg`);
         } else { // Regular Story Mode logic
              if (options.story.playerIds) {
                 playerIdsInGame = options.story.playerIds;
@@ -130,17 +130,17 @@ export const initializeGame = async (mode, options) => {
             isXaelChallenge = storyBattle === 'xael_challenge';
             
             switch(storyBattle) {
-                case 'contravox': modeText = 'Modo História: Contravox'; playStoryMusic('contravox.ogg'); break;
-                case 'versatrix': modeText = 'Modo História: Versatrix'; playStoryMusic('versatrix.ogg'); break;
-                case 'reversum': modeText = 'Modo História: Rei Reversum'; playStoryMusic('reversum.ogg'); break;
-                case 'necroverso_king': modeText = 'Modo História: Rei Necroverso'; playStoryMusic('necroverso.ogg'); break;
+                case 'contravox': modeText = 'Modo História: Contravox'; await playStoryMusic('contravox.ogg'); break;
+                case 'versatrix': modeText = 'Modo História: Versatrix'; await playStoryMusic('versatrix.ogg'); break;
+                case 'reversum': modeText = 'Modo História: Rei Reversum'; await playStoryMusic('reversum.ogg'); break;
+                case 'necroverso_king': modeText = 'Modo História: Rei Necroverso'; await playStoryMusic('necroverso.ogg'); break;
                 case 'necroverso_final':
                     modeText = 'Modo História: Necroverso Final';
-                    playStoryMusic('necroversofinal.ogg');
+                    await playStoryMusic('necroversofinal.ogg');
                     createSpiralStarryBackground(dom.storyStarsBackgroundEl);
                     break;
-                case 'narrador': modeText = 'Batalha Secreta: Narrador'; playStoryMusic('narrador.ogg'); break;
-                case 'xael_challenge': modeText = 'Desafio: Xael'; playStoryMusic('xaeldesafio.ogg'); break;
+                case 'narrador': modeText = 'Batalha Secreta: Narrador'; await playStoryMusic('narrador.ogg'); break;
+                case 'xael_challenge': modeText = 'Desafio: Xael'; await playStoryMusic('xaeldesafio.ogg'); break;
                 default: modeText = `Modo História: ${storyBattle}`; stopStoryMusic();
             }
         }
