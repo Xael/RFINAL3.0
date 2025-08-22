@@ -9,6 +9,7 @@ import { showGameOver } from '../ui/ui-renderer.js';
 import { animateNecroX, shatterImage, toggleReversusTotalBackground } from '../ui/animations.js';
 import { playSoundEffect, announceEffect } from '../core/sound.js';
 import { applyEffect } from '../game-logic/card-effects.js';
+import { t } from '../core/i18n.js';
 
 
 /**
@@ -519,7 +520,8 @@ export async function tryToSpeak(player) {
         }
         
         if (lineToSay) {
-            updateLog({ type: 'dialogue', speaker: aiType, message: `${player.name}: "${lineToSay}"` });
+            const translatedMessage = t(lineToSay);
+            updateLog({ type: 'dialogue', speaker: aiType, message: `${player.name}: "${translatedMessage}"` });
             gameState.dialogueState.spokenLines.add(`${aiType}-${lineToSay}`);
             await new Promise(res => setTimeout(res, 500));
         }
