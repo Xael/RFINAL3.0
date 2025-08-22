@@ -18,6 +18,7 @@ import { createCosmicGlowOverlay, shatterImage } from './animations.js';
 import { announceEffect } from '../core/sound.js';
 import { playCard } from '../game-logic/player-actions.js';
 import { advanceToNextPlayer } from '../game-logic/turn-manager.js';
+import { setLanguage } from '../core/i18n.js';
 
 /**
  * Gets the ID of the local human player.
@@ -590,6 +591,18 @@ export function initializeUiHandlers() {
             }
         }
     });
+
+    // Language Switcher
+    const langPtBrButton = document.getElementById('lang-pt-BR');
+    const langEnUsButton = document.getElementById('lang-en-US');
+
+    if (langPtBrButton) {
+        langPtBrButton.addEventListener('click', () => setLanguage('pt-BR'));
+    }
+    if (langEnUsButton) {
+        langEnUsButton.addEventListener('click', () => setLanguage('en-US'));
+    }
+
 
     // In-Game Menu Handlers
     dom.debugButton.addEventListener('click', () => dom.gameMenuModal.classList.remove('hidden'));

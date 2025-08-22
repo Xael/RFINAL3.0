@@ -36,6 +36,10 @@ export function initializeGoogleSignIn() {
             client_id: "2701468714-udbjtea2v5d1vnr8sdsshi3lem60dvkn.apps.googleusercontent.com",
             callback: handleCredentialResponse
         });
+        
+        // Ensure correct initial visibility before rendering the button
+        dom.googleSignInContainer.classList.remove('hidden');
+        dom.userProfileDisplay.classList.add('hidden');
 
         const signInButton = document.getElementById('google-signin-button');
         if (signInButton) {

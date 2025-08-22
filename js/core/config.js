@@ -3,10 +3,10 @@
 // --- CONSTANTS ---
 export const WINNING_POSITION = 10;
 export const BOARD_SIZE = 9;
-export const NUM_PATHS = 4;
+export const NUM_PATHS = 6;
 export const COLORED_SPACES_PER_PATH = 2;
-export const MAX_VALUE_CARDS_IN_HAND = 2;
-export const MAX_EFFECT_CARDS_IN_HAND = 5;
+export const MAX_VALUE_CARDS_IN_HAND = 3;
+export const MAX_EFFECT_CARDS_IN_HAND = 2;
 
 export const MASTER_PLAYER_IDS = ['player-1', 'player-2', 'player-3', 'player-4'];
 
