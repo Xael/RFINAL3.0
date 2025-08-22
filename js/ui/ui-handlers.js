@@ -22,6 +22,8 @@ import { setLanguage, t } from '../core/i18n.js';
 import { showSplashScreen } from './splash-screen.js';
 import { renderProfile } from './profile-renderer.js';
 
+let currentEventData = null;
+
 /**
  * Gets the ID of the local human player.
  * In PvP, this is the ID assigned by the server.
@@ -282,70 +284,63 @@ export function initializeUiHandlers() {
         dom.pvpRoomListModal.classList.remove('hidden');
     });
 
+    // --- EVENT MODAL: REFACTORED LOGIC ---
+    // This handler opens the modal and sets its content.
     dom.eventButton.addEventListener('click', () => {
         const currentMonth = new Date().getMonth();
-        const eventData = config.MONTHLY_EVENTS[currentMonth];
+        currentEventData = config.MONTHLY_EVENTS[currentMonth]; // Store current event data
 
-        if (eventData) {
+        if (currentEventData) {
             // Populate the modal with the current month's event data, using translations
-            dom.eventCharacterImage.src = `./${eventData.image}`;
-            dom.eventCharacterName.textContent = t(eventData.characterNameKey);
-            dom.eventAbilityDescription.textContent = t(eventData.abilityKey);
-            dom.eventRewardText.textContent = t('event.reward_text_placeholder', { rewardName: t(eventData.rewardTitleKey) });
+            dom.eventCharacterImage.src = `./${currentEventData.image}`;
+            dom.eventCharacterName.textContent = t(currentEventData.characterNameKey);
+            dom.eventAbilityDescription.textContent = t(currentEventData.abilityKey);
+            dom.eventRewardText.textContent = t('event.reward_text_placeholder', { rewardName: t(currentEventData.rewardTitleKey) });
 
             // Check if the player has already attempted the challenge today
             const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
             const lastAttemptDate = localStorage.getItem('reversus-event-attempt-date');
             const hasAttemptedToday = lastAttemptDate === today;
 
-            if (hasAttemptedToday) {
-                dom.challengeEventButton.disabled = true;
-                dom.eventStatusText.textContent = t('event.status_wait');
-            } else {
-                dom.challengeEventButton.disabled = false;
-                dom.eventStatusText.textContent = '';
-            }
-            
-            // This trick removes any old listeners and adds a fresh one, preventing duplicates.
-            const oldButton = dom.challengeEventButton;
-            const newButton = oldButton.cloneNode(true);
-            oldButton.parentNode.replaceChild(newButton, oldButton);
-            
-            newButton.addEventListener('click', () => {
-                // If button is somehow clicked while disabled, do nothing.
-                if (newButton.disabled) return;
-                
-                // Set the local storage flag to lock the event for today
-                localStorage.setItem('reversus-event-attempt-date', today);
-
-                const gameOptions = {
-                    story: { // Use story mode infrastructure for events
-                        battle: `event_${eventData.ai}`,
-                        eventData: {
-                            name: t(eventData.nameKey),
-                            ai: eventData.ai
-                        },
-                        playerIds: ['player-1', 'player-2'],
-                        overrides: {
-                            'player-2': {
-                                name: t(eventData.characterNameKey),
-                                aiType: eventData.ai
-                            }
-                        }
-                    }
-                };
-                initializeGame('solo', gameOptions);
-            });
-
+            dom.challengeEventButton.disabled = hasAttemptedToday;
+            dom.eventStatusText.textContent = hasAttemptedToday ? t('event.status_wait') : '';
         } else {
             // Fallback if no event is configured for the current month
             dom.eventCharacterImage.src = '';
             dom.eventCharacterName.textContent = 'Nenhum Evento Ativo';
             dom.eventAbilityDescription.textContent = 'Volte mais tarde para novos desafios.';
             dom.challengeEventButton.disabled = true;
+            dom.eventStatusText.textContent = '';
+            currentEventData = null;
         }
-
         dom.eventModal.classList.remove('hidden');
+    });
+
+    // This is the single, persistent listener for the challenge button.
+    dom.challengeEventButton.addEventListener('click', () => {
+        if (dom.challengeEventButton.disabled || !currentEventData) return;
+
+        // Set the local storage flag to lock the event for today
+        const today = new Date().toISOString().split('T')[0];
+        localStorage.setItem('reversus-event-attempt-date', today);
+
+        const gameOptions = {
+            story: { // Use story mode infrastructure for events
+                battle: `event_${currentEventData.ai}`,
+                eventData: {
+                    name: t(currentEventData.nameKey),
+                    ai: currentEventData.ai
+                },
+                playerIds: ['player-1', 'player-2'],
+                overrides: {
+                    'player-2': {
+                        name: t(currentEventData.characterNameKey),
+                        aiType: currentEventData.ai
+                    }
+                }
+            }
+        };
+        initializeGame('solo', gameOptions);
     });
     
     dom.rankingButton.addEventListener('click', () => {
