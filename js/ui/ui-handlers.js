@@ -133,42 +133,33 @@ async function handlePlayButtonClick() {
         return;
     }
 
-    // Handle targeting for effect cards
-    const allPlayers = gameState.playerIdsInGame.filter(id => !gameState.players[id].isEliminated);
+    // --- EFFECT CARDS ---
+    const targetableCards = ['Mais', 'Menos', 'Sobe', 'Desce', 'Pula', 'Reversus'];
 
-    switch (card.name) {
-        case 'Mais':
-        case 'Menos':
-        case 'Sobe':
-        case 'Desce':
-        case 'Pula':
-        case 'Reversus': {
-            if (allPlayers.length === 0) {
-                updateLog(`Não há jogadores para usar a carta '${card.name}'.`);
-                cancelPlayerAction();
-                return;
-            }
-            dom.targetModalCardName.textContent = card.name;
-            dom.targetPlayerButtonsEl.innerHTML = allPlayers.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${gameState.players[id].name}</button>`).join('');
-            dom.targetModal.classList.remove('hidden');
-            break;
+    if (targetableCards.includes(card.name)) {
+        const allPlayers = gameState.playerIdsInGame.filter(id => !gameState.players[id].isEliminated);
+        if (allPlayers.length === 0) {
+            updateLog(`Não há jogadores para usar a carta '${card.name}'.`);
+            cancelPlayerAction();
+            return;
         }
-        case 'Reversus Total': {
-            dom.reversusTotalChoiceModal.classList.remove('hidden');
-            break;
+        dom.targetModalCardName.textContent = card.name;
+        dom.targetPlayerButtonsEl.innerHTML = allPlayers.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${gameState.players[id].name}</button>`).join('');
+        dom.targetModal.classList.remove('hidden');
+    } else if (card.name === 'Reversus Total') {
+        dom.reversusTotalChoiceModal.classList.remove('hidden');
+    } else if (card.name === 'Carta da Versatrix') {
+        if (gameState.isPvp) {
+             network.emitPlayCard({ cardId: card.id, targetId: player.id });
+        } else {
+             await playCard(player, card, player.id);
         }
-        case 'Carta da Versatrix': {
-             if (gameState.isPvp) {
-                 network.emitPlayCard({ cardId: card.id, targetId: player.id });
-             } else {
-                 await playCard(player, card, player.id);
-             }
-             gameState.gamePhase = 'playing';
-             renderAll();
-             break;
-        }
-        default:
-             gameState.gamePhase = 'playing'; // Fallback
+        gameState.gamePhase = 'playing';
+        renderAll();
+    } else {
+        // Fallback for any other unhandled effect card
+        console.warn(`Unhandled effect card in handlePlayButtonClick: ${card.name}`);
+        cancelPlayerAction();
     }
 }
 
@@ -492,6 +483,7 @@ export function initializeUiHandlers() {
             return;
         }
 
+        // Handle the specific, multi-step cards first
         if (reversusTotalIndividualFlow && card.name === 'Reversus Total') {
             gameState.reversusTarget = targetId;
             dom.reversusIndividualEffectChoiceModal.classList.remove('hidden');
@@ -512,7 +504,7 @@ export function initializeUiHandlers() {
                  updateLog(`Não há caminhos vazios para usar 'Pula'.`);
                  cancelPlayerAction();
             }
-        } else if (['Mais', 'Menos', 'Sobe', 'Desce'].includes(card.name)) {
+        } else { // CATCH-ALL for simple targetable cards like 'Mais', 'Menos', 'Sobe', 'Desce'
             if (gameState.isPvp) {
                 network.emitPlayCard({ cardId: card.id, targetId: targetId });
             } else {
@@ -610,7 +602,6 @@ export function initializeUiHandlers() {
         dom.reversusTotalChoiceModal.classList.add('hidden');
         
         const { gameState } = getState();
-        const myPlayerId = getLocalPlayerId();
         const allPlayers = gameState.playerIdsInGame.filter(id => !gameState.players[id].isEliminated);
         
         dom.targetModalCardName.textContent = 'Reversus Individual';
