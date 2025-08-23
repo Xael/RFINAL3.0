@@ -192,6 +192,13 @@ export function emitChangeMode(mode) {
     }
 }
 
+export function emitStartGame() {
+    const { socket } = getState();
+    if (socket) {
+        socket.emit('startGame');
+    }
+}
+
 export function emitPlayCard({ cardId, targetId, options = {} }) {
     const { socket } = getState();
     if (socket) {
