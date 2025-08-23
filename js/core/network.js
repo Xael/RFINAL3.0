@@ -8,6 +8,29 @@ import { showSplashScreen } from '../ui/splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 
+/**
+ * Sets up the player areas in the UI so the local player is always at the bottom.
+ */
+function setupPlayerPerspective() {
+    const { gameState, playerId } = getState();
+    if (!gameState || !playerId || !gameState.playerIdsInGame) return;
+
+    const playerIds = gameState.playerIdsInGame;
+    if (!playerIds.includes(playerId)) return;
+    
+    const myIndex = playerIds.indexOf(playerId);
+    
+    // Create a new array with the local player first, followed by others in order
+    const orderedPlayerIds = [...playerIds.slice(myIndex), ...playerIds.slice(0, myIndex)];
+
+    const player1Container = document.getElementById('player-1-area-container');
+    const opponentsContainer = document.getElementById('opponent-zones-container');
+    const createPlayerAreaHTML = (id) => `<div class="player-area" id="player-area-${id}"></div>`;
+    
+    if(player1Container) player1Container.innerHTML = createPlayerAreaHTML(orderedPlayerIds[0]);
+    if(opponentsContainer) opponentsContainer.innerHTML = orderedPlayerIds.slice(1).map(id => createPlayerAreaHTML(id)).join('');
+}
+
 
 export function connectToServer() {
     const SERVER_URL = "https://reversus-node.dke42d.easypanel.host";
@@ -71,6 +94,18 @@ export function connectToServer() {
     
     socket.on('lobbyUpdate', (roomData) => {
         updateState('currentRoomId', roomData.id);
+
+        // --- CRITICAL FIX: Identify my playerId ---
+        const { clientId, userProfile } = getState();
+        const myPlayerData = roomData.players.find(p => p.id === clientId);
+        if (myPlayerData) {
+            updateState('playerId', myPlayerData.playerId);
+            if (userProfile) {
+                userProfile.playerId = myPlayerData.playerId;
+                updateState('userProfile', userProfile);
+            }
+        }
+        
         dom.pvpRoomListModal.classList.add('hidden');
         dom.pvpLobbyModal.classList.remove('hidden');
         updateLobbyUi(roomData);
@@ -79,9 +114,6 @@ export function connectToServer() {
     socket.on('gameStarted', (initialGameState) => {
         console.log('Game is starting!');
         updateState('gameState', initialGameState);
-
-        const { userProfile } = getState();
-        updateState('playerId', userProfile.playerId);
         
         dom.pvpLobbyModal.classList.add('hidden');
         dom.appContainerEl.classList.remove('hidden');
@@ -92,11 +124,26 @@ export function connectToServer() {
         updateGameTimer();
         updateState('gameTimerInterval', setInterval(updateGameTimer, 1000));
         
+        // --- CRITICAL FIX: Setup player perspective ---
+        setupPlayerPerspective();
         renderAll();
     });
 
     socket.on('gameStateUpdate', (gameState) => {
-        updateState('gameState', gameState);
+        const { gameState: localGameState } = getState();
+
+        // Preserve local UI state (like selected card) across updates
+        const localUiState = localGameState ? {
+            selectedCard: localGameState.selectedCard,
+            reversusTarget: localGameState.reversusTarget,
+            pulaTarget: localGameState.pulaTarget,
+        } : {};
+
+        const newGameState = { ...gameState, ...localUiState };
+        updateState('gameState', newGameState);
+
+        // --- CRITICAL FIX: Ensure perspective is maintained ---
+        setupPlayerPerspective();
         renderAll();
     });
 
