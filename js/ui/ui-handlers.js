@@ -152,13 +152,13 @@ async function handlePlayButtonClick() {
              break;
         }
         case 'Pula': {
-            if (opponents.length === 0) {
-                updateLog("Não há oponentes para usar a carta 'Pula'.");
+            if (allPlayers.length === 0) {
+                updateLog("Não há jogadores para usar a carta 'Pula'.");
                 cancelPlayerAction();
                 return;
             }
             dom.targetModalCardName.textContent = card.name;
-            dom.targetPlayerButtonsEl.innerHTML = opponents.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${gameState.players[id].name}</button>`).join('');
+            dom.targetPlayerButtonsEl.innerHTML = allPlayers.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${gameState.players[id].name}</button>`).join('');
             dom.targetModal.classList.remove('hidden');
             break;
         }
@@ -953,5 +953,19 @@ export function initializeUiHandlers() {
     
     dom.lobbyStartGameButton.addEventListener('click', () => {
         network.emitStartGame();
+    });
+    
+    // Field Effect Target Modal Handler (FIX for freeze)
+    dom.fieldEffectTargetModal.addEventListener('click', (e) => {
+        const button = e.target.closest('button');
+        if (!button) return;
+        
+        const { fieldEffectTargetResolver } = getState();
+        if (fieldEffectTargetResolver) {
+            const playerId = button.dataset.playerId;
+            fieldEffectTargetResolver(playerId); // Resolve the promise in story-abilities.js
+            updateState('fieldEffectTargetResolver', null);
+            dom.fieldEffectTargetModal.classList.add('hidden');
+        }
     });
 }
