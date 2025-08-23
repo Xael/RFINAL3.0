@@ -134,39 +134,19 @@ async function handlePlayButtonClick() {
     }
 
     // Handle targeting for effect cards
-    const opponents = gameState.playerIdsInGame.filter(id => id !== player.id && !gameState.players[id].isEliminated);
     const allPlayers = gameState.playerIdsInGame.filter(id => !gameState.players[id].isEliminated);
 
     switch (card.name) {
         case 'Mais':
         case 'Menos':
         case 'Sobe':
-        case 'Desce': {
-             if (gameState.isPvp) {
-                network.emitPlayCard({ cardId: card.id, targetId: player.id });
-             } else {
-                await playCard(player, card, player.id);
-             }
-             gameState.gamePhase = 'playing';
-             renderAll();
-             break;
-        }
-        case 'Pula': {
-            if (allPlayers.length === 0) {
-                updateLog("Não há jogadores para usar a carta 'Pula'.");
-                cancelPlayerAction();
-                return;
-            }
-            dom.targetModalCardName.textContent = card.name;
-            dom.targetPlayerButtonsEl.innerHTML = allPlayers.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${gameState.players[id].name}</button>`).join('');
-            dom.targetModal.classList.remove('hidden');
-            break;
-        }
+        case 'Desce':
+        case 'Pula':
         case 'Reversus': {
             if (allPlayers.length === 0) {
-                 updateLog("Não há jogadores para usar a carta 'Reversus'.");
-                 cancelPlayerAction();
-                 return;
+                updateLog(`Não há jogadores para usar a carta '${card.name}'.`);
+                cancelPlayerAction();
+                return;
             }
             dom.targetModalCardName.textContent = card.name;
             dom.targetPlayerButtonsEl.innerHTML = allPlayers.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${gameState.players[id].name}</button>`).join('');
@@ -291,6 +271,7 @@ export function initializeUiHandlers() {
         currentEventData = config.MONTHLY_EVENTS[currentMonth]; // Store current event data
 
         if (currentEventData) {
+            sound.playStoryMusic(`${currentEventData.ai}.ogg`); // Play event music
             // Populate the modal with the current month's event data, using translations
             dom.eventCharacterImage.src = `./${currentEventData.image}`;
             dom.eventCharacterName.textContent = t(currentEventData.characterNameKey);
@@ -305,6 +286,7 @@ export function initializeUiHandlers() {
             dom.challengeEventButton.disabled = hasAttemptedToday;
             dom.eventStatusText.textContent = hasAttemptedToday ? t('event.status_wait') : '';
         } else {
+            sound.playStoryMusic('tela.ogg'); // Revert to menu music if no event
             // Fallback if no event is configured for the current month
             dom.eventCharacterImage.src = '';
             dom.eventCharacterName.textContent = 'Nenhum Evento Ativo';
@@ -377,7 +359,10 @@ export function initializeUiHandlers() {
     // Ranking, Profile, and Event Modal Close Buttons
     dom.closeRankingButton.addEventListener('click', () => dom.rankingModal.classList.add('hidden'));
     dom.closeProfileButton.addEventListener('click', () => dom.profileModal.classList.add('hidden'));
-    dom.closeEventButton.addEventListener('click', () => dom.eventModal.classList.add('hidden'));
+    dom.closeEventButton.addEventListener('click', () => {
+        dom.eventModal.classList.add('hidden');
+        sound.playStoryMusic('tela.ogg'); // Revert to menu music
+    });
 
     // Tab handlers for Profile/Achievements Modal
     dom.profileModal.querySelectorAll('.profile-tab-button').forEach(button => {
@@ -491,32 +476,50 @@ export function initializeUiHandlers() {
     });
     
     // Targeting Modals Handlers
-    dom.targetPlayerButtonsEl.addEventListener('click', (e) => {
+    dom.targetPlayerButtonsEl.addEventListener('click', async (e) => {
         if (e.target.tagName !== 'BUTTON') return;
+        
         const targetId = e.target.dataset.playerId;
-        const { gameState } = getState();
+        const { gameState, reversusTotalIndividualFlow } = getState();
         const card = gameState.selectedCard;
+        const myPlayerId = getLocalPlayerId();
+        const player = gameState.players[myPlayerId];
+        
+        dom.targetModal.classList.add('hidden');
 
-        if (card.name === 'Reversus') {
+        if (!card || !player) {
+            cancelPlayerAction();
+            return;
+        }
+
+        if (reversusTotalIndividualFlow && card.name === 'Reversus Total') {
             gameState.reversusTarget = targetId;
-            dom.targetModal.classList.add('hidden');
+            dom.reversusIndividualEffectChoiceModal.classList.remove('hidden');
+        } else if (card.name === 'Reversus') {
+            gameState.reversusTarget = targetId;
             dom.reversusTargetModal.classList.remove('hidden');
         } else if (card.name === 'Pula') {
             gameState.pulaTarget = targetId;
-            dom.targetModal.classList.add('hidden');
-            
             const targetPlayer = gameState.players[targetId];
             const availablePaths = gameState.boardPaths.filter(p => !Object.values(gameState.players).some(pl => pl.pathId === p.id));
             
-            if(availablePaths.length > 0) {
-                dom.pulaModalTitle.textContent = `Jogar 'Pula' em ${targetPlayer.name}`;
-                dom.pulaModalText.textContent = `Escolha um caminho vazio para ${targetPlayer.name} pular:`;
-                dom.pulaPathButtonsEl.innerHTML = availablePaths.map(p => `<button class="control-button" data-path-id="${p.id}">Caminho ${p.id + 1}</button>`).join('');
+            if (availablePaths.length > 0) {
+                dom.pulaModalTitle.textContent = t('pula.title_with_target', { targetName: targetPlayer.name });
+                dom.pulaModalText.textContent = t('pula.description_with_target', { targetName: targetPlayer.name });
+                dom.pulaPathButtonsEl.innerHTML = availablePaths.map(p => `<button class="control-button" data-path-id="${p.id}">${t('pula.path_button', { pathNumber: p.id + 1 })}</button>`).join('');
                 dom.pulaModal.classList.remove('hidden');
             } else {
                  updateLog(`Não há caminhos vazios para usar 'Pula'.`);
                  cancelPlayerAction();
             }
+        } else if (['Mais', 'Menos', 'Sobe', 'Desce'].includes(card.name)) {
+            if (gameState.isPvp) {
+                network.emitPlayCard({ cardId: card.id, targetId: targetId });
+            } else {
+                await playCard(player, card, targetId);
+            }
+            gameState.gamePhase = 'playing';
+            renderAll();
         }
     });
 
