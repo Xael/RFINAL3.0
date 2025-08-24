@@ -154,16 +154,19 @@ export const stopStoryMusic = () => {
 /**
  * Updates the music player's state (playing/paused, volume) based on the global sound state.
  */
-export const updateMusic = async () => {
+export const updateMusic = () => {
     const { soundState, isMusicInitialized } = getState();
     if (soundState.muted) {
         dom.musicPlayer.pause();
     } else {
         if (isMusicInitialized) {
-            try {
-                await dom.musicPlayer.play();
-            } catch(e) {
-                console.error("Music play failed:", e);
+            const playPromise = dom.musicPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    if (error.name !== 'AbortError') {
+                        console.error("Music play failed:", error);
+                    }
+                });
             }
         }
     }

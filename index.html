@@ -140,10 +140,12 @@
     <!-- Ranking Modal -->
     <div id="ranking-modal" class="modal-overlay hidden">
         <div class="modal-content ranking-modal-content">
-            <h2 class="ranking-title" data-i18n="ranking.title">🏆 Ranking - Top 10 🏆</h2>
+            <h2 class="ranking-title" data-i18n="ranking.title">🏆 Ranking 🏆</h2>
             <div id="ranking-container">
-                <!-- Ranking data will be rendered here -->
                 <p data-i18n="ranking.loading">Carregando ranking...</p>
+            </div>
+            <div id="ranking-pagination" class="ranking-pagination">
+                <!-- Pagination buttons will be here -->
             </div>
             <button id="close-ranking-button" class="control-button" data-i18n="common.close">Fechar</button>
         </div>
@@ -155,15 +157,35 @@
             <div class="info-tabs">
                 <button class="profile-tab-button active" data-tab="profile-main" data-i18n="splash.profile">Perfil</button>
                 <button class="profile-tab-button" data-tab="profile-achievements" data-i18n="splash.achievements">Conquistas</button>
+                <button class="profile-tab-button" data-tab="profile-friends" data-i18n="splash.friends">Amigos</button>
             </div>
             <div id="profile-main-tab-content" class="info-tab-content active">
                 <div id="profile-data-container">
                     <p data-i18n="profile.loading">Carregando perfil...</p>
                 </div>
+                 <div id="profile-action-buttons" class="profile-action-buttons">
+                    <!-- Add/Remove Friend buttons will be injected here -->
+                </div>
             </div>
             <div id="profile-achievements-tab-content" class="info-tab-content">
                  <div id="achievements-grid" class="achievements-grid">
                     <!-- Achievements will be rendered here -->
+                </div>
+            </div>
+            <div id="profile-friends-tab-content" class="info-tab-content">
+                 <div class="friends-management-area">
+                    <h3 data-i18n="friends.add_title">Adicionar Amigo</h3>
+                    <div class="friends-search-container">
+                        <input type="text" id="friends-search-input" data-i18n-placeholder="friends.search_placeholder" placeholder="Buscar por nome de usuário...">
+                        <button id="friends-search-button" class="control-button" data-i18n="friends.search_button">Buscar</button>
+                    </div>
+                    <div id="friends-search-results" class="friends-list"></div>
+                </div>
+                <div class="friends-list-area">
+                    <h3 data-i18n="friends.list_title">Lista de Amigos</h3>
+                    <div id="friends-list-container" class="friends-list">
+                        <p data-i18n="friends.no_friends">Você ainda não adicionou nenhum amigo.</p>
+                    </div>
                 </div>
             </div>
             <button id="close-profile-button" class="control-button" data-i18n="common.close">Fechar</button>
@@ -300,6 +322,9 @@
     </div>
     
     <!-- Other Modals & Overlays -->
+    <div id="private-chat-panel" class="private-chat-panel hidden">
+        <!-- Chat windows will be injected here by JS -->
+    </div>
     <div id="cosmic-glow-overlay" class="hidden"></div>
     <div id="xael-popup" class="hidden"><img src="xael.png" alt="Xael Challenge"></div>
     

@@ -34,6 +34,7 @@
         "ranking": "Ranking",
         "profile": "Perfil",
         "achievements": "Conquistas",
+        "friends": "Amigos",
         "inversus": "INVERSUS",
         "version": "Versão 3.0"
     },
@@ -221,7 +222,7 @@
         "unlocked_toast": "{name}: {description}"
     },
     "ranking": {
-        "title": "🏆 Ranking - Top 10 🏆",
+        "title": "🏆 Ranking 🏆",
         "loading": "Carregando ranking...",
         "error": "Não foi possível carregar o ranking.",
         "empty": "O ranking ainda está vazio. Seja o primeiro a vencer!",
@@ -237,13 +238,34 @@
         "experience": "Experiência",
         "victories": "Vitórias",
         "defeats": "Derrotas",
+        "select_title": "Selecionar Título",
         "unlocked_titles": "Títulos Desbloqueados",
         "no_titles": "Nenhum título desbloqueado ainda.",
         "match_history": "Histórico de Partidas",
         "no_history": "Nenhuma partida registrada.",
         "outcome_win": "Vitória",
         "outcome_loss": "Derrota",
-        "avatar_alt": "Avatar do usuário"
+        "avatar_alt": "Avatar do usuário",
+        "add_friend": "Adicionar Amigo",
+        "remove_friend": "Remover Amigo",
+        "request_sent": "Solicitação Enviada"
+    },
+    "friends": {
+        "add_title": "Adicionar Amigo",
+        "search_placeholder": "Buscar por nome de usuário...",
+        "search_button": "Buscar",
+        "list_title": "Lista de Amigos",
+        "no_friends": "Você ainda não adicionou nenhum amigo.",
+        "no_results": "Nenhum jogador encontrado.",
+        "status_online": "Online",
+        "status_offline": "Offline",
+        "view_profile": "Ver Perfil",
+        "send_message": "Mensagem",
+        "remove": "Remover",
+        "add": "Adicionar"
+    },
+    "chat": {
+        "placeholder": "Digite uma mensagem..."
     },
     "event": {
         "title": "Evento Mensal",

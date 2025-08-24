@@ -33,12 +33,16 @@ export const renderRoomList = (rooms) => {
 
 
 export const renderRanking = (rankingData) => {
-    if (!rankingData) {
+    const { players, currentPage, totalPages } = rankingData;
+
+    if (!players) {
         dom.rankingContainer.innerHTML = `<p>${t('ranking.error')}</p>`;
+        dom.rankingPagination.innerHTML = '';
         return;
     }
-    if (rankingData.length === 0) {
+    if (players.length === 0 && currentPage === 1) {
         dom.rankingContainer.innerHTML = `<p>${t('ranking.empty')}</p>`;
+        dom.rankingPagination.innerHTML = '';
         return;
     }
 
@@ -52,11 +56,14 @@ export const renderRanking = (rankingData) => {
                 </tr>
             </thead>
             <tbody>
-                ${rankingData.map((player, index) => `
-                    <tr>
-                        <td class="rank-position">${index + 1}</td>
+                ${players.map(player => `
+                    <tr class="rank-${player.rank}">
+                        <td class="rank-position">${player.rank}</td>
                         <td><img src="${player.avatar_url}" alt="Avatar" class="rank-avatar"></td>
-                        <td class="rank-name">${player.username}</td>
+                        <td>
+                            <span class="rank-name clickable" data-google-id="${player.google_id}">${player.username}</span>
+                            <span class="rank-player-title">${player.title || ''}</span>
+                        </td>
                         <td>${player.victories}</td>
                     </tr>
                 `).join('')}
@@ -64,7 +71,16 @@ export const renderRanking = (rankingData) => {
         </table>
     `;
     dom.rankingContainer.innerHTML = tableHTML;
+
+    // Render pagination
+    const paginationHTML = `
+        <button id="rank-prev-btn" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button>
+        <span>Página ${currentPage} de ${totalPages}</span>
+        <button id="rank-next-btn" ${currentPage >= totalPages ? 'disabled' : ''}>&gt;</button>
+    `;
+    dom.rankingPagination.innerHTML = paginationHTML;
 };
+
 
 export const updateLobbyUi = (roomData) => {
     const { clientId } = getState();
@@ -77,14 +93,20 @@ export const updateLobbyUi = (roomData) => {
     const playerSlots = ['player-1', 'player-2', 'player-3', 'player-4'];
     
     playerSlots.forEach((slot, index) => {
-        const player = roomData.players[index];
+        const player = roomData.players.find(p => p.playerId === slot);
         const slotEl = document.createElement('div');
         slotEl.className = 'lobby-player-slot';
         slotEl.id = `lobby-player-${index + 1}`;
         
         if (player) {
             const hostStar = player.id === roomData.hostId ? ' <span class="master-star">★</span>' : '';
-            slotEl.innerHTML = `${player.username}${hostStar}`;
+            const playerTitle = player.title ? `<span class="player-title">${player.title}</span>` : '';
+            slotEl.innerHTML = `
+                <div>
+                    <span class="player-name clickable" data-google-id="${player.googleId}">${player.username}</span>${hostStar}
+                </div>
+                ${playerTitle}
+            `;
         } else {
             slotEl.textContent = t('pvp.waiting_player');
         }
