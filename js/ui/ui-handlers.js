@@ -904,32 +904,36 @@ export function initializeUiHandlers() {
         });
     }
     
-    dom.profileModal.addEventListener('click', (e) => {
-         if (e.target.matches('.add-friend-btn')) {
-            const userId = e.target.dataset.userId;
-            network.emitAddFriend(userId);
-            e.target.textContent = t('profile.request_sent');
-            e.target.disabled = true;
-        } else if (e.target.matches('.remove-friend-btn')) {
-            const userId = e.target.dataset.userId;
-            network.emitRemoveFriend(userId);
-            e.target.textContent = t('profile.add_friend');
-            e.target.classList.remove('cancel', 'remove-friend-btn');
-            e.target.classList.add('add-friend-btn');
-        }
-    });
+    if (dom.profileModal) {
+        dom.profileModal.addEventListener('click', (e) => {
+             if (e.target.matches('.add-friend-btn')) {
+                const userId = e.target.dataset.userId;
+                network.emitAddFriend(userId);
+                e.target.textContent = t('profile.request_sent');
+                e.target.disabled = true;
+            } else if (e.target.matches('.remove-friend-btn')) {
+                const userId = e.target.dataset.userId;
+                network.emitRemoveFriend(userId);
+                e.target.textContent = t('profile.add_friend');
+                e.target.classList.remove('cancel', 'remove-friend-btn');
+                e.target.classList.add('add-friend-btn');
+            }
+        });
+    }
 
-    dom.privateChatPanel.addEventListener('click', (e) => {
-        if (e.target.matches('.chat-window-close')) {
-            const userId = e.target.dataset.userId;
-            const chatWindow = document.getElementById(`chat-window-${userId}`);
-            if (chatWindow) {
-                chatWindow.remove();
-                activeChatWindows.delete(userId);
-                if (activeChatWindows.size === 0) {
-                    dom.privateChatPanel.classList.add('hidden');
+    if (dom.privateChatPanel) {
+        dom.privateChatPanel.addEventListener('click', (e) => {
+            if (e.target.matches('.chat-window-close')) {
+                const userId = e.target.dataset.userId;
+                const chatWindow = document.getElementById(`chat-window-${userId}`);
+                if (chatWindow) {
+                    chatWindow.remove();
+                    activeChatWindows.delete(userId);
+                    if (activeChatWindows.size === 0) {
+                        dom.privateChatPanel.classList.add('hidden');
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 }
