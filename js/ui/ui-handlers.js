@@ -71,7 +71,7 @@ export function openChatWindow(userId, username) {
         if (e.key === 'Enter') {
             const content = input.value.trim();
             if (content) {
-                network.emitSendPrivateMessage(userId, content);
+                network.emitSendPrivateMessage(parseInt(userId, 10), content);
                 input.value = '';
             }
         }
@@ -382,6 +382,7 @@ export function initializeUiHandlers() {
     dom.userProfileDisplay.addEventListener('click', () => {
         network.emitGetProfile();
         network.emitGetFriendsList();
+        network.emitGetPendingRequests();
         renderAchievementsModal();
         dom.profileModal.classList.remove('hidden');
     });
@@ -905,7 +906,7 @@ export function initializeUiHandlers() {
         dom.profileFriendsTabContent.addEventListener('click', (e) => {
             if (e.target.matches('.add-friend-btn')) {
                 const userId = e.target.dataset.userId;
-                network.emitAddFriend(userId);
+                network.emitSendFriendRequest(userId);
                 e.target.textContent = t('profile.request_sent');
                 e.target.disabled = true;
             }
@@ -931,20 +932,32 @@ export function initializeUiHandlers() {
             }
         });
     }
+
+    if(dom.friendRequestsListContainer) {
+        dom.friendRequestsListContainer.addEventListener('click', (e) => {
+            const target = e.target;
+            const requestId = target.dataset.requestId;
+            if(!requestId) return;
+
+            if (target.matches('.accept-request-btn')) {
+                network.emitRespondToRequest(requestId, 'accept');
+            } else if (target.matches('.decline-request-btn')) {
+                network.emitRespondToRequest(requestId, 'decline');
+            }
+        });
+    }
     
     if (dom.profileModal) {
         dom.profileModal.addEventListener('click', (e) => {
              if (e.target.matches('.add-friend-btn')) {
                 const userId = e.target.dataset.userId;
-                network.emitAddFriend(userId);
+                network.emitSendFriendRequest(userId);
                 e.target.textContent = t('profile.request_sent');
                 e.target.disabled = true;
             } else if (e.target.matches('.remove-friend-btn')) {
                 const userId = e.target.dataset.userId;
                 network.emitRemoveFriend(userId);
-                e.target.textContent = t('profile.add_friend');
-                e.target.classList.remove('cancel', 'remove-friend-btn');
-                e.target.classList.add('add-friend-btn');
+                 // The button will be updated when the profile re-renders after the friend list is updated
             }
         });
     }

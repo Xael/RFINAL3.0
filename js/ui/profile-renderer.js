@@ -13,6 +13,7 @@ function xpForLevel(level) {
 export function renderProfile(profileData) {
     if (!profileData) return;
     const { userProfile: myProfile } = getState();
+    if (!myProfile) return;
     const isMyProfile = myProfile.google_id === profileData.google_id;
 
     // --- 1. Renderizar o Display do Cabeçalho (se for meu perfil) ---
@@ -97,10 +98,16 @@ export function renderProfile(profileData) {
     const actionButtonsContainer = document.getElementById('profile-action-buttons');
     if (!isMyProfile) {
         let buttonHTML = '';
-        if (profileData.friendshipStatus === 'friends') {
-            buttonHTML = `<button class="control-button cancel remove-friend-btn" data-user-id="${profileData.id}">${t('profile.remove_friend')}</button>`;
-        } else {
-            buttonHTML = `<button class="control-button add-friend-btn" data-user-id="${profileData.id}">${t('profile.add_friend')}</button>`;
+        switch(profileData.friendshipStatus) {
+            case 'friends':
+                buttonHTML = `<button class="control-button cancel remove-friend-btn" data-user-id="${profileData.id}">${t('profile.remove_friend')}</button>`;
+                break;
+            case 'pending':
+                buttonHTML = `<button class="control-button" disabled>${t('profile.request_sent')}</button>`;
+                break;
+            default: // 'none'
+                buttonHTML = `<button class="control-button add-friend-btn" data-user-id="${profileData.id}">${t('profile.add_friend')}</button>`;
+                break;
         }
         actionButtonsContainer.innerHTML = buttonHTML;
     } else {
@@ -155,6 +162,27 @@ export function renderFriendsList(friends) {
         `}).join('');
 }
 
+export function renderFriendRequests(requests) {
+    const container = dom.friendRequestsListContainer;
+    if (!container) return;
+    if (!requests || requests.length === 0) {
+        container.innerHTML = `<p>${t('friends.no_requests')}</p>`;
+        return;
+    }
+    container.innerHTML = requests.map(req => `
+        <div class="friend-item friend-request-item" id="friend-request-${req.id}">
+            <img src="${req.avatar_url}" alt="Avatar" class="friend-avatar">
+            <div class="friend-info">
+                <span class="friend-name">${req.username}</span>
+            </div>
+            <div class="friend-actions">
+                <button class="control-button btn-p3-color accept-request-btn" data-request-id="${req.id}">${t('friends.accept')}</button>
+                <button class="control-button cancel decline-request-btn" data-request-id="${req.id}">${t('friends.decline')}</button>
+            </div>
+        </div>
+    `).join('');
+}
+
 export function updateFriendStatusIndicator(userId, isOnline) {
     const statusEl = document.getElementById(`friend-status-${userId}`);
     const messageBtn = document.querySelector(`.send-message-btn[data-user-id="${userId}"]`);
@@ -169,23 +197,28 @@ export function updateFriendStatusIndicator(userId, isOnline) {
 
 export function addPrivateChatMessage(message) {
     const { userProfile } = getState();
+    if (!userProfile) return;
+
     const isSentByMe = message.senderId === userProfile.id;
     const chatPartnerId = isSentByMe ? message.recipientId : message.senderId;
+    const chatPartnerUsername = isSentByMe ? null : message.senderUsername;
 
     let chatWindow = document.getElementById(`chat-window-${chatPartnerId}`);
+    // If window doesn't exist and the message is for me, open it.
+    if (!chatWindow && !isSentByMe) {
+        openChatWindow(chatPartnerId, chatPartnerUsername);
+        chatWindow = document.getElementById(`chat-window-${chatPartnerId}`);
+    }
+
     if (!chatWindow) {
-        if (!isSentByMe && message.senderUsername) {
-            openChatWindow(message.senderId, message.senderUsername);
-            chatWindow = document.getElementById(`chat-window-${chatPartnerId}`);
-        } else {
-             console.log("Received a message for a chat that is not open, but couldn't open window.", message);
-             return;
-        }
+        console.log("Chat window not found for message:", message);
+        return;
     }
     
     const messagesContainer = chatWindow.querySelector('.chat-window-messages');
     const messageEl = document.createElement('div');
     messageEl.className = `chat-message ${isSentByMe ? 'sent' : 'received'}`;
+    // Sanitize message content before inserting
     messageEl.textContent = message.content;
     messagesContainer.appendChild(messageEl);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;

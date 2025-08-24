@@ -268,7 +268,9 @@
         "remove": "Remove",
         "add": "Add",
         "accept": "Accept",
-        "decline": "Decline"
+        "decline": "Decline",
+        "new_request_alert": "You have a new friend request from {username}!",
+        "request_accepted_alert": "{username} accepted your friend request!"
     },
     "chat": {
         "placeholder": "Type a message..."

@@ -3,10 +3,11 @@ import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
-import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator } from '../ui/profile-renderer.js';
+import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests } from '../ui/profile-renderer.js';
 import { showSplashScreen } from '../ui/splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
+import { t } from './i18n.js';
 
 /**
  * Sets up the player areas in the UI so the local player is always at the bottom.
@@ -61,6 +62,7 @@ export function connectToServer() {
         dom.rankingButton.classList.remove('hidden'); 
         dom.eventButton.classList.remove('hidden');
         emitGetFriendsList(); // Carrega a lista de amigos após o login
+        emitGetPendingRequests(); // Carrega pedidos pendentes
     });
 
     socket.on('loginError', (message) => {
@@ -105,6 +107,26 @@ export function connectToServer() {
 
     socket.on('friendsList', (friends) => {
         renderFriendsList(friends);
+    });
+
+    socket.on('pendingRequestsData', (requests) => {
+        renderFriendRequests(requests);
+        dom.friendRequestBadge.classList.toggle('hidden', requests.length === 0);
+    });
+
+    socket.on('newFriendRequest', (request) => {
+        alert(t('friends.new_request_alert', { username: request.username }));
+        dom.friendRequestBadge.classList.remove('hidden');
+        // Opcional: Adicionar dinamicamente à lista se o modal de perfil estiver aberto
+        if (!dom.profileModal.classList.contains('hidden')) {
+            emitGetPendingRequests(); // Recarrega a lista para mostrar a nova
+        }
+    });
+
+    socket.on('friendRequestResponded', ({ username, action }) => {
+        if (action === 'accept') {
+            alert(t('friends.request_accepted_alert', { username }));
+        }
     });
     
     socket.on('friendStatusUpdate', ({ userId, isOnline }) => {
@@ -211,7 +233,9 @@ export function emitChangeMode(mode) { const { socket } = getState(); if (socket
 export function emitStartGame() { const { socket } = getState(); if (socket) socket.emit('startGame'); }
 export function emitPlayCard({ cardId, targetId, options = {} }) { const { socket } = getState(); if (socket) socket.emit('playCard', { cardId, targetId, options }); }
 export function emitSearchUsers(query) { const { socket } = getState(); if (socket) socket.emit('searchUsers', { query }); }
-export function emitAddFriend(targetUserId) { const { socket } = getState(); if (socket) socket.emit('addFriend', { targetUserId }); }
+export function emitSendFriendRequest(targetUserId) { const { socket } = getState(); if (socket) socket.emit('sendFriendRequest', { targetUserId }); }
+export function emitRespondToRequest(requestId, action) { const { socket } = getState(); if(socket) socket.emit('respondToRequest', { requestId, action }); }
+export function emitGetPendingRequests() { const { socket } = getState(); if(socket) socket.emit('getPendingRequests'); }
 export function emitRemoveFriend(targetUserId) { const { socket } = getState(); if (socket) socket.emit('removeFriend', { targetUserId }); }
 export function emitGetFriendsList() { const { socket } = getState(); if (socket) socket.emit('getFriendsList'); }
 export function emitSendPrivateMessage(recipientId, content) { const { socket } = getState(); if (socket) socket.emit('sendPrivateMessage', { recipientId, content }); }
