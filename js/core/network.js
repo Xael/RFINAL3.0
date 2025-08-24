@@ -135,17 +135,8 @@ export function connectToServer() {
         
         dom.pvpRoomListModal.classList.add('hidden');
         dom.pvpLobbyModal.classList.remove('hidden');
-
-        // Fetch titles for lobby
-        const playersWithTitles = await Promise.all(roomData.players.map(async (p) => {
-            const profile = await new Promise(resolve => {
-                socket.emit('viewProfile', { googleId: p.googleId });
-                socket.once('viewProfileData', resolve);
-            });
-            return { ...p, title: profile.selected_title || '' };
-        }));
         
-        updateLobbyUi({ ...roomData, players: playersWithTitles });
+        updateLobbyUi(roomData);
     });
 
     socket.on('lobbyChatMessage', ({ speaker, message }) => {
@@ -188,7 +179,7 @@ export function connectToServer() {
     socket.on('gameOver', ({ message, winnerId }) => {
         const { gameState } = getState();
         if (gameState) {
-             emitGameFinished(winnerId, [], gameState.gameMode);
+             emitGameFinished(winnerId, gameState.gameMode);
         }
         showGameOver(message, "Fim de Jogo!", { action: 'menu' });
     });
@@ -205,7 +196,12 @@ export function emitGetProfile() { const { socket } = getState(); if (socket) so
 export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
 export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
 export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
-export function emitGameFinished(winnerId, loserIds, mode) { const { socket } = getState(); if (socket) socket.emit('gameFinished', { winnerId, loserIds, mode }); }
+export function emitGameFinished(winnerId, mode) {
+    const { socket, currentRoomId } = getState();
+    if (socket && winnerId && currentRoomId) {
+        socket.emit('gameFinished', { winnerId, roomId: currentRoomId, mode });
+    }
+}
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
 export function emitCreateRoom() { const { socket } = getState(); if (socket) socket.emit('createRoom'); }
 export function emitJoinRoom(roomId) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId }); }

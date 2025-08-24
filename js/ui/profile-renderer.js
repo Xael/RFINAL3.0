@@ -35,13 +35,16 @@ export function renderProfile(profileData) {
     // --- 2. Renderizar o Modal de Perfil Detalhado ---
     const lang = getCurrentLanguage().replace('_', '-');
     const joinDate = new Date(profileData.created_at).toLocaleDateString(lang);
+    const selectedTitleText = profileData.selected_title_code ? t(`titles.${profileData.selected_title_code}`) : '';
+
 
     const titlesHTML = isMyProfile ? (profileData.titles || []).reduce((acc, title) => {
         if (!acc[title.line]) acc[title.line] = '';
+        const titleName = t(`titles.${title.code}`) || title.name;
         acc[title.line] += `
             <li>
                 <input type="radio" id="title-${title.code}" name="selected-title" value="${title.code}" ${profileData.selected_title_code === title.code ? 'checked' : ''}>
-                <label for="title-${title.code}">${title.name}</label>
+                <label for="title-${title.code}">${titleName}</label>
             </li>`;
         return acc;
     }, {}) : {};
@@ -67,7 +70,7 @@ export function renderProfile(profileData) {
             <div class="profile-sidebar">
                 <img src="${profileData.avatar_url}" alt="${t('profile.avatar_alt')}" class="profile-avatar">
                 <h2 class="profile-username">${profileData.username}</h2>
-                <p class="profile-title-display">${profileData.selected_title || ''}</p>
+                <p class="profile-title-display">${selectedTitleText}</p>
                 <p class="profile-joindate">${t('profile.since', { date: joinDate })}</p>
             </div>
             <div class="profile-main-content">
@@ -131,23 +134,25 @@ export function renderFriendsList(friends) {
         container.innerHTML = `<p>${t('friends.no_friends')}</p>`;
         return;
     }
-    container.innerHTML = friends.map(friend => `
-        <div class="friend-item" id="friend-item-${friend.id}">
-            <img src="${friend.avatar_url}" alt="Avatar" class="friend-avatar">
-            <div class="friend-info">
-                <span class="friend-name">
-                    <div class="friend-status ${friend.isOnline ? 'online' : 'offline'}" id="friend-status-${friend.id}" title="${t(friend.isOnline ? 'friends.status_online' : 'friends.status_offline')}"></div>
-                    ${friend.username}
-                </span>
-                <span class="friend-title">${friend.title || ''}</span>
+    container.innerHTML = friends.map(friend => {
+        const titleText = friend.selected_title_code ? t(`titles.${friend.selected_title_code}`) : '';
+        return `
+            <div class="friend-item" id="friend-item-${friend.id}">
+                <img src="${friend.avatar_url}" alt="Avatar" class="friend-avatar">
+                <div class="friend-info">
+                    <span class="friend-name">
+                        <div class="friend-status ${friend.isOnline ? 'online' : 'offline'}" id="friend-status-${friend.id}" title="${t(friend.isOnline ? 'friends.status_online' : 'friends.status_offline')}"></div>
+                        ${friend.username}
+                    </span>
+                    <span class="friend-title">${titleText}</span>
+                </div>
+                <div class="friend-actions">
+                    <button class="control-button view-profile-btn" data-google-id="${friend.google_id}">${t('friends.view_profile')}</button>
+                    <button class="control-button send-message-btn" data-user-id="${friend.id}" data-username="${friend.username}" ${!friend.isOnline ? 'disabled' : ''}>${t('friends.send_message')}</button>
+                    <button class="control-button cancel remove-friend-btn" data-user-id="${friend.id}">${t('friends.remove')}</button>
+                </div>
             </div>
-            <div class="friend-actions">
-                <button class="control-button view-profile-btn" data-google-id="${friend.google_id}">${t('friends.view_profile')}</button>
-                <button class="control-button send-message-btn" data-user-id="${friend.id}" data-username="${friend.username}" ${!friend.isOnline ? 'disabled' : ''}>${t('friends.send_message')}</button>
-                <button class="control-button cancel remove-friend-btn" data-user-id="${friend.id}">${t('friends.remove')}</button>
-            </div>
-        </div>
-    `).join('');
+        `}).join('');
 }
 
 export function updateFriendStatusIndicator(userId, isOnline) {

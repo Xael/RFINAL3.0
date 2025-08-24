@@ -333,6 +333,34 @@ export function initializeUiHandlers() {
         dom.rankingModal.classList.remove('hidden');
     });
 
+    // Delegated listener for clicking names in the ranking modal
+    if (dom.rankingContainer) {
+        dom.rankingContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('.rank-name.clickable');
+            if (target) {
+                const googleId = target.dataset.googleId;
+                if (googleId) {
+                    network.emitViewProfile(googleId);
+                }
+            }
+        });
+    }
+
+
+    // Delegated listener for clicking names in the PvP lobby
+    if (dom.pvpLobbyModal) {
+        dom.pvpLobbyModal.addEventListener('click', (e) => {
+            const target = e.target.closest('.lobby-player-grid .clickable');
+            if(target) {
+                const googleId = target.dataset.googleId;
+                if (googleId) {
+                    network.emitViewProfile(googleId);
+                }
+            }
+        });
+    }
+
+
     dom.storyNewGameButton.addEventListener('click', () => {
         dom.storyStartOptionsModal.classList.add('hidden');
         startStoryMode();

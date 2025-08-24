@@ -51,6 +51,7 @@
 
     <!-- User Profile & Login -->
     <div id="user-profile-display" class="user-profile-display hidden">
+        <div id="friend-request-badge" class="friend-request-badge hidden">!</div>
         <img id="user-avatar" src="" alt="User Avatar">
         <div class="user-info">
              <span id="user-name"></span>
@@ -181,10 +182,18 @@
                     </div>
                     <div id="friends-search-results" class="friends-list"></div>
                 </div>
-                <div class="friends-list-area">
-                    <h3 data-i18n="friends.list_title">Lista de Amigos</h3>
-                    <div id="friends-list-container" class="friends-list">
-                        <p data-i18n="friends.no_friends">Você ainda não adicionou nenhum amigo.</p>
+                <div class="friends-display-area">
+                    <div class="friend-requests-area">
+                        <h3 data-i18n="friends.requests_title">Pedidos de Amizade</h3>
+                        <div id="friend-requests-list-container" class="friends-list">
+                            <p data-i18n="friends.no_requests">Nenhum pedido de amizade pendente.</p>
+                        </div>
+                    </div>
+                    <div class="friends-list-area">
+                        <h3 data-i18n="friends.list_title">Lista de Amigos</h3>
+                        <div id="friends-list-container" class="friends-list">
+                            <p data-i18n="friends.no_friends">Você ainda não adicionou nenhum amigo.</p>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -56,17 +56,19 @@ export const renderRanking = (rankingData) => {
                 </tr>
             </thead>
             <tbody>
-                ${players.map(player => `
+                ${players.map(player => {
+                    const titleText = player.selected_title_code ? t(`titles.${player.selected_title_code}`) : '';
+                    return `
                     <tr class="rank-${player.rank}">
                         <td class="rank-position">${player.rank}</td>
                         <td><img src="${player.avatar_url}" alt="Avatar" class="rank-avatar"></td>
                         <td>
                             <span class="rank-name clickable" data-google-id="${player.google_id}">${player.username}</span>
-                            <span class="rank-player-title">${player.title || ''}</span>
+                            <span class="rank-player-title">${titleText}</span>
                         </td>
                         <td>${player.victories}</td>
                     </tr>
-                `).join('')}
+                `}).join('')}
             </tbody>
         </table>
     `;
@@ -100,7 +102,7 @@ export const updateLobbyUi = (roomData) => {
         
         if (player) {
             const hostStar = player.id === roomData.hostId ? ' <span class="master-star">★</span>' : '';
-            const playerTitle = player.title ? `<span class="player-title">${player.title}</span>` : '';
+            const playerTitle = player.title_code ? `<span class="player-title">${t(`titles.${player.title_code}`)}</span>` : '';
             slotEl.innerHTML = `
                 <div>
                     <span class="player-name clickable" data-google-id="${player.googleId}">${player.username}</span>${hostStar}

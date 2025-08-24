@@ -2700,18 +2700,16 @@ body.screen-shaking {
 }
 
 /* --- GOOGLE SIGN IN & USER PROFILE --- */
-#google-signin-container {
+#google-signin-container,
+#user-profile-display {
     position: fixed;
-    bottom: 10px;
-    right: 60px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2001;
 }
 
 .user-profile-display {
-    position: fixed;
-    top: 10px;
-    left: 60px;
-    z-index: 2001;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -2723,10 +2721,30 @@ body.screen-shaking {
     color: var(--text-primary);
     cursor: pointer;
     transition: background-color 0.2s;
+    position: relative;
 }
 .user-profile-display:hover {
     background-color: rgba(29, 53, 87, 0.8);
 }
+
+.friend-request-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--accent-red);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border: 2px solid var(--bg-main);
+    animation: pulse-red 1.5s infinite;
+}
+
 .user-info {
     display: flex;
     flex-direction: column;
@@ -3004,18 +3022,24 @@ body.screen-shaking {
 /* --- FRIENDS TAB --- */
 #profile-friends-tab-content {
     display: none;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 300px 1fr;
     gap: 2rem;
     align-items: start;
 }
 #profile-friends-tab-content.active {
     display: grid;
 }
-.friends-management-area, .friends-list-area {
+.friends-management-area {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
+.friends-display-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
 .friends-search-container {
     display: flex;
     gap: 0.5rem;
@@ -3032,7 +3056,7 @@ body.screen-shaking {
     background: rgba(0,0,0,0.2);
     border-radius: 8px;
     padding: 1rem;
-    min-height: 200px;
+    min-height: 150px;
     max-height: 400px;
     overflow-y: auto;
     display: flex;
@@ -3086,6 +3110,11 @@ body.screen-shaking {
     padding: 5px 10px;
     font-size: 0.8rem;
 }
+
+.friend-request-item .control-button.btn-p3-color {
+    background: var(--accent-green);
+}
+
 
 /* --- PRIVATE CHAT --- */
 .private-chat-panel {

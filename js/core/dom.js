@@ -224,6 +224,8 @@ export const friendsSearchButton = document.getElementById('friends-search-butto
 export const friendsSearchInput = document.getElementById('friends-search-input');
 export const profileFriendsTabContent = document.getElementById('profile-friends-tab-content');
 export const friendsListContainer = document.getElementById('friends-list-container');
+export const friendRequestsListContainer = document.getElementById('friend-requests-list-container');
+export const friendRequestBadge = document.getElementById('friend-request-badge');
 
 // Chat
 export const privateChatPanel = document.getElementById('private-chat-panel');
