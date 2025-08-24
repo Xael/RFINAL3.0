@@ -218,3 +218,9 @@ export const eventRewardText = document.getElementById('event-reward-text');
 export const eventStatusText = document.getElementById('event-status-text');
 export const challengeEventButton = document.getElementById('challenge-event-button');
 export const closeEventButton = document.getElementById('close-event-button');
+
+// Friends Tab
+export const friendsSearchButton = document.getElementById('friends-search-button');
+export const friendsSearchInput = document.getElementById('friends-search-input');
+export const profileFriendsTabContent = document.getElementById('profile-friends-tab-content');
+export const friendsListContainer = document.getElementById('friends-list-container');

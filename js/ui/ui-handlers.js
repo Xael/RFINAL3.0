@@ -866,36 +866,43 @@ export function initializeUiHandlers() {
     });
     
     // Friends & Chat Handlers
-    document.getElementById('friends-search-button').addEventListener('click', () => {
-        const query = document.getElementById('friends-search-input').value.trim();
-        if (query) network.emitSearchUsers(query);
-    });
+    if (dom.friendsSearchButton) {
+        dom.friendsSearchButton.addEventListener('click', () => {
+            const query = dom.friendsSearchInput ? dom.friendsSearchInput.value.trim() : '';
+            if (query) network.emitSearchUsers(query);
+        });
+    }
 
-    document.getElementById('profile-friends-tab-content').addEventListener('click', (e) => {
-        if (e.target.matches('.add-friend-btn')) {
-            const userId = e.target.dataset.userId;
-            network.emitAddFriend(userId);
-            e.target.textContent = t('profile.request_sent');
-            e.target.disabled = true;
-        }
-    });
-    
-    document.getElementById('friends-list-container').addEventListener('click', (e) => {
-        const target = e.target;
-        if (target.matches('.remove-friend-btn')) {
-            const userId = target.dataset.userId;
-            if (confirm(t('confirm.remove_friend', { username: 'este amigo' }))) {
-                 network.emitRemoveFriend(userId);
+    if (dom.profileFriendsTabContent) {
+        dom.profileFriendsTabContent.addEventListener('click', (e) => {
+            if (e.target.matches('.add-friend-btn')) {
+                const userId = e.target.dataset.userId;
+                network.emitAddFriend(userId);
+                e.target.textContent = t('profile.request_sent');
+                e.target.disabled = true;
             }
-        } else if (target.matches('.view-profile-btn')) {
-            const googleId = target.dataset.googleId;
-            network.emitViewProfile(googleId);
-        } else if (target.matches('.send-message-btn')) {
-            const userId = target.dataset.userId;
-            const username = target.dataset.username;
-            openChatWindow(userId, username);
-        }
-    });
+        });
+    }
+    
+    if (dom.friendsListContainer) {
+        dom.friendsListContainer.addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.matches('.remove-friend-btn')) {
+                const userId = target.dataset.userId;
+                const username = target.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este amigo';
+                if (confirm(t('confirm.remove_friend', { username }))) {
+                     network.emitRemoveFriend(userId);
+                }
+            } else if (target.matches('.view-profile-btn')) {
+                const googleId = target.dataset.googleId;
+                network.emitViewProfile(googleId);
+            } else if (target.matches('.send-message-btn')) {
+                const userId = target.dataset.userId;
+                const username = target.dataset.username;
+                openChatWindow(userId, username);
+            }
+        });
+    }
     
     dom.profileModal.addEventListener('click', (e) => {
          if (e.target.matches('.add-friend-btn')) {

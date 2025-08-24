@@ -215,7 +215,8 @@
         "exit_yes": "Yes, Exit",
         "xael_power_title": "Activate Star Power?",
         "xael_power_text": "The \"Stellar Revelation\" ability will reveal the hands of all opponents for an entire round. This action cannot be undone.",
-        "xael_power_yes": "Activate"
+        "xael_power_yes": "Activate",
+        "remove_friend": "Are you sure you want to remove {username} from your friends list?"
     },
     "achievements": {
         "title": "Achievements",
