@@ -1,12 +1,9 @@
 // js/ui/ui-handlers.js
-
-
-
 import * as dom from '../core/dom.js';
 import { getState, updateState } from '../core/state.js';
 import { initializeGame, restartLastDuel } from '../game-controller.js';
 import { renderAchievementsModal } from './achievements-renderer.js';
-import { renderAll, updateActionButtons, showGameOver } from './ui-renderer.js';
+import { renderAll } from './ui-renderer.js';
 import * as sound from '../core/sound.js';
 import { startStoryMode, renderStoryNode, playEndgameSequence } from '../story/story-controller.js';
 import * as saveLoad from '../core/save-load.js';
@@ -14,7 +11,7 @@ import * as achievements from '../core/achievements.js';
 import { updateLog } from '../core/utils.js';
 import * as config from '../core/config.js';
 import * as network from '../core/network.js';
-import { createCosmicGlowOverlay, shatterImage } from './animations.js';
+import { shatterImage } from './animations.js';
 import { announceEffect } from '../core/sound.js';
 import { playCard } from '../game-logic/player-actions.js';
 import { advanceToNextPlayer } from '../game-logic/turn-manager.js';
@@ -23,22 +20,63 @@ import { showSplashScreen } from './splash-screen.js';
 import { renderProfile } from './profile-renderer.js';
 
 let currentEventData = null;
+const activeChatWindows = new Set();
 
 /**
  * Gets the ID of the local human player.
- * In PvP, this is the ID assigned by the server.
- * In single-player, this is the player with the `isHuman` flag.
  * @returns {string | null} The player ID or null if not found.
  */
 function getLocalPlayerId() {
     const { gameState, playerId } = getState();
     if (!gameState) return null;
     if (gameState.isPvp) return playerId;
-    
     const humanPlayer = Object.values(gameState.players).find(p => p.isHuman);
     return humanPlayer ? humanPlayer.id : null;
 }
 
+/**
+ * Creates and manages a private chat window for a specific user.
+ * This function is now exported to be used by other modules.
+ * @param {string} userId - The ID of the user to chat with.
+ * @param {string} username - The username of the user to chat with.
+ */
+export function openChatWindow(userId, username) {
+    if (activeChatWindows.has(userId)) {
+        const existingWindow = document.getElementById(`chat-window-${userId}`);
+        if (existingWindow) existingWindow.querySelector('.chat-window-input').focus();
+        return;
+    }
+    activeChatWindows.add(userId);
+    dom.privateChatPanel.classList.remove('hidden');
+
+    const chatWindow = document.createElement('div');
+    chatWindow.className = 'chat-window';
+    chatWindow.id = `chat-window-${userId}`;
+    chatWindow.innerHTML = `
+        <div class="chat-window-header">
+            <span>${username}</span>
+            <button class="chat-window-close" data-user-id="${userId}">&times;</button>
+        </div>
+        <div class="chat-window-messages"></div>
+        <div class="chat-window-input-area">
+            <input type="text" class="chat-window-input" placeholder="${t('chat.placeholder')}">
+        </div>
+    `;
+    dom.privateChatPanel.appendChild(chatWindow);
+
+    const input = chatWindow.querySelector('.chat-window-input');
+    input.focus();
+
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const content = input.value.trim();
+            if (content) {
+                network.emitSendPrivateMessage(userId, content);
+                input.value = '';
+            }
+        }
+    });
+}
 
 /**
  * Resets the game state after a player cancels an action modal.
@@ -81,7 +119,6 @@ function handleCardClick(e) {
     const card = player.hand.find(c => String(c.id) === cardId);
     if (!card) return;
 
-    // Handle card viewer click
     if (e.target.classList.contains('card-maximize-button')) {
         const isHidden = cardEl.style.backgroundImage.includes('verso');
         if (isHidden) return;
@@ -90,13 +127,12 @@ function handleCardClick(e) {
         return;
     }
 
-    // Handle card selection for playing
     if (gameState.currentPlayer !== myPlayerId || cardEl.classList.contains('disabled')) {
         return;
     }
 
     if (gameState.selectedCard?.id === card.id) {
-        gameState.selectedCard = null; // Deselect
+        gameState.selectedCard = null;
     } else {
         gameState.selectedCard = card;
     }
@@ -119,7 +155,7 @@ async function handlePlayButtonClick() {
 
     if (!player || !card) return;
 
-    gameState.gamePhase = 'paused'; // Prevent other actions while modals are open
+    gameState.gamePhase = 'paused';
     renderAll();
 
     if (card.type === 'value') {
@@ -133,7 +169,6 @@ async function handlePlayButtonClick() {
         return;
     }
 
-    // --- EFFECT CARDS ---
     const targetableCards = ['Mais', 'Menos', 'Sobe', 'Desce', 'Pula', 'Reversus'];
 
     if (targetableCards.includes(card.name)) {
@@ -157,7 +192,6 @@ async function handlePlayButtonClick() {
         gameState.gamePhase = 'playing';
         renderAll();
     } else {
-        // Fallback for any other unhandled effect card
         console.warn(`Unhandled effect card in handlePlayButtonClick: ${card.name}`);
         cancelPlayerAction();
     }
@@ -187,7 +221,7 @@ function handleEndTurnButtonClick() {
     } else {
         updateLog(`${player.name} passou o turno.`);
         gameState.consecutivePasses++;
-        advanceToNextPlayer(); // Call directly to fix the game getting stuck
+        advanceToNextPlayer();
     }
 }
 
@@ -215,11 +249,8 @@ function handleFieldEffectIndicatorClick(e) {
 
 
 export function initializeUiHandlers() {
-    // This listener connects the AI's turn completion signal to the function
-    // that advances the game to the next player. It's crucial for the game flow.
     document.addEventListener('aiTurnEnded', advanceToNextPlayer);
     
-    // Game Action Handlers
     document.body.addEventListener('click', (e) => {
         if (e.target.closest('.player-hand')) handleCardClick(e);
         if (e.target.closest('.field-effect-indicator')) handleFieldEffectIndicatorClick(e);
@@ -229,7 +260,6 @@ export function initializeUiHandlers() {
     dom.endTurnButton.addEventListener('click', handleEndTurnButtonClick);
     dom.cardViewerCloseButton.addEventListener('click', () => dom.cardViewerModalEl.classList.add('hidden'));
     
-    // Splash Screen Handlers
     dom.quickStartButton.addEventListener('click', () => {
         sound.initializeMusic();
         dom.splashScreenEl.classList.add('hidden');
@@ -238,7 +268,6 @@ export function initializeUiHandlers() {
     
     dom.storyModeButton.addEventListener('click', () => {
         sound.initializeMusic();
-        // Check for saved game and update the continue button
         const hasSave = localStorage.getItem('reversus-story-save');
         dom.storyContinueGameButton.disabled = !hasSave;
         dom.storyStartOptionsModal.classList.remove('hidden');
@@ -255,30 +284,23 @@ export function initializeUiHandlers() {
         dom.pvpRoomListModal.classList.remove('hidden');
     });
 
-    // --- EVENT MODAL: REFACTORED LOGIC ---
-    // This handler opens the modal and sets its content.
     dom.eventButton.addEventListener('click', () => {
         const currentMonth = new Date().getMonth();
-        currentEventData = config.MONTHLY_EVENTS[currentMonth]; // Store current event data
+        currentEventData = config.MONTHLY_EVENTS[currentMonth];
 
         if (currentEventData) {
-            sound.playStoryMusic(`${currentEventData.ai}.ogg`); // Play event music
-            // Populate the modal with the current month's event data, using translations
+            sound.playStoryMusic(`${currentEventData.ai}.ogg`);
             dom.eventCharacterImage.src = `./${currentEventData.image}`;
             dom.eventCharacterName.textContent = t(currentEventData.characterNameKey);
             dom.eventAbilityDescription.textContent = t(currentEventData.abilityKey);
             dom.eventRewardText.textContent = t('event.reward_text_placeholder', { rewardName: t(currentEventData.rewardTitleKey) });
-
-            // Check if the player has already attempted the challenge today
-            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            const today = new Date().toISOString().split('T')[0];
             const lastAttemptDate = localStorage.getItem('reversus-event-attempt-date');
             const hasAttemptedToday = lastAttemptDate === today;
-
             dom.challengeEventButton.disabled = hasAttemptedToday;
             dom.eventStatusText.textContent = hasAttemptedToday ? t('event.status_wait') : '';
         } else {
-            sound.playStoryMusic('tela.ogg'); // Revert to menu music if no event
-            // Fallback if no event is configured for the current month
+            sound.playStoryMusic('tela.ogg');
             dom.eventCharacterImage.src = '';
             dom.eventCharacterName.textContent = 'Nenhum Evento Ativo';
             dom.eventAbilityDescription.textContent = 'Volte mais tarde para novos desafios.';
@@ -289,28 +311,18 @@ export function initializeUiHandlers() {
         dom.eventModal.classList.remove('hidden');
     });
 
-    // This is the single, persistent listener for the challenge button.
     dom.challengeEventButton.addEventListener('click', () => {
         if (dom.challengeEventButton.disabled || !currentEventData) return;
 
-        // Set the local storage flag to lock the event for today
         const today = new Date().toISOString().split('T')[0];
         localStorage.setItem('reversus-event-attempt-date', today);
 
         const gameOptions = {
-            story: { // Use story mode infrastructure for events
+            story: {
                 battle: `event_${currentEventData.ai}`,
-                eventData: {
-                    name: t(currentEventData.nameKey),
-                    ai: currentEventData.ai
-                },
+                eventData: { name: t(currentEventData.nameKey), ai: currentEventData.ai },
                 playerIds: ['player-1', 'player-2'],
-                overrides: {
-                    'player-2': {
-                        name: t(currentEventData.characterNameKey),
-                        aiType: currentEventData.ai
-                    }
-                }
+                overrides: { 'player-2': { name: t(currentEventData.characterNameKey), aiType: currentEventData.ai } }
             }
         };
         initializeGame('solo', gameOptions);
@@ -321,7 +333,6 @@ export function initializeUiHandlers() {
         dom.rankingModal.classList.remove('hidden');
     });
 
-    // Story Start Options Modal Handlers
     dom.storyNewGameButton.addEventListener('click', () => {
         dom.storyStartOptionsModal.classList.add('hidden');
         startStoryMode();
@@ -340,22 +351,20 @@ export function initializeUiHandlers() {
         initializeGame('inversus', {});
     });
 
-    // Profile & Achievements via User Display
     dom.userProfileDisplay.addEventListener('click', () => {
-        network.emitGetProfile(); // This will trigger profile rendering
-        renderAchievementsModal(); // Also render achievements
+        network.emitGetProfile();
+        network.emitGetFriendsList();
+        renderAchievementsModal();
         dom.profileModal.classList.remove('hidden');
     });
 
-    // Ranking, Profile, and Event Modal Close Buttons
     dom.closeRankingButton.addEventListener('click', () => dom.rankingModal.classList.add('hidden'));
     dom.closeProfileButton.addEventListener('click', () => dom.profileModal.classList.add('hidden'));
     dom.closeEventButton.addEventListener('click', () => {
         dom.eventModal.classList.add('hidden');
-        sound.playStoryMusic('tela.ogg'); // Revert to menu music
+        sound.playStoryMusic('tela.ogg');
     });
 
-    // Tab handlers for Profile/Achievements Modal
     dom.profileModal.querySelectorAll('.profile-tab-button').forEach(button => {
         button.addEventListener('click', () => {
             const tabId = button.dataset.tab;
@@ -366,7 +375,6 @@ export function initializeUiHandlers() {
         });
     });
 
-    // Info Modal Handlers
     dom.infoButton.addEventListener('click', () => dom.infoModal.classList.remove('hidden'));
     dom.closeInfoButton.addEventListener('click', () => dom.infoModal.classList.add('hidden'));
     dom.infoModal.querySelectorAll('.info-tab-button').forEach(button => {
@@ -379,7 +387,6 @@ export function initializeUiHandlers() {
         });
     });
     
-    // Game Setup Modal Handlers
     dom.closeSetupButton.addEventListener('click', () => {
         dom.gameSetupModal.classList.add('hidden');
         dom.splashScreenEl.classList.remove('hidden');
@@ -394,7 +401,6 @@ export function initializeUiHandlers() {
     dom.solo4pButton.addEventListener('click', () => initializeGame('solo', { numPlayers: 4 }));
     dom.duoModeButton.addEventListener('click', () => initializeGame('duo', { numPlayers: 4 }));
 
-    // 1v1 Setup Handlers
     dom.oneVOneBackButton.addEventListener('click', () => {
         dom.oneVOneSetupModal.classList.add('hidden');
         dom.gameSetupModal.classList.remove('hidden');
@@ -447,7 +453,6 @@ export function initializeUiHandlers() {
         initializeGame('solo', { numPlayers: 2, overrides });
     });
 
-    // Game Over Modal Handler
     dom.restartButton.addEventListener('click', (e) => {
         dom.gameOverModal.classList.add('hidden');
         const action = e.target.dataset.action;
@@ -461,12 +466,11 @@ export function initializeUiHandlers() {
             } else {
                  showSplashScreen();
             }
-        } else { // 'menu' or default
+        } else {
             showSplashScreen();
         }
     });
     
-    // Targeting Modals Handlers
     dom.targetPlayerButtonsEl.addEventListener('click', async (e) => {
         if (e.target.tagName !== 'BUTTON') return;
         
@@ -483,7 +487,6 @@ export function initializeUiHandlers() {
             return;
         }
 
-        // Handle the specific, multi-step cards first
         if (reversusTotalIndividualFlow && card.name === 'Reversus Total') {
             gameState.reversusTarget = targetId;
             dom.reversusIndividualEffectChoiceModal.classList.remove('hidden');
@@ -504,7 +507,7 @@ export function initializeUiHandlers() {
                  updateLog(`Não há caminhos vazios para usar 'Pula'.`);
                  cancelPlayerAction();
             }
-        } else { // CATCH-ALL for simple targetable cards like 'Mais', 'Menos', 'Sobe', 'Desce'
+        } else {
             if (gameState.isPvp) {
                 network.emitPlayCard({ cardId: card.id, targetId: targetId });
             } else {
@@ -627,7 +630,7 @@ export function initializeUiHandlers() {
             const targetPlayer = gameState.players[targetId];
             const availablePaths = gameState.boardPaths.filter(p => !Object.values(gameState.players).some(pl => pl.pathId === p.id));
             if(availablePaths.length > 0) {
-                targetPlayer.targetPathForPula = availablePaths[0].id; // Human chooses first available for now
+                targetPlayer.targetPathForPula = availablePaths[0].id;
                 options.pulaPath = availablePaths[0].id;
             } else {
                  updateLog(`Não há caminhos vazios para usar 'Pula' Individual.`);
@@ -660,7 +663,6 @@ export function initializeUiHandlers() {
         }
     });
 
-    // Sound and System Controls
     dom.muteButton.addEventListener('click', sound.toggleMute);
     dom.nextTrackButton.addEventListener('click', sound.changeTrack);
     dom.volumeSlider.addEventListener('input', (e) => sound.setVolume(parseFloat(e.target.value)));
@@ -680,30 +682,21 @@ export function initializeUiHandlers() {
         }
     });
 
-    // Language Switcher
     const langPtBrButton = document.getElementById('lang-pt-BR');
     const langEnUsButton = document.getElementById('lang-en-US');
 
     const handleLanguageChange = async (lang) => {
         await setLanguage(lang);
         const { userProfile } = getState();
-        // If profile modal is open, re-render it with the new language
         if (!dom.profileModal.classList.contains('hidden') && userProfile) {
             renderProfile(userProfile);
-            // Also re-render achievements if that tab is active
             renderAchievementsModal();
         }
     };
 
-    if (langPtBrButton) {
-        langPtBrButton.addEventListener('click', () => handleLanguageChange('pt-BR'));
-    }
-    if (langEnUsButton) {
-        langEnUsButton.addEventListener('click', () => handleLanguageChange('en-US'));
-    }
+    if (langPtBrButton) langPtBrButton.addEventListener('click', () => handleLanguageChange('pt-BR'));
+    if (langEnUsButton) langEnUsButton.addEventListener('click', () => handleLanguageChange('en-US'));
 
-
-    // In-Game Menu Handlers
     dom.debugButton.addEventListener('click', () => dom.gameMenuModal.classList.remove('hidden'));
     dom.gameMenuCloseButton.addEventListener('click', () => dom.gameMenuModal.classList.add('hidden'));
     dom.menuSaveGameButton.addEventListener('click', () => {
@@ -715,7 +708,6 @@ export function initializeUiHandlers() {
         dom.exitGameConfirmModal.classList.remove('hidden');
     });
     
-    // Save/Exit Confirmation Handlers
     dom.saveGameYesButton.addEventListener('click', saveLoad.saveGameState);
     dom.saveGameNoButton.addEventListener('click', () => dom.saveGameConfirmModal.classList.add('hidden'));
     dom.exitGameYesButton.addEventListener('click', () => {
@@ -729,7 +721,6 @@ export function initializeUiHandlers() {
     });
     dom.exitGameNoButton.addEventListener('click', () => dom.exitGameConfirmModal.classList.add('hidden'));
     
-    // Story Event Listeners (dispatched from other modules)
     document.addEventListener('startStoryGame', (e) => initializeGame(e.detail.mode, e.detail.options));
     document.addEventListener('showSplashScreen', showSplashScreen);
     
@@ -738,110 +729,38 @@ export function initializeUiHandlers() {
         const { gameState, storyState } = getState();
         updateState('lastStoryGameOptions', { mode: gameState.gameMode, options: gameState.gameOptions });
         
-        let title = won ? 'Vitória!' : 'Derrota...';
+        let title = won ? t('game_over.story_victory_title') : t('game_over.story_defeat_title');
         let message;
         let buttonAction = 'restart';
 
         switch (battle) {
-            case 'tutorial_necroverso':
-                if (won) {
-                    achievements.grantAchievement('tutorial_win');
-                    setTimeout(() => renderStoryNode('post_tutorial'), 1000);
-                    return; // Skip standard game over modal
-                } else {
-                    message = "Você foi derrotado, mas aprendeu o básico. Vamos tentar de novo.";
-                }
-                break;
-            case 'contravox':
-                 if (won) {
-                    achievements.grantAchievement('contravox_win');
-                    setTimeout(() => renderStoryNode('post_contravox_victory'), 1000);
-                     return;
-                } else {
-                    message = "O Contravox te venceu. Quer tentar de novo?";
-                }
-                break;
-            case 'versatrix':
-                if (won) {
-                    achievements.grantAchievement('versatrix_win');
-                    setTimeout(() => renderStoryNode('post_versatrix_victory'), 1000);
-                } else {
-                    storyState.lostToVersatrix = true;
-                    achievements.grantAchievement('versatrix_loss');
-                    setTimeout(() => renderStoryNode('post_versatrix_defeat'), 1000);
-                }
-                return;
-            case 'reversum':
-                if (won) {
-                    achievements.grantAchievement('reversum_win');
-                    setTimeout(() => renderStoryNode('post_reversum_victory'), 1000);
-                } else {
-                     message = "O Rei Reversum é muito poderoso. Tentar novamente?";
-                }
-                break;
-            case 'necroverso_king':
-                if (won) {
-                    achievements.grantAchievement('true_end_beta');
-                    setTimeout(() => renderStoryNode('post_necroverso_king_victory'), 1000);
-                } else {
-                    message = "O poder combinado dos reis é demais. Deseja tentar novamente?";
-                }
-                break;
-            case 'necroverso_final':
-                 if (won) {
-                    achievements.grantAchievement('true_end_final');
-                    playEndgameSequence();
-                 } else {
-                     message = reason === 'time' 
-                        ? "O tempo acabou! O Inversus foi consumido..."
-                        : "O Necroverso venceu. A escuridão consome tudo. Tentar novamente?";
-                 }
-                 break;
-             case 'xael_challenge':
-                if (won) {
-                    achievements.grantAchievement('xael_win');
-                    message = "Você venceu o criador! Habilidade 'Revelação Estelar' desbloqueada no Modo História.";
-                    buttonAction = 'menu';
-                } else {
-                    message = "O criador conhece todos os truques. Tentar novamente?";
-                }
-                break;
-            case 'narrador':
-                 if (won) {
-                     achievements.grantAchievement('120%_unlocked');
-                     message = "Você derrotou o Narrador! O que acontece agora...?";
-                     buttonAction = 'menu';
-                 } else {
-                     message = "O Narrador reescreveu a história para te derrotar. Tentar de novo?";
-                 }
-                 break;
-            default:
-                 message = won ? 'Você venceu o duelo!' : 'Você foi derrotado.';
+            case 'tutorial_necroverso': if (won) { achievements.grantAchievement('tutorial_win'); setTimeout(() => renderStoryNode('post_tutorial'), 1000); return; } else { message = "Você foi derrotado, mas aprendeu o básico. Vamos tentar de novo."; } break;
+            case 'contravox': if (won) { achievements.grantAchievement('contravox_win'); setTimeout(() => renderStoryNode('post_contravox_victory'), 1000); return; } else { message = "O Contravox te venceu. Quer tentar de novo?"; } break;
+            case 'versatrix': if (won) { achievements.grantAchievement('versatrix_win'); setTimeout(() => renderStoryNode('post_versatrix_victory'), 1000); } else { storyState.lostToVersatrix = true; achievements.grantAchievement('versatrix_loss'); setTimeout(() => renderStoryNode('post_versatrix_defeat'), 1000); } return;
+            case 'reversum': if (won) { achievements.grantAchievement('reversum_win'); setTimeout(() => renderStoryNode('post_reversum_victory'), 1000); } else { message = "O Rei Reversum é muito poderoso. Tentar novamente?"; } break;
+            case 'necroverso_king': if (won) { achievements.grantAchievement('true_end_beta'); setTimeout(() => renderStoryNode('post_necroverso_king_victory'), 1000); } else { message = "O poder combinado dos reis é demais. Deseja tentar novamente?"; } break;
+            case 'necroverso_final': if (won) { achievements.grantAchievement('true_end_final'); playEndgameSequence(); } else { message = reason === 'time' ? "O tempo acabou! O Inversus foi consumido..." : "O Necroverso venceu. A escuridão consome tudo. Tentar novamente?"; } break;
+            case 'xael_challenge': if (won) { achievements.grantAchievement('xael_win'); message = "Você venceu o criador! Habilidade 'Revelação Estelar' desbloqueada no Modo História."; buttonAction = 'menu'; } else { message = "O criador conhece todos os truques. Tentar novamente?"; } break;
+            case 'narrador': if (won) { achievements.grantAchievement('120%_unlocked'); message = "Você derrotou o Narrador! O que acontece agora...?"; buttonAction = 'menu'; } else { message = "O Narrador reescreveu a história para te derrotar. Tentar de novo?"; } break;
+            default: message = won ? 'Você venceu o duelo!' : 'Você foi derrotado.';
         }
         showGameOver(message, title, { action: buttonAction });
     });
 
-    // Secret Battle Trigger (Splash Logo)
     dom.splashLogo.addEventListener('click', (e) => {
         const { achievements } = getState();
         if (!achievements.has('inversus_win')) return;
-
-        // Prevent click if another modal is open
         if(document.querySelector('.modal-overlay:not(.hidden)')) return;
-
         e.preventDefault();
-        
         sound.playSoundEffect('x');
         document.body.classList.add('screen-shaking');
         setTimeout(() => document.body.classList.remove('screen-shaking'), 500);
-
         setTimeout(() => {
             const gameOptions = { story: { battle: 'narrador', playerIds: ['player-1', 'player-2'], overrides: { 'player-2': { name: 'Narrador', aiType: 'narrador' } } } };
             initializeGame('solo', gameOptions);
         }, 800);
     });
 
-    // Secret Card Collection
     dom.splashAnimationContainerEl.addEventListener('click', (e) => {
         if (e.target.id === 'secret-versatrix-card') {
             const { achievements } = getState();
@@ -855,7 +774,6 @@ export function initializeUiHandlers() {
         }
     });
     
-    // Xael Challenge Popup
     dom.xaelPopup.addEventListener('click', async () => {
         dom.xaelPopup.classList.add('hidden');
         await shatterImage(dom.xaelPopup.querySelector('img'));
@@ -884,7 +802,6 @@ export function initializeUiHandlers() {
         }
     });
 
-    // Chat Handlers
     const sendChatMessage = () => {
         const message = dom.chatInput.value.trim();
         if (message) {
@@ -892,7 +809,7 @@ export function initializeUiHandlers() {
             if (gameState.isPvp) {
                  network.emitChatMessage(message);
             } else {
-                updateLog({ type: 'dialogue', speaker: userProfile?.username || 'Você', message });
+                updateLog({ type: 'dialogue', speaker: userProfile?.username || t('game.you'), message });
             }
             dom.chatInput.value = '';
         }
@@ -900,7 +817,6 @@ export function initializeUiHandlers() {
     dom.chatSendButton.addEventListener('click', sendChatMessage);
     dom.chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
 
-    // Lobby Handlers
     dom.lobbyChatSendButton.addEventListener('click', () => {
         const message = dom.lobbyChatInput.value.trim();
         if(message) {
@@ -919,16 +835,12 @@ export function initializeUiHandlers() {
         }
     });
 
-    dom.pvpCreateRoomButton.addEventListener('click', () => {
-        network.emitCreateRoom();
-    });
+    dom.pvpCreateRoomButton.addEventListener('click', () => network.emitCreateRoom());
 
     dom.pvpRoomGridEl.addEventListener('click', (e) => {
         if (e.target.classList.contains('join-room-button')) {
             const roomId = e.target.dataset.roomId;
-            if (roomId) {
-                network.emitJoinRoom(roomId);
-            }
+            if (roomId) network.emitJoinRoom(roomId);
         }
     });
 
@@ -937,29 +849,80 @@ export function initializeUiHandlers() {
         showSplashScreen();
     });
     
-    dom.pvpLobbyCloseButton.addEventListener('click', () => {
-        network.emitLeaveRoom();
-    });
-
-    dom.lobbyGameModeEl.addEventListener('change', (e) => {
-        network.emitChangeMode(e.target.value);
-    });
+    dom.pvpLobbyCloseButton.addEventListener('click', () => network.emitLeaveRoom());
+    dom.lobbyGameModeEl.addEventListener('change', (e) => network.emitChangeMode(e.target.value));
+    dom.lobbyStartGameButton.addEventListener('click', () => network.emitStartGame());
     
-    dom.lobbyStartGameButton.addEventListener('click', () => {
-        network.emitStartGame();
-    });
-    
-    // Field Effect Target Modal Handler (FIX for freeze)
     dom.fieldEffectTargetModal.addEventListener('click', (e) => {
         const button = e.target.closest('button');
         if (!button) return;
-        
         const { fieldEffectTargetResolver } = getState();
         if (fieldEffectTargetResolver) {
             const playerId = button.dataset.playerId;
-            fieldEffectTargetResolver(playerId); // Resolve the promise in story-abilities.js
+            fieldEffectTargetResolver(playerId);
             updateState('fieldEffectTargetResolver', null);
             dom.fieldEffectTargetModal.classList.add('hidden');
+        }
+    });
+    
+    // Friends & Chat Handlers
+    document.getElementById('friends-search-button').addEventListener('click', () => {
+        const query = document.getElementById('friends-search-input').value.trim();
+        if (query) network.emitSearchUsers(query);
+    });
+
+    document.getElementById('profile-friends-tab-content').addEventListener('click', (e) => {
+        if (e.target.matches('.add-friend-btn')) {
+            const userId = e.target.dataset.userId;
+            network.emitAddFriend(userId);
+            e.target.textContent = t('profile.request_sent');
+            e.target.disabled = true;
+        }
+    });
+    
+    document.getElementById('friends-list-container').addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.matches('.remove-friend-btn')) {
+            const userId = target.dataset.userId;
+            if (confirm(t('confirm.remove_friend', { username: 'este amigo' }))) {
+                 network.emitRemoveFriend(userId);
+            }
+        } else if (target.matches('.view-profile-btn')) {
+            const googleId = target.dataset.googleId;
+            network.emitViewProfile(googleId);
+        } else if (target.matches('.send-message-btn')) {
+            const userId = target.dataset.userId;
+            const username = target.dataset.username;
+            openChatWindow(userId, username);
+        }
+    });
+    
+    dom.profileModal.addEventListener('click', (e) => {
+         if (e.target.matches('.add-friend-btn')) {
+            const userId = e.target.dataset.userId;
+            network.emitAddFriend(userId);
+            e.target.textContent = t('profile.request_sent');
+            e.target.disabled = true;
+        } else if (e.target.matches('.remove-friend-btn')) {
+            const userId = e.target.dataset.userId;
+            network.emitRemoveFriend(userId);
+            e.target.textContent = t('profile.add_friend');
+            e.target.classList.remove('cancel', 'remove-friend-btn');
+            e.target.classList.add('add-friend-btn');
+        }
+    });
+
+    dom.privateChatPanel.addEventListener('click', (e) => {
+        if (e.target.matches('.chat-window-close')) {
+            const userId = e.target.dataset.userId;
+            const chatWindow = document.getElementById(`chat-window-${userId}`);
+            if (chatWindow) {
+                chatWindow.remove();
+                activeChatWindows.delete(userId);
+                if (activeChatWindows.size === 0) {
+                    dom.privateChatPanel.classList.add('hidden');
+                }
+            }
         }
     });
 }

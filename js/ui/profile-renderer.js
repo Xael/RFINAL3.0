@@ -91,7 +91,6 @@ export function renderProfile(profileData) {
         });
     }
 
-    // Render action buttons (Add/Remove Friend)
     const actionButtonsContainer = document.getElementById('profile-action-buttons');
     if (!isMyProfile) {
         let buttonHTML = '';
@@ -170,12 +169,13 @@ export function addPrivateChatMessage(message) {
 
     let chatWindow = document.getElementById(`chat-window-${chatPartnerId}`);
     if (!chatWindow) {
-        // If chat window doesn't exist, we need the partner's username to create it.
-        // This part is tricky without a local friends cache. For now, we rely on the window being opened first.
-        // A more robust solution would be to fetch friend data or have it cached.
-        console.log("Received a message for a chat that is not open.");
-        // We can add a notification system here later.
-        return;
+        if (!isSentByMe && message.senderUsername) {
+            openChatWindow(message.senderId, message.senderUsername);
+            chatWindow = document.getElementById(`chat-window-${chatPartnerId}`);
+        } else {
+             console.log("Received a message for a chat that is not open, but couldn't open window.", message);
+             return;
+        }
     }
     
     const messagesContainer = chatWindow.querySelector('.chat-window-messages');
