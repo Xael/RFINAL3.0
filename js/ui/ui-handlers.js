@@ -250,11 +250,15 @@ function handleFieldEffectIndicatorClick(e) {
     const activeEffect = gameState.activeFieldEffects.find(fe => fe.appliesTo === playerId);
     
     if (activeEffect) {
-        dom.fieldEffectInfoTitle.textContent = "Efeito de Campo Ativo";
+        dom.fieldEffectInfoTitle.textContent = t('field_effect.info_title');
         const isPositive = activeEffect.type === 'positive';
         dom.fieldEffectInfoModal.querySelector('.field-effect-card').className = `field-effect-card ${isPositive ? 'positive' : 'negative'}`;
         dom.fieldEffectInfoName.textContent = activeEffect.name;
-        dom.fieldEffectInfoDescription.textContent = isPositive ? config.POSITIVE_EFFECTS[activeEffect.name] : config.NEGATIVE_EFFECTS[activeEffect.name];
+        
+        // Correctly get and translate the description
+        const effectConfig = isPositive ? config.POSITIVE_EFFECTS[activeEffect.name] : config.NEGATIVE_EFFECTS[activeEffect.name];
+        dom.fieldEffectInfoDescription.textContent = effectConfig ? t(effectConfig.descriptionKey) : 'Descrição não encontrada.';
+        
         dom.fieldEffectInfoModal.classList.remove('hidden');
     }
 }
@@ -414,6 +418,8 @@ export function initializeUiHandlers() {
 
     dom.infoButton.addEventListener('click', () => dom.infoModal.classList.remove('hidden'));
     dom.closeInfoButton.addEventListener('click', () => dom.infoModal.classList.add('hidden'));
+    dom.fieldEffectInfoCloseButton.addEventListener('click', () => dom.fieldEffectInfoModal.classList.add('hidden'));
+
     dom.infoModal.querySelectorAll('.info-tab-button').forEach(button => {
         button.addEventListener('click', () => {
             const tabId = button.dataset.tab;
