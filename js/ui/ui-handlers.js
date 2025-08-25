@@ -864,6 +864,7 @@ export function initializeUiHandlers() {
         }
     });
 
+    // FIX: Re-added the missing event listener for the create room button
     dom.pvpCreateRoomButton.addEventListener('click', () => network.emitCreateRoom());
 
     dom.pvpRoomGridEl.addEventListener('click', (e) => {
