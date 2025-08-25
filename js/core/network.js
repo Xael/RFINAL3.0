@@ -9,6 +9,7 @@ import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
 import { t } from './i18n.js';
+import { animateCardPlay } from '../ui/animations.js';
 
 /**
  * Sets up the player areas in the UI so the local player is always at the bottom.
@@ -178,25 +179,27 @@ export function connectToServer() {
         updateState('gameState', initialGameState);
         
         dom.pvpLobbyModal.classList.add('hidden');
-
-        if (initialGameState.gamePhase === 'initial_draw') {
-            await showPvpDrawSequence(initialGameState);
-            // After draw, the server will send a gameStateUpdate to start the game.
-            // For now, we'll transition client-side.
-            initialGameState.gamePhase = 'playing';
-            updateState('gameState', initialGameState);
-        }
-        
         dom.appContainerEl.classList.remove('hidden');
-
+        
         const state = getState();
         if (state.gameTimerInterval) clearInterval(state.gameTimerInterval);
         updateState('gameStartTime', Date.now());
         updateGameTimer();
         updateState('gameTimerInterval', setInterval(updateGameTimer, 1000));
         
-        setupPlayerPerspective();
-        renderAll();
+        if (initialGameState.gamePhase === 'initial_draw') {
+            await showPvpDrawSequence(initialGameState);
+            // The server will send a gameStateUpdate with gamePhase: 'playing' after this.
+        } else {
+             // Fallback for games that might not have a draw phase
+            setupPlayerPerspective();
+            renderAll();
+        }
+    });
+
+    socket.on('cardPlayedAnimation', async ({ casterId, targetId, card, targetSlotLabel }) => {
+        const startElement = document.querySelector(`#hand-${casterId} [data-card-id="${card.id}"]`);
+        await animateCardPlay(card, startElement, targetId, targetSlotLabel);
     });
 
     socket.on('gameStateUpdate', (gameState) => {

@@ -155,9 +155,17 @@ async function handlePlayButtonClick() {
 
     if (!player || !card) return;
 
-    gameState.gamePhase = 'paused';
-    renderAll();
+    // Immediately disable buttons for better UX
+    dom.playButton.disabled = true;
+    dom.endTurnButton.disabled = true;
 
+    if (gameState.isPvp) {
+        // In PvP, we just send the event and wait for the server's gameStateUpdate
+        // The modal logic for complex cards is handled below before sending the event
+    } else {
+        gameState.gamePhase = 'paused';
+    }
+    
     if (card.type === 'value') {
         if (gameState.isPvp) {
             network.emitPlayCard({ cardId: card.id, targetId: player.id });
@@ -216,6 +224,10 @@ function handleEndTurnButtonClick() {
         return;
     }
     
+    // Immediately disable buttons for better UX
+    dom.playButton.disabled = true;
+    dom.endTurnButton.disabled = true;
+
     if (gameState.isPvp) {
         network.emitEndTurn();
     } else {
