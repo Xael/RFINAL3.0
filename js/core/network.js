@@ -4,7 +4,8 @@ import * as dom from './dom.js';
 import { renderAll, showGameOver } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests } from '../ui/profile-renderer.js';
-import { showSplashScreen } from '../ui/splash-screen.js';
+import { renderAdminReports, renderAdminUserSearchResults } from '../ui/admin-renderer.js';
+import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
@@ -60,6 +61,11 @@ export function connectToServer() {
         
         dom.googleSignInContainer.classList.add('hidden');
         dom.userProfileDisplay.classList.remove('hidden');
+        
+        if (userProfile.isAdmin) {
+            dom.adminButton.classList.remove('hidden');
+        }
+
         renderProfile(userProfile);
         dom.rankingButton.classList.remove('hidden'); 
         dom.eventButton.classList.remove('hidden');
@@ -143,6 +149,14 @@ export function connectToServer() {
         addPrivateChatMessage(message);
     });
 
+    // --- Admin Panel Listeners ---
+    socket.on('admin:reportsData', (reports) => {
+        renderAdminReports(reports);
+    });
+
+    socket.on('admin:userSearchResults', (results) => {
+        renderAdminUserSearchResults(results);
+    });
 
     // --- Room & Game Listeners ---
     socket.on('roomList', (rooms) => {
@@ -167,12 +181,16 @@ export function connectToServer() {
         updateLobbyUi(roomData);
     });
 
-    socket.on('lobbyChatMessage', ({ speaker, message }) => {
-        addLobbyChatMessage(speaker, message);
+    socket.on('lobbyChatMessage', ({ speaker, message, speakerId }) => {
+        addLobbyChatMessage({ speaker, message, speakerId });
     });
 
-    socket.on('chatMessage', ({ speaker, message }) => {
-        updateLog({ type: 'dialogue', speaker, message });
+    socket.on('chatMessage', ({ speaker, message, speakerId }) => {
+        updateLog({ type: 'dialogue', speaker, message, speakerId });
+    });
+
+    socket.on('reportConfirmation', ({ success, message }) => {
+        alert(message);
     });
 
     socket.on('gameStarted', async (initialGameState) => {
@@ -246,6 +264,7 @@ export function emitCreateRoom() { const { socket } = getState(); if (socket) so
 export function emitJoinRoom(roomId) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId }); }
 export function emitLobbyChat(message) { const { socket } = getState(); if(socket) socket.emit('lobbyChatMessage', message); }
 export function emitChatMessage(message) { const { socket } = getState(); if (socket) socket.emit('chatMessage', message); }
+export function emitReportChat(reportedUserId) { const { socket } = getState(); if (socket) socket.emit('reportChat', { reportedUserId }); }
 export function emitChangeMode(mode) { const { socket } = getState(); if (socket) socket.emit('changeMode', mode); }
 export function emitStartGame() { const { socket } = getState(); if (socket) socket.emit('startGame'); }
 export function emitPlayCard({ cardId, targetId, options = {} }) { const { socket } = getState(); if (socket) socket.emit('playCard', { cardId, targetId, options }); }
@@ -263,6 +282,13 @@ export function emitGetPendingRequests() { const { socket } = getState(); if(soc
 export function emitRemoveFriend(targetUserId) { const { socket } = getState(); if (socket) socket.emit('removeFriend', { targetUserId }); }
 export function emitGetFriendsList() { const { socket } = getState(); if (socket) socket.emit('getFriendsList'); }
 export function emitSendPrivateMessage(recipientId, content) { const { socket } = getState(); if (socket) socket.emit('sendPrivateMessage', { recipientId, content }); }
+
+// Admin Emitters
+export function emitAdminGetReports() { const { socket } = getState(); if (socket) socket.emit('admin:getReports'); }
+export function emitAdminUpdateReportStatus(reportId, status) { const { socket } = getState(); if (socket) socket.emit('admin:updateReportStatus', { reportId, status }); }
+export function emitAdminBanUser(googleId) { const { socket } = getState(); if (socket) socket.emit('admin:banUser', { googleId }); }
+export function emitAdminSearchUsers(query) { const { socket } = getState(); if (socket) socket.emit('admin:searchUsers', { query }); }
+
 
 export function emitLeaveRoom() {
     const { socket, currentRoomId } = getState();

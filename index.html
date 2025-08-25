@@ -62,6 +62,7 @@
         </div>
         <div id="user-level" class="user-level"></div>
     </div>
+     <button id="admin-button" class="admin-button hidden">Admin ⚙️</button>
     <div id="google-signin-container">
         <div id="google-signin-button"></div>
     </div>
@@ -201,12 +202,40 @@
         </div>
     </div>
 
+    <!-- Admin Panel Modal -->
+    <div id="admin-panel-modal" class="modal-overlay hidden">
+        <div class="modal-content admin-modal-content">
+            <h2>Painel Administrativo</h2>
+            <div class="info-tabs">
+                <button class="admin-tab-button active" data-tab="reports">Denúncias de Chat</button>
+                <button class="admin-tab-button" data-tab="users">Gerenciar Usuários</button>
+            </div>
+            <div id="admin-reports-tab-content" class="info-tab-content active">
+                <h3>Denúncias Pendentes</h3>
+                <div id="admin-reports-container" class="admin-reports-container">
+                    <p>Carregando denúncias...</p>
+                </div>
+            </div>
+            <div id="admin-users-tab-content" class="info-tab-content">
+                <h3>Buscar e Gerenciar Usuários</h3>
+                <div class="admin-user-search">
+                    <input type="text" id="admin-user-search-input" placeholder="Buscar por nome de usuário...">
+                    <button id="admin-user-search-button" class="control-button">Buscar</button>
+                </div>
+                <div id="admin-user-search-results" class="admin-reports-container"></div>
+            </div>
+            <button id="close-admin-panel-button" class="control-button cancel" style="margin-top: 1rem;">Fechar</button>
+        </div>
+    </div>
+
+
     <!-- Info Modal (Replaces Rules and Credits) -->
     <div id="info-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="info-tabs">
                 <button class="info-tab-button active" data-tab="instructions" data-i18n="info.instructions_tab">Instruções</button>
                 <button class="info-tab-button" data-tab="credits" data-i18n="info.credits_tab">Créditos</button>
+                <button class="info-tab-button" data-tab="conduct" data-i18n="info.conduct_tab">Conduta & Fair Play</button>
             </div>
 
             <div id="instructions-tab-content" class="info-tab-content active">
@@ -253,6 +282,32 @@
                 <p data-i18n="info.credits_line_3">E em breve: versão para mobile! o/</p>
                 <p data-i18n="info.credits_line_4">Meus agradecimentos especiais a todos os que apoiaram este projeto desde o início.</p>
             </div>
+            
+            <div id="conduct-tab-content" class="info-tab-content">
+                <h2 data-i18n="info.conduct_title">Código de Conduta & Fair Play</h2>
+                <div class="rules-content">
+                    <p><strong data-i18n="info.conduct_intro_title">Nosso Compromisso:</strong> <span data-i18n="info.conduct_intro_text">Estamos comprometidos em manter um ambiente de jogo divertido, justo e seguro para todos os jogadores. Ao jogar Reversus, você concorda em seguir estas regras.</span></p>
+                    
+                    <p><strong data-i18n="info.conduct_respect_title">1. Respeito Mútuo:</strong></p>
+                    <ul>
+                        <li data-i18n="info.conduct_respect_rule_1">Trate todos os jogadores com respeito. Assédio, discurso de ódio, ameaças, spam ou qualquer tipo de comportamento tóxico não serão tolerados.</li>
+                        <li data-i18n="info.conduct_respect_rule_2">Utilize a ferramenta de denúncia no chat para reportar qualquer comportamento inadequado. Todas as denúncias são levadas a sério.</li>
+                    </ul>
+
+                    <p><strong data-i18n="info.conduct_fair_play_title">2. Fair Play (Jogo Limpo):</strong></p>
+                    <ul>
+                        <li data-i18n="info.conduct_fair_play_rule_1"><strong>Uso de Bots/Trapaças:</strong> O uso de qualquer software de terceiros, bots, scripts ou qualquer forma de trapaça para obter vantagem é estritamente proibido.</li>
+                        <li data-i18n="info.conduct_fair_play_rule_2"><strong>Manipulação de Ranking (Boosting):</strong> Desistir de partidas propositalmente ou conspirar com outros jogadores para manipular o ranking é proibido. As partidas devem ser jogadas de forma competitiva e legítima.</li>
+                        <li data-i18n="info.conduct_fair_play_rule_3"><strong>Anulação de Partidas:</strong> Reservamo-nos o direito de anular os resultados de qualquer partida que seja considerada ilegítima ou que viole estas regras.</li>
+                    </ul>
+
+                     <p><strong data-i18n="info.conduct_consequences_title">3. Consequências:</strong></p>
+                    <ul>
+                        <li data-i18n="info.conduct_consequences_rule_1">A violação de qualquer uma destas regras pode resultar em advertências, suspensões temporárias ou o <strong>banimento permanente</strong> da sua conta, a nosso critério.</li>
+                        <li data-i18n="info.conduct_consequences_rule_2">Ao utilizar a plataforma, você reconhece nosso direito de moderar a comunidade e aplicar estas regras para garantir uma experiência positiva para todos.</li>
+                    </ul>
+                </div>
+            </div>
 
             <button id="close-info-button" class="control-button" data-i18n="common.close">Fechar</button>
         </div>
@@ -295,6 +350,12 @@
             <div class="chat-container">
                 <h2 data-i18n="game.log_title">Histórico do Jogo</h2>
                 <div id="game-log" class="game-log"></div>
+                <div class="chat-controls">
+                    <div class="chat-toggle">
+                        <input type="checkbox" id="chat-toggle-checkbox" checked>
+                        <label for="chat-toggle-checkbox" data-i18n="game.enable_chat">Habilitar Chat</label>
+                    </div>
+                </div>
                 <div id="chat-input-area" class="chat-input-area">
                     <input type="text" id="chat-input" data-i18n-placeholder="game.chat_placeholder">
                     <button id="chat-send-button" class="control-button" data-i18n="game.chat_send">Enviar</button>
