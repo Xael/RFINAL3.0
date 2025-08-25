@@ -893,8 +893,11 @@ export function initializeUiHandlers() {
         if (!button) return;
         const { fieldEffectTargetResolver } = getState();
         if (fieldEffectTargetResolver) {
-            const playerId = button.dataset.playerId;
-            fieldEffectTargetResolver(playerId);
+            let targetId = null;
+            if (button.id !== 'field-effect-target-cancel-button') {
+                targetId = button.dataset.playerId;
+            }
+            fieldEffectTargetResolver(targetId); // Resolve with null on cancel
             updateState('fieldEffectTargetResolver', null);
             dom.fieldEffectTargetModal.classList.add('hidden');
         }

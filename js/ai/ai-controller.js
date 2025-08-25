@@ -233,8 +233,8 @@ export async function executeAiTurn(player) {
                 const reversusTotalAbilityCard = { id: 'ability_reversus_total', name: 'Reversus Total', type: 'effect' };
                 await playCard(player, reversusTotalAbilityCard, player.id, null, { isGlobal: true });
                 specialAbilityUsed = true;
-            } else if (specialAbilityChance < 0.30 && leader) {
-                leader.player1CardsObscured = true;
+            } else if (specialAbilityChance < 0.30 && leader && leader.isHuman) {
+                gameState.player1CardsObscured = true;
                 playSoundEffect('confusao');
                 announceEffect('!OÃSUFNOC', 'reversus');
                 updateLog(`Inversus usou sua habilidade e confundiu as cartas de ${leader.name}!`);
