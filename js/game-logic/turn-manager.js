@@ -12,6 +12,55 @@ import { toggleReversusTotalBackground, clearInversusScreenEffects } from '../ui
 import { updateLiveScoresAndWinningStatus } from './score.js';
 import { rotateAndApplyKingNecroversoBoardEffects } from './board.js';
 import { playSoundEffect, announceEffect } from '../core/sound.js';
+import { t } from '../core/i18n.js';
+
+
+/**
+ * Displays the initial draw sequence for a PvP match based on server results.
+ * @param {object} gameState - The initial game state from the server.
+ */
+export async function showPvpDrawSequence(gameState) {
+    const { drawResults, currentPlayer: startingPlayerId } = gameState;
+
+    dom.drawStartTitle.textContent = t('draw.title');
+    dom.drawStartResultMessage.textContent = t('draw.message_drawing');
+
+    dom.drawStartCardsContainerEl.innerHTML = gameState.playerIdsInGame.map(id => {
+        const player = gameState.players[id];
+        return `
+            <div class="draw-start-player-slot">
+                <span class="player-name ${id}">${player.name}</span>
+                <div class="card modal-card" style="background-image: url('./verso_valor.png');" id="draw-card-${id}"></div>
+            </div>
+        `;
+    }).join('');
+
+    dom.drawStartModal.classList.remove('hidden');
+    await new Promise(res => setTimeout(res, 1500));
+
+    const cardPromises = [];
+    for (const id of gameState.playerIdsInGame) {
+        const card = drawResults[id];
+        const cardEl = document.getElementById(`draw-card-${id}`);
+        const promise = new Promise(res => {
+            setTimeout(() => {
+                if (cardEl) cardEl.outerHTML = renderCard(card, 'modal');
+                res();
+            }, 500 * (cardPromises.length));
+        });
+        cardPromises.push(promise);
+    }
+    
+    await Promise.all(cardPromises);
+    await new Promise(res => setTimeout(res, 1500));
+
+    const winner = gameState.players[startingPlayerId];
+    dom.drawStartResultMessage.textContent = t('draw.message_winner', { winnerName: winner.name });
+
+    await new Promise(res => setTimeout(res, 2000));
+    dom.drawStartModal.classList.add('hidden');
+}
+
 
 /**
  * Initiates the sequence to start a game, beginning with the initial draw.

@@ -7,6 +7,7 @@ import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMe
 import { showSplashScreen } from '../ui/splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
+import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
 import { t } from './i18n.js';
 
 /**
@@ -173,10 +174,19 @@ export function connectToServer() {
         updateLog({ type: 'dialogue', speaker, message });
     });
 
-    socket.on('gameStarted', (initialGameState) => {
+    socket.on('gameStarted', async (initialGameState) => {
         updateState('gameState', initialGameState);
         
         dom.pvpLobbyModal.classList.add('hidden');
+
+        if (initialGameState.gamePhase === 'initial_draw') {
+            await showPvpDrawSequence(initialGameState);
+            // After draw, the server will send a gameStateUpdate to start the game.
+            // For now, we'll transition client-side.
+            initialGameState.gamePhase = 'playing';
+            updateState('gameState', initialGameState);
+        }
+        
         dom.appContainerEl.classList.remove('hidden');
 
         const state = getState();

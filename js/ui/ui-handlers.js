@@ -895,11 +895,11 @@ export function initializeUiHandlers() {
     // Consolidated Friends Tab Handler
     if (dom.profileFriendsTabContent) {
         dom.profileFriendsTabContent.addEventListener('click', (e) => {
-            const target = e.target;
             const button = e.target.closest('button');
+            if (!button) return;
     
             // Handle Add Friend (from search results)
-            if (button && button.matches('.add-friend-btn')) {
+            if (button.matches('.add-friend-btn')) {
                 const userId = button.dataset.userId;
                 button.disabled = true;
                 network.emitSendFriendRequest(userId, (response) => {
@@ -914,7 +914,7 @@ export function initializeUiHandlers() {
             }
     
             // Handle Remove Friend (from friends list)
-            if (button && button.matches('.remove-friend-btn')) {
+            if (button.matches('.remove-friend-btn')) {
                 const userId = button.dataset.userId;
                 const username = button.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este amigo';
                 if (confirm(t('confirm.remove_friend', { username }))) {
@@ -924,7 +924,7 @@ export function initializeUiHandlers() {
             }
     
             // Handle View Profile (from friends list) - THE FIX
-            if (button && button.matches('.view-profile-btn')) {
+            if (button.matches('.view-profile-btn')) {
                 const googleId = button.dataset.googleId;
                 if (googleId) {
                     network.emitViewProfile(googleId);
@@ -933,7 +933,7 @@ export function initializeUiHandlers() {
             }
     
             // Handle Send Message (from friends list)
-            if (button && button.matches('.send-message-btn')) {
+            if (button.matches('.send-message-btn')) {
                 const userId = button.dataset.userId;
                 const username = button.dataset.username;
                 if (userId && username) {
@@ -943,7 +943,7 @@ export function initializeUiHandlers() {
             }
     
             // Handle Accept/Decline Friend Request
-            if (button && (button.matches('.accept-request-btn') || button.matches('.decline-request-btn'))) {
+            if (button.matches('.accept-request-btn') || button.matches('.decline-request-btn')) {
                 const requestId = button.dataset.requestId;
                 if (requestId) {
                     const action = button.matches('.accept-request-btn') ? 'accept' : 'decline';
@@ -963,7 +963,9 @@ export function initializeUiHandlers() {
 
     if (dom.profileModal) {
         dom.profileModal.addEventListener('click', (e) => {
-             const button = e.target;
+             const button = e.target.closest('button.add-friend-btn, button.remove-friend-btn');
+             if (!button) return;
+
              if (button.matches('.add-friend-btn')) {
                 const userId = button.dataset.userId;
                 button.disabled = true; // Disable immediately
