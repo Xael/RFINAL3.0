@@ -163,9 +163,9 @@ async function handlePlayButtonClick() {
             network.emitPlayCard({ cardId: card.id, targetId: player.id });
         } else {
             await playCard(player, card, player.id);
+            gameState.gamePhase = 'playing';
+            renderAll();
         }
-        gameState.gamePhase = 'playing';
-        renderAll();
         return;
     }
 
@@ -188,9 +188,9 @@ async function handlePlayButtonClick() {
              network.emitPlayCard({ cardId: card.id, targetId: player.id });
         } else {
              await playCard(player, card, player.id);
+             gameState.gamePhase = 'playing';
+             renderAll();
         }
-        gameState.gamePhase = 'playing';
-        renderAll();
     } else {
         console.warn(`Unhandled effect card in handlePlayButtonClick: ${card.name}`);
         cancelPlayerAction();
@@ -333,7 +333,6 @@ export function initializeUiHandlers() {
         dom.rankingModal.classList.remove('hidden');
     });
 
-    // Delegated listener for clicking names in the ranking modal
     if (dom.rankingContainer) {
         dom.rankingContainer.addEventListener('click', (e) => {
             const target = e.target.closest('.rank-name.clickable');
@@ -346,7 +345,6 @@ export function initializeUiHandlers() {
         });
     }
 
-    // Delegated listener for clicking names in the PvP lobby
     if (dom.pvpLobbyModal) {
         dom.pvpLobbyModal.addEventListener('click', (e) => {
             const target = e.target.closest('.lobby-player-grid .clickable');
@@ -539,9 +537,9 @@ export function initializeUiHandlers() {
                 network.emitPlayCard({ cardId: card.id, targetId: targetId });
             } else {
                 await playCard(player, card, targetId);
+                gameState.gamePhase = 'playing';
+                renderAll();
             }
-            gameState.gamePhase = 'playing';
-            renderAll();
         }
     });
 
@@ -567,11 +565,10 @@ export function initializeUiHandlers() {
             network.emitPlayCard({ cardId: card.id, targetId, options: { pulaPath: pathId } });
         } else {
             await playCard(player, card, targetId);
+            gameState.gamePhase = 'playing';
+            gameState.pulaTarget = null;
+            renderAll();
         }
-        
-        gameState.gamePhase = 'playing';
-        gameState.pulaTarget = null;
-        renderAll();
     });
 
     dom.pulaCancelButton.addEventListener('click', cancelPlayerAction);
@@ -588,9 +585,9 @@ export function initializeUiHandlers() {
             network.emitPlayCard({ cardId: card.id, targetId, options: { effectType: 'score' } });
         } else {
             await playCard(player, card, targetId, 'score');
+            gameState.gamePhase = 'playing';
+            renderAll();
         }
-        gameState.gamePhase = 'playing';
-        renderAll();
     });
 
     dom.reversusTargetMovementButton.addEventListener('click', async () => {
@@ -605,9 +602,9 @@ export function initializeUiHandlers() {
             network.emitPlayCard({ cardId: card.id, targetId, options: { effectType: 'movement' } });
         } else {
             await playCard(player, card, targetId, 'movement');
+            gameState.gamePhase = 'playing';
+            renderAll();
         }
-        gameState.gamePhase = 'playing';
-        renderAll();
     });
 
     dom.reversusTargetCancelButton.addEventListener('click', cancelPlayerAction);
@@ -622,9 +619,9 @@ export function initializeUiHandlers() {
             network.emitPlayCard({ cardId: card.id, targetId: player.id, options: { isGlobal: true } });
         } else {
             await playCard(player, card, player.id);
+            gameState.gamePhase = 'playing';
+            renderAll();
         }
-        gameState.gamePhase = 'playing';
-        renderAll();
     });
     
     dom.reversusTotalIndividualButton.addEventListener('click', () => {
@@ -670,11 +667,10 @@ export function initializeUiHandlers() {
              network.emitPlayCard({ cardId: card.id, targetId, options });
         } else {
             await playCard(player, card, targetId, null, options);
+            updateState('reversusTotalIndividualFlow', false);
+            gameState.gamePhase = 'playing';
+            renderAll();
         }
-        
-        updateState('reversusTotalIndividualFlow', false);
-        gameState.gamePhase = 'playing';
-        renderAll();
     });
     
     dom.reversusIndividualCancelButton.addEventListener('click', cancelPlayerAction);
@@ -892,13 +888,11 @@ export function initializeUiHandlers() {
         }
     });
     
-    // Consolidated Friends Tab Handler
     if (dom.profileFriendsTabContent) {
         dom.profileFriendsTabContent.addEventListener('click', (e) => {
             const button = e.target.closest('button');
             if (!button) return;
     
-            // Handle Add Friend (from search results)
             if (button.matches('.add-friend-btn')) {
                 const userId = button.dataset.userId;
                 button.disabled = true;
@@ -913,7 +907,6 @@ export function initializeUiHandlers() {
                 return;
             }
     
-            // Handle Remove Friend (from friends list)
             if (button.matches('.remove-friend-btn')) {
                 const userId = button.dataset.userId;
                 const username = button.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este amigo';
@@ -923,7 +916,6 @@ export function initializeUiHandlers() {
                 return;
             }
     
-            // Handle View Profile (from friends list) - THE FIX
             if (button.matches('.view-profile-btn')) {
                 const googleId = button.dataset.googleId;
                 if (googleId) {
@@ -932,7 +924,6 @@ export function initializeUiHandlers() {
                 return;
             }
     
-            // Handle Send Message (from friends list)
             if (button.matches('.send-message-btn')) {
                 const userId = button.dataset.userId;
                 const username = button.dataset.username;
@@ -942,7 +933,6 @@ export function initializeUiHandlers() {
                 return;
             }
     
-            // Handle Accept/Decline Friend Request
             if (button.matches('.accept-request-btn') || button.matches('.decline-request-btn')) {
                 const requestId = button.dataset.requestId;
                 if (requestId) {
@@ -968,13 +958,13 @@ export function initializeUiHandlers() {
 
              if (button.matches('.add-friend-btn')) {
                 const userId = button.dataset.userId;
-                button.disabled = true; // Disable immediately
+                button.disabled = true;
                 network.emitSendFriendRequest(userId, (response) => {
                     if (response.success) {
                         button.textContent = t('profile.request_sent');
                     } else {
                         alert(response.error || 'Falha ao enviar pedido.');
-                        button.disabled = false; // Re-enable on failure
+                        button.disabled = false;
                     }
                 });
             } else if (button.matches('.remove-friend-btn')) {
