@@ -346,7 +346,6 @@ export function initializeUiHandlers() {
         });
     }
 
-
     // Delegated listener for clicking names in the PvP lobby
     if (dom.pvpLobbyModal) {
         dom.pvpLobbyModal.addEventListener('click', (e) => {
@@ -359,7 +358,6 @@ export function initializeUiHandlers() {
             }
         });
     }
-
 
     dom.storyNewGameButton.addEventListener('click', () => {
         dom.storyStartOptionsModal.classList.add('hidden');
@@ -894,7 +892,68 @@ export function initializeUiHandlers() {
         }
     });
     
-    // Friends & Chat Handlers
+    // Consolidated Friends Tab Handler
+    if (dom.profileFriendsTabContent) {
+        dom.profileFriendsTabContent.addEventListener('click', (e) => {
+            const target = e.target;
+            const button = e.target.closest('button');
+    
+            // Handle Add Friend (from search results)
+            if (button && button.matches('.add-friend-btn')) {
+                const userId = button.dataset.userId;
+                button.disabled = true;
+                network.emitSendFriendRequest(userId, (response) => {
+                    if (response.success) {
+                        button.textContent = t('profile.request_sent');
+                    } else {
+                        alert(response.error || 'Falha ao enviar pedido.');
+                        button.disabled = false;
+                    }
+                });
+                return;
+            }
+    
+            // Handle Remove Friend (from friends list)
+            if (button && button.matches('.remove-friend-btn')) {
+                const userId = button.dataset.userId;
+                const username = button.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este amigo';
+                if (confirm(t('confirm.remove_friend', { username }))) {
+                     network.emitRemoveFriend(userId);
+                }
+                return;
+            }
+    
+            // Handle View Profile (from friends list) - THE FIX
+            if (button && button.matches('.view-profile-btn')) {
+                const googleId = button.dataset.googleId;
+                if (googleId) {
+                    network.emitViewProfile(googleId);
+                }
+                return;
+            }
+    
+            // Handle Send Message (from friends list)
+            if (button && button.matches('.send-message-btn')) {
+                const userId = button.dataset.userId;
+                const username = button.dataset.username;
+                if (userId && username) {
+                    openChatWindow(userId, username);
+                }
+                return;
+            }
+    
+            // Handle Accept/Decline Friend Request
+            if (button && (button.matches('.accept-request-btn') || button.matches('.decline-request-btn'))) {
+                const requestId = button.dataset.requestId;
+                if (requestId) {
+                    const action = button.matches('.accept-request-btn') ? 'accept' : 'decline';
+                    network.emitRespondToRequest(requestId, action);
+                }
+                return;
+            }
+        });
+    }
+
     if (dom.friendsSearchButton) {
         dom.friendsSearchButton.addEventListener('click', () => {
             const query = dom.friendsSearchInput ? dom.friendsSearchInput.value.trim() : '';
@@ -902,58 +961,6 @@ export function initializeUiHandlers() {
         });
     }
 
-    if (dom.profileFriendsTabContent) {
-        dom.profileFriendsTabContent.addEventListener('click', (e) => {
-            const button = e.target;
-            if (button.matches('.add-friend-btn')) {
-                const userId = button.dataset.userId;
-                button.disabled = true; // Disable immediately
-                network.emitSendFriendRequest(userId, (response) => {
-                    if (response.success) {
-                        button.textContent = t('profile.request_sent');
-                    } else {
-                        alert(response.error || 'Falha ao enviar pedido.');
-                        button.disabled = false; // Re-enable on failure
-                    }
-                });
-            }
-        });
-    }
-    
-    if (dom.friendsListContainer) {
-        dom.friendsListContainer.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target.matches('.remove-friend-btn')) {
-                const userId = target.dataset.userId;
-                const username = target.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este amigo';
-                if (confirm(t('confirm.remove_friend', { username }))) {
-                     network.emitRemoveFriend(userId);
-                }
-            } else if (target.matches('.view-profile-btn')) {
-                const googleId = target.dataset.googleId;
-                network.emitViewProfile(googleId);
-            } else if (target.matches('.send-message-btn')) {
-                const userId = target.dataset.userId;
-                const username = target.dataset.username;
-                openChatWindow(userId, username);
-            }
-        });
-    }
-
-    if(dom.friendRequestsListContainer) {
-        dom.friendRequestsListContainer.addEventListener('click', (e) => {
-            const target = e.target;
-            const requestId = target.dataset.requestId;
-            if(!requestId) return;
-
-            if (target.matches('.accept-request-btn')) {
-                network.emitRespondToRequest(requestId, 'accept');
-            } else if (target.matches('.decline-request-btn')) {
-                network.emitRespondToRequest(requestId, 'decline');
-            }
-        });
-    }
-    
     if (dom.profileModal) {
         dom.profileModal.addEventListener('click', (e) => {
              const button = e.target;
