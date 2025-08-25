@@ -457,21 +457,28 @@ export async function triggerFieldEffects() {
                 const isPositive = space.color === 'blue';
                 updateLog(`${player.name} parou em uma casa ${isPositive ? 'azul' : 'vermelha'}! Ativando efeito: ${space.effectName}`);
                 
-                dom.fieldEffectCardEl.className = `field-effect-card ${isPositive ? 'positive' : 'negative'}`;
-                dom.fieldEffectNameEl.textContent = space.effectName;
-                dom.fieldEffectDescriptionEl.textContent = isPositive ? config.POSITIVE_EFFECTS[space.effectName] : config.NEGATIVE_EFFECTS[space.effectName];
-                dom.fieldEffectModal.classList.remove('hidden');
+                const effectData = isPositive ? config.POSITIVE_EFFECTS[space.effectName] : config.NEGATIVE_EFFECTS[space.effectName];
                 
-                await new Promise(resolve => {
-                    const handler = () => {
-                        dom.fieldEffectContinueButton.removeEventListener('click', handler);
-                        dom.fieldEffectModal.classList.add('hidden');
-                        resolve();
-                    };
-                    dom.fieldEffectContinueButton.addEventListener('click', handler);
-                });
-
-                effectSucceeded = await executeFieldEffect(player, space.effectName);
+                if (effectData && effectData.descriptionKey) {
+                    dom.fieldEffectCardEl.className = `field-effect-card ${isPositive ? 'positive' : 'negative'}`;
+                    dom.fieldEffectNameEl.textContent = space.effectName;
+                    dom.fieldEffectDescriptionEl.textContent = t(effectData.descriptionKey);
+                    dom.fieldEffectModal.classList.remove('hidden');
+                    
+                    await new Promise(resolve => {
+                        const handler = () => {
+                            dom.fieldEffectContinueButton.removeEventListener('click', handler);
+                            dom.fieldEffectModal.classList.add('hidden');
+                            resolve();
+                        };
+                        dom.fieldEffectContinueButton.addEventListener('click', handler);
+                    });
+                    
+                    effectSucceeded = await executeFieldEffect(player, space.effectName);
+                } else {
+                    console.error(`Missing effect data for effect: ${space.effectName}`);
+                    effectSucceeded = false;
+                }
             }
 
             if (effectSucceeded) {

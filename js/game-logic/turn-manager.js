@@ -494,6 +494,8 @@ function checkGameEnd() {
  */
 async function calculateScoresAndEndRound() {
     const { gameState } = getState();
+    if (gameState.gamePhase !== 'playing') return;
+
     const finalScores = {};
 
     // 0. Reset Contravox flag before checking for new triggers

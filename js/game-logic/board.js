@@ -104,10 +104,10 @@ export const generateBoardPaths = (options = {}) => {
                  if (spaceToColor) {
                     if (isPositive) {
                         spaceToColor.color = 'blue';
-                        spaceToColor.effectName = shuffle([...allPositiveEffects])[0];
+                        spaceToColor.effectName = allPositiveEffects[Math.floor(Math.random() * allPositiveEffects.length)];
                     } else {
                         spaceToColor.color = 'red';
-                        spaceToColor.effectName = shuffle([...allNegativeEffects])[0];
+                        spaceToColor.effectName = allNegativeEffects[Math.floor(Math.random() * allNegativeEffects.length)];
                     }
                 }
                 currentSpaceIndex++;

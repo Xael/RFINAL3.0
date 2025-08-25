@@ -22,7 +22,24 @@ export async function executeAiTurn(player) {
     let specialAbilityUsed = false;
 
     try {
-        // --- Part 1: Play a value card if necessary ---
+        // --- Part 1: Event Boss Special Abilities ---
+        if (player.isEventBoss) {
+            const player1 = gameState.players['player-1'];
+            switch(player.aiType) {
+                case 'astronomoperdido': // August
+                    if (!player.eventAbilityUsedThisMatch && player.position < player1.position - 3) {
+                        updateLog(`${player.name} usa 'Caos Cósmico' para trocar de lugar!`);
+                        [player.position, player1.position] = [player1.position, player.position];
+                        player.eventAbilityUsedThisMatch = true;
+                        specialAbilityUsed = true;
+                        renderAll();
+                        await new Promise(res => setTimeout(res, 1000));
+                    }
+                    break;
+            }
+        }
+
+        // --- Part 2: Play a value card if necessary ---
         const valueCards = player.hand.filter(c => c.type === 'value');
         if (valueCards.length > 1 && !player.playedValueCardThisTurn) {
             const otherScores = gameState.playerIdsInGame
@@ -53,7 +70,7 @@ export async function executeAiTurn(player) {
             playedACard = true;
         }
 
-        // --- Part 2: Consider playing one effect card ---
+        // --- Part 3: Consider playing one effect card ---
         const effectCards = player.hand.filter(c => c.type === 'effect');
         let bestMove = { score: -1 };
         
@@ -295,7 +312,7 @@ export async function executeAiTurn(player) {
             playedACard = true;
         }
 
-        // --- Part 3: Pass the turn ---
+        // --- Part 4: Pass the turn ---
         if (!playedACard && !specialAbilityUsed) {
             updateLog(`AI ${player.name}: Nenhuma jogada estratégica, passando o turno.`);
         } else {

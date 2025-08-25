@@ -227,6 +227,7 @@ export const initializeGame = async (mode, options) => {
             };
             if (eventData && id === 'player-2') {
                 playerObject.isEventBoss = true;
+                playerObject.eventAbilityUsedThisMatch = false;
             }
             if (isInversusMode) {
                 playerObject.hearts = 10;
