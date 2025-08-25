@@ -864,7 +864,6 @@ export function initializeUiHandlers() {
         }
     });
 
-    // FIX: Re-added the missing event listener for the create room button
     dom.pvpCreateRoomButton.addEventListener('click', () => network.emitCreateRoom());
 
     dom.pvpRoomGridEl.addEventListener('click', (e) => {
@@ -905,11 +904,18 @@ export function initializeUiHandlers() {
 
     if (dom.profileFriendsTabContent) {
         dom.profileFriendsTabContent.addEventListener('click', (e) => {
-            if (e.target.matches('.add-friend-btn')) {
-                const userId = e.target.dataset.userId;
-                network.emitSendFriendRequest(userId);
-                e.target.textContent = t('profile.request_sent');
-                e.target.disabled = true;
+            const button = e.target;
+            if (button.matches('.add-friend-btn')) {
+                const userId = button.dataset.userId;
+                button.disabled = true; // Disable immediately
+                network.emitSendFriendRequest(userId, (response) => {
+                    if (response.success) {
+                        button.textContent = t('profile.request_sent');
+                    } else {
+                        alert(response.error || 'Falha ao enviar pedido.');
+                        button.disabled = false; // Re-enable on failure
+                    }
+                });
             }
         });
     }
@@ -950,15 +956,21 @@ export function initializeUiHandlers() {
     
     if (dom.profileModal) {
         dom.profileModal.addEventListener('click', (e) => {
-             if (e.target.matches('.add-friend-btn')) {
-                const userId = e.target.dataset.userId;
-                network.emitSendFriendRequest(userId);
-                e.target.textContent = t('profile.request_sent');
-                e.target.disabled = true;
-            } else if (e.target.matches('.remove-friend-btn')) {
-                const userId = e.target.dataset.userId;
+             const button = e.target;
+             if (button.matches('.add-friend-btn')) {
+                const userId = button.dataset.userId;
+                button.disabled = true; // Disable immediately
+                network.emitSendFriendRequest(userId, (response) => {
+                    if (response.success) {
+                        button.textContent = t('profile.request_sent');
+                    } else {
+                        alert(response.error || 'Falha ao enviar pedido.');
+                        button.disabled = false; // Re-enable on failure
+                    }
+                });
+            } else if (button.matches('.remove-friend-btn')) {
+                const userId = button.dataset.userId;
                 network.emitRemoveFriend(userId);
-                 // The button will be updated when the profile re-renders after the friend list is updated
             }
         });
     }

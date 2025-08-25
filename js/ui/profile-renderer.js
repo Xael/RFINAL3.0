@@ -36,12 +36,19 @@ export function renderProfile(profileData) {
     // --- 2. Renderizar o Modal de Perfil Detalhado ---
     const lang = getCurrentLanguage().replace('_', '-');
     const joinDate = new Date(profileData.created_at).toLocaleDateString(lang);
-    const selectedTitleText = profileData.selected_title_code ? t(`titles.${profileData.selected_title_code}`) : '';
+    
+    let selectedTitleText = profileData.selected_title_code ? t(`titles.${profileData.selected_title_code}`) : '';
+    if (selectedTitleText.startsWith('titles.')) {
+        selectedTitleText = profileData.selected_title_code;
+    }
 
 
     const titlesHTML = isMyProfile ? (profileData.titles || []).reduce((acc, title) => {
         if (!acc[title.line]) acc[title.line] = '';
-        const titleName = t(`titles.${title.code}`) || title.name;
+        let titleName = t(`titles.${title.code}`) || title.name;
+        if (titleName.startsWith('titles.')) {
+            titleName = title.code;
+        }
         acc[title.line] += `
             <li>
                 <input type="radio" id="title-${title.code}" name="selected-title" value="${title.code}" ${profileData.selected_title_code === title.code ? 'checked' : ''}>
@@ -142,7 +149,10 @@ export function renderFriendsList(friends) {
         return;
     }
     container.innerHTML = friends.map(friend => {
-        const titleText = friend.selected_title_code ? t(`titles.${friend.selected_title_code}`) : '';
+        let titleText = friend.selected_title_code ? t(`titles.${friend.selected_title_code}`) : '';
+        if (titleText.startsWith('titles.')) {
+            titleText = friend.selected_title_code;
+        }
         return `
             <div class="friend-item" id="friend-item-${friend.id}">
                 <img src="${friend.avatar_url}" alt="Avatar" class="friend-avatar">

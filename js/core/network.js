@@ -117,9 +117,8 @@ export function connectToServer() {
     socket.on('newFriendRequest', (request) => {
         alert(t('friends.new_request_alert', { username: request.username }));
         dom.friendRequestBadge.classList.remove('hidden');
-        // Opcional: Adicionar dinamicamente à lista se o modal de perfil estiver aberto
         if (!dom.profileModal.classList.contains('hidden')) {
-            emitGetPendingRequests(); // Recarrega a lista para mostrar a nova
+            emitGetPendingRequests();
         }
     });
 
@@ -127,10 +126,15 @@ export function connectToServer() {
         if (action === 'accept') {
             alert(t('friends.request_accepted_alert', { username }));
         }
+        // Refresh both lists to show new friend or updated request list
+        emitGetFriendsList();
+        emitGetPendingRequests();
     });
     
-    socket.on('friendStatusUpdate', ({ userId, isOnline }) => {
-        updateFriendStatusIndicator(userId, isOnline);
+    socket.on('friendStatusUpdate', () => {
+        // A simple status change for one friend requires a full refresh to guarantee
+        // that the online status and message buttons are always correct.
+        emitGetFriendsList();
     });
 
     socket.on('privateMessage', (message) => {
@@ -233,7 +237,14 @@ export function emitChangeMode(mode) { const { socket } = getState(); if (socket
 export function emitStartGame() { const { socket } = getState(); if (socket) socket.emit('startGame'); }
 export function emitPlayCard({ cardId, targetId, options = {} }) { const { socket } = getState(); if (socket) socket.emit('playCard', { cardId, targetId, options }); }
 export function emitSearchUsers(query) { const { socket } = getState(); if (socket) socket.emit('searchUsers', { query }); }
-export function emitSendFriendRequest(targetUserId) { const { socket } = getState(); if (socket) socket.emit('sendFriendRequest', { targetUserId }); }
+export function emitSendFriendRequest(targetUserId, callback) { 
+    const { socket } = getState(); 
+    if (socket) {
+        socket.emit('sendFriendRequest', { targetUserId }, callback);
+    } else {
+        callback({ success: false, error: 'Sem conexão com o servidor.' });
+    }
+}
 export function emitRespondToRequest(requestId, action) { const { socket } = getState(); if(socket) socket.emit('respondToRequest', { requestId, action }); }
 export function emitGetPendingRequests() { const { socket } = getState(); if(socket) socket.emit('getPendingRequests'); }
 export function emitRemoveFriend(targetUserId) { const { socket } = getState(); if (socket) socket.emit('removeFriend', { targetUserId }); }
