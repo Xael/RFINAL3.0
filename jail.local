@@ -1,0 +1,8 @@
+[nginx-attack]
+enabled = true
+port    = http,https
+filter  = nginx-attack
+logpath = /var/log/nginx/access.log
+maxretry = 3
+findtime = 600
+bantime  = 86400
