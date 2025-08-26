@@ -110,11 +110,16 @@ export const updateLobbyUi = (roomData) => {
                 playerTitleText = player.title_code;
             }
             const playerTitle = playerTitleText ? `<span class="player-title">${playerTitleText}</span>` : '';
+
             slotEl.innerHTML = `
-                <div>
-                    <span class="player-name clickable" data-google-id="${player.googleId}">${player.username}</span>${hostStar}
+                <div class="lobby-player-level">${player.level}</div>
+                <img src="${player.avatar_url}" alt="Avatar" class="lobby-player-avatar">
+                <div class="lobby-player-info">
+                    <div class="lobby-player-name-container">
+                        <span class="player-name clickable" data-google-id="${player.googleId}">${player.username}</span>${hostStar}
+                    </div>
+                    ${playerTitle}
                 </div>
-                ${playerTitle}
             `;
         } else {
             slotEl.textContent = t('pvp.waiting_player');
