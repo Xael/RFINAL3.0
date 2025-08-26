@@ -51,7 +51,6 @@ const appState = {
     userProfile: null, // Holds profile data from the server (name, avatar, stats)
     isLoggedIn: false, // Flag to indicate if the user is authenticated
     currentRoomId: null, // The ID of the room the player is currently in
-    mutedUsers: new Set(), // Locally muted user IDs for chat
 };
 
 /**

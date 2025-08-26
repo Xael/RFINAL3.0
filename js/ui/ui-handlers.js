@@ -263,542 +263,751 @@ function handleFieldEffectIndicatorClick(e) {
     }
 }
 
-function handleChatModerationClick(e) {
-    const { mutedUsers, gameState } = getState();
+
+export function initializeUiHandlers() {
+    document.addEventListener('aiTurnEnded', advanceToNextPlayer);
     
-    const reportButton = e.target.closest('.chat-report-button');
-    if (reportButton) {
-        const userId = reportButton.dataset.userId;
-        const username = reportButton.dataset.username;
-        if (confirm(`Deseja denunciar ${username} por comportamento inadequado no chat? A conversa será enviada para análise.`)) {
-            network.emitReportChat(userId);
-        }
-        return;
-    }
+    document.body.addEventListener('click', (e) => {
+        if (e.target.closest('.player-hand')) handleCardClick(e);
+        if (e.target.closest('.field-effect-indicator')) handleFieldEffectIndicatorClick(e);
+    });
 
-    const muteButton = e.target.closest('.chat-mute-button');
-    if (muteButton) {
-        const userId = muteButton.dataset.userId;
-        if (mutedUsers.has(userId)) {
-            mutedUsers.delete(userId);
-            updateLog(`Você reativou as mensagens de ${muteButton.dataset.username || 'um jogador'}.`);
-        } else {
-            mutedUsers.add(userId);
-            updateLog(`Você silenciou ${muteButton.dataset.username || 'um jogador'}.`);
-        }
-        // Re-render the relevant chat log
-        if (gameState) {
-            updateLog(); // Re-renders the in-game log
-        } else {
-            // This is likely the lobby, need a way to re-render it
-            // For now, the button icon will change, and new messages won't appear.
-            // A full re-render is more complex here. Let's just update the button.
-            const isMuted = mutedUsers.has(userId);
-            muteButton.title = isMuted ? 'Desmutar Jogador' : 'Silenciar Jogador';
-            muteButton.innerHTML = isMuted
-                ? `<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path></svg>`
-                : `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>`;
-        }
-        return;
-    }
-}
-
-/**
- * Initializes all UI event handlers for the application.
- */
-export const initializeUiHandlers = () => {
-    // --- Splash Screen ---
+    dom.playButton.addEventListener('click', handlePlayButtonClick);
+    dom.endTurnButton.addEventListener('click', handleEndTurnButtonClick);
+    dom.cardViewerCloseButton.addEventListener('click', () => dom.cardViewerModalEl.classList.add('hidden'));
+    
     dom.quickStartButton.addEventListener('click', () => {
         sound.initializeMusic();
+        dom.splashScreenEl.classList.add('hidden');
         dom.gameSetupModal.classList.remove('hidden');
     });
+    
     dom.storyModeButton.addEventListener('click', () => {
+        sound.initializeMusic();
+        const hasSave = localStorage.getItem('reversus-story-save');
+        dom.storyContinueGameButton.disabled = !hasSave;
         dom.storyStartOptionsModal.classList.remove('hidden');
     });
+
     dom.pvpModeButton.addEventListener('click', () => {
-        sound.initializeMusic();
         const { isLoggedIn } = getState();
         if (!isLoggedIn) {
-            alert("Você precisa fazer login com o Google para jogar no modo PvP.");
+            alert("É necessário fazer login com o Google para jogar no modo PVP.");
             return;
         }
-        dom.pvpRoomListModal.classList.remove('hidden');
         network.emitListRooms();
+        dom.splashScreenEl.classList.add('hidden');
+        dom.pvpRoomListModal.classList.remove('hidden');
     });
-    dom.rankingButton.addEventListener('click', () => {
-        sound.initializeMusic();
-        dom.rankingModal.classList.remove('hidden');
-        network.emitGetRanking();
-    });
-    dom.infoButton.addEventListener('click', () => {
-        sound.initializeMusic();
-        dom.infoModal.classList.remove('hidden');
-    });
-    dom.closeInfoButton.addEventListener('click', () => dom.infoModal.classList.add('hidden'));
 
-    // --- Story Start Options ---
+    dom.eventButton.addEventListener('click', () => {
+        const currentMonth = new Date().getMonth();
+        currentEventData = config.MONTHLY_EVENTS[currentMonth];
+
+        if (currentEventData) {
+            sound.playStoryMusic(`${currentEventData.ai}.ogg`);
+            dom.eventCharacterImage.src = `./${currentEventData.image}`;
+            dom.eventCharacterName.textContent = t(currentEventData.characterNameKey);
+            dom.eventAbilityDescription.textContent = t(currentEventData.abilityKey);
+            dom.eventRewardText.textContent = t('event.reward_text_placeholder', { rewardName: t(currentEventData.rewardTitleKey) });
+            const today = new Date().toISOString().split('T')[0];
+            const lastAttemptDate = localStorage.getItem('reversus-event-attempt-date');
+            const hasAttemptedToday = lastAttemptDate === today;
+            dom.challengeEventButton.disabled = hasAttemptedToday;
+            dom.eventStatusText.textContent = hasAttemptedToday ? t('event.status_wait') : '';
+        } else {
+            sound.playStoryMusic('tela.ogg');
+            dom.eventCharacterImage.src = '';
+            dom.eventCharacterName.textContent = 'Nenhum Evento Ativo';
+            dom.eventAbilityDescription.textContent = 'Volte mais tarde para novos desafios.';
+            dom.challengeEventButton.disabled = true;
+            dom.eventStatusText.textContent = '';
+            currentEventData = null;
+        }
+        dom.eventModal.classList.remove('hidden');
+    });
+
+    dom.challengeEventButton.addEventListener('click', () => {
+        if (dom.challengeEventButton.disabled || !currentEventData) return;
+
+        const today = new Date().toISOString().split('T')[0];
+        localStorage.setItem('reversus-event-attempt-date', today);
+
+        const gameOptions = {
+            story: {
+                battle: `event_${currentEventData.ai}`,
+                eventData: { name: t(currentEventData.nameKey), ai: currentEventData.ai },
+                playerIds: ['player-1', 'player-2'],
+                overrides: { 'player-2': { name: t(currentEventData.characterNameKey), aiType: currentEventData.ai } }
+            }
+        };
+        initializeGame('solo', gameOptions);
+    });
+    
+    dom.rankingButton.addEventListener('click', () => {
+        network.emitGetRanking();
+        dom.rankingModal.classList.remove('hidden');
+    });
+
+    if (dom.rankingContainer) {
+        dom.rankingContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('.rank-name.clickable');
+            if (target) {
+                const googleId = target.dataset.googleId;
+                if (googleId) {
+                    network.emitViewProfile(googleId);
+                }
+            }
+        });
+    }
+
+    if (dom.pvpLobbyModal) {
+        dom.pvpLobbyModal.addEventListener('click', (e) => {
+            const target = e.target.closest('.lobby-player-grid .clickable');
+            if(target) {
+                const googleId = target.dataset.googleId;
+                if (googleId) {
+                    network.emitViewProfile(googleId);
+                }
+            }
+        });
+    }
+
     dom.storyNewGameButton.addEventListener('click', () => {
         dom.storyStartOptionsModal.classList.add('hidden');
         startStoryMode();
     });
-    dom.storyContinueGameButton.addEventListener('click', () => {
-        if (!dom.storyContinueGameButton.disabled) {
-            dom.storyStartOptionsModal.classList.add('hidden');
-            saveLoad.loadGameState();
-        }
-    });
-    dom.storyOptionsCloseButton.addEventListener('click', () => dom.storyStartOptionsModal.classList.add('hidden'));
 
-    // --- Game Setup Modals ---
-    dom.closeSetupButton.addEventListener('click', () => dom.gameSetupModal.classList.add('hidden'));
+    dom.storyContinueGameButton.addEventListener('click', () => {
+        dom.storyStartOptionsModal.classList.add('hidden');
+        saveLoad.loadGameState();
+    });
+
+    dom.storyOptionsCloseButton.addEventListener('click', () => {
+        dom.storyStartOptionsModal.classList.add('hidden');
+    });
+    
+    dom.inversusModeButton.addEventListener('click', () => {
+        initializeGame('inversus', {});
+    });
+
+    dom.userProfileDisplay.addEventListener('click', () => {
+        network.emitGetProfile();
+        network.emitGetFriendsList();
+        network.emitGetPendingRequests();
+        renderAchievementsModal();
+        dom.profileModal.classList.remove('hidden');
+    });
+
+    dom.closeRankingButton.addEventListener('click', () => dom.rankingModal.classList.add('hidden'));
+    dom.closeProfileButton.addEventListener('click', () => dom.profileModal.classList.add('hidden'));
+    dom.closeEventButton.addEventListener('click', () => {
+        dom.eventModal.classList.add('hidden');
+        sound.playStoryMusic('tela.ogg');
+    });
+
+    dom.profileModal.querySelectorAll('.profile-tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.dataset.tab;
+            dom.profileModal.querySelectorAll('.profile-tab-button').forEach(btn => btn.classList.remove('active'));
+            dom.profileModal.querySelectorAll('.info-tab-content').forEach(content => content.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(`${tabId}-tab-content`).classList.add('active');
+        });
+    });
+
+    dom.infoButton.addEventListener('click', () => dom.infoModal.classList.remove('hidden'));
+    dom.closeInfoButton.addEventListener('click', () => dom.infoModal.classList.add('hidden'));
+    dom.fieldEffectInfoCloseButton.addEventListener('click', () => dom.fieldEffectInfoModal.classList.add('hidden'));
+
+    dom.infoModal.querySelectorAll('.info-tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.dataset.tab;
+            dom.infoModal.querySelectorAll('.info-tab-button').forEach(btn => btn.classList.remove('active'));
+            dom.infoModal.querySelectorAll('.info-tab-content').forEach(content => content.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(`${tabId}-tab-content`).classList.add('active');
+        });
+    });
+    
+    dom.closeSetupButton.addEventListener('click', () => {
+        dom.gameSetupModal.classList.add('hidden');
+        dom.splashScreenEl.classList.remove('hidden');
+    });
+    
     dom.solo2pButton.addEventListener('click', () => {
         dom.gameSetupModal.classList.add('hidden');
         dom.oneVOneSetupModal.classList.remove('hidden');
     });
+    
     dom.solo3pButton.addEventListener('click', () => initializeGame('solo', { numPlayers: 3 }));
     dom.solo4pButton.addEventListener('click', () => initializeGame('solo', { numPlayers: 4 }));
     dom.duoModeButton.addEventListener('click', () => initializeGame('duo', { numPlayers: 4 }));
+
     dom.oneVOneBackButton.addEventListener('click', () => {
         dom.oneVOneSetupModal.classList.add('hidden');
         dom.gameSetupModal.classList.remove('hidden');
     });
+    
+    dom.oneVOneDefaultButton.addEventListener('click', () => {
+        dom.oneVOneSetupModal.classList.add('hidden');
+        initializeGame('solo', { numPlayers: 2 });
+    });
 
-    // --- Game Actions ---
-    dom.playButton.addEventListener('click', handlePlayButtonClick);
-    dom.endTurnButton.addEventListener('click', handleEndTurnButtonClick);
+    dom.oneVOneRandomButton.addEventListener('click', async () => {
+        dom.oneVOneSetupModal.classList.add('hidden');
+        dom.randomOpponentSpinnerModal.classList.remove('hidden');
 
-    // AI turn end listener
-    document.addEventListener('aiTurnEnded', advanceToNextPlayer);
+        const opponents = [
+            { name: 'Contravox', aiType: 'contravox', image: './contravox.png' },
+            { name: 'Versatrix', aiType: 'versatrix', image: './versatrix.png' },
+            { name: 'Rei Reversum', aiType: 'reversum', image: './reversum.png' },
+            { name: 'Inversus', aiType: 'inversus', image: './INVERSUM1.png' },
+            { name: 'Xael', aiType: 'xael', image: './xaeldesafio.png' },
+            { name: 'Narrador', aiType: 'narrador', image: './narrador.png' },
+            { name: 'Necroverso Final', aiType: 'necroverso_final', image: './necroverso2.png' }
+        ];
 
-    // --- Game Over ---
+        let spinnerInterval;
+        let selectedOpponent;
+        const spinPromise = new Promise(resolve => {
+            let currentIndex = 0;
+            spinnerInterval = setInterval(() => {
+                dom.opponentSpinnerImage.src = opponents[currentIndex].image;
+                dom.opponentSpinnerName.textContent = opponents[currentIndex].name;
+                currentIndex = (currentIndex + 1) % opponents.length;
+            }, 100);
+
+            setTimeout(() => {
+                clearInterval(spinnerInterval);
+                selectedOpponent = opponents[Math.floor(Math.random() * opponents.length)];
+                dom.opponentSpinnerImage.src = selectedOpponent.image;
+                dom.opponentSpinnerName.textContent = selectedOpponent.name;
+                sound.playSoundEffect('escolhido');
+                resolve();
+            }, 3000);
+        });
+        
+        await spinPromise;
+        await new Promise(res => setTimeout(res, 1500));
+        dom.randomOpponentSpinnerModal.classList.add('hidden');
+        
+        const overrides = { 'player-2': { name: selectedOpponent.name, aiType: selectedOpponent.aiType } };
+        initializeGame('solo', { numPlayers: 2, overrides });
+    });
+
     dom.restartButton.addEventListener('click', (e) => {
         dom.gameOverModal.classList.add('hidden');
         const action = e.target.dataset.action;
+        
         if (action === 'restart') {
             const { gameState } = getState();
-            if (gameState && gameState.gameOptions) {
+            if (gameState && gameState.isStoryMode) {
+                restartLastDuel();
+            } else if (gameState) {
                 initializeGame(gameState.gameMode, gameState.gameOptions);
+            } else {
+                 showSplashScreen();
             }
-        } else if (action === 'restart_duel') {
-            restartLastDuel();
         } else {
             showSplashScreen();
         }
     });
-
-    // --- In-Game Chat ---
-    const chatContainer = document.querySelector('.chat-container');
-    const chatToggleCheckbox = document.getElementById('chat-toggle-checkbox');
-    chatToggleCheckbox.addEventListener('change', () => {
-        chatContainer.classList.toggle('disabled', !chatToggleCheckbox.checked);
-        dom.chatInputArea.classList.toggle('hidden', !chatToggleCheckbox.checked);
-    });
-
-    dom.chatSendButton.addEventListener('click', () => {
-        const message = dom.chatInput.value.trim();
-        if (message) {
-            const { gameState } = getState();
-            if (gameState && gameState.isPvp) {
-                network.emitChatMessage(message);
-            } else {
-                const myPlayerId = getLocalPlayerId();
-                const player = myPlayerId ? gameState.players[myPlayerId] : null;
-                if(player) {
-                    updateLog({ type: 'dialogue', speaker: player.name, message: message, speakerId: player.id });
-                }
-            }
-            dom.chatInput.value = '';
-        }
-    });
-    dom.chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') dom.chatSendButton.click();
-    });
-
-    // --- Card Interaction ---
-    dom.appContainerEl.addEventListener('click', handleCardClick);
-    dom.cardViewerCloseButton.addEventListener('click', () => dom.cardViewerModalEl.classList.add('hidden'));
-
-    // --- Target Selection ---
+    
     dom.targetPlayerButtonsEl.addEventListener('click', async (e) => {
         if (e.target.tagName !== 'BUTTON') return;
+        
         const targetId = e.target.dataset.playerId;
-        const { gameState } = getState();
+        const { gameState, reversusTotalIndividualFlow } = getState();
         const card = gameState.selectedCard;
-
+        const myPlayerId = getLocalPlayerId();
+        const player = gameState.players[myPlayerId];
+        
         dom.targetModal.classList.add('hidden');
 
-        if (card.name === 'Reversus') {
+        if (!card || !player) {
+            cancelPlayerAction();
+            return;
+        }
+
+        if (reversusTotalIndividualFlow && card.name === 'Reversus Total') {
+            gameState.reversusTarget = targetId;
+            dom.reversusIndividualEffectChoiceModal.classList.remove('hidden');
+        } else if (card.name === 'Reversus') {
             gameState.reversusTarget = targetId;
             dom.reversusTargetModal.classList.remove('hidden');
         } else if (card.name === 'Pula') {
-            const targetPlayer = gameState.players[targetId];
-            if (!targetPlayer) return;
             gameState.pulaTarget = targetId;
-
-            const occupiedPaths = new Set(Object.values(gameState.players).map(p => p.pathId));
-            const availablePaths = gameState.boardPaths.filter(p => !occupiedPaths.has(p.id));
-
-            if (availablePaths.length === 0) {
-                updateLog(`Não há caminhos vazios para usar 'Pula' em ${targetPlayer.name}.`);
-                cancelPlayerAction();
-                return;
+            const targetPlayer = gameState.players[targetId];
+            const availablePaths = gameState.boardPaths.filter(p => !Object.values(gameState.players).some(pl => pl.pathId === p.id));
+            
+            if (availablePaths.length > 0) {
+                dom.pulaModalTitle.textContent = t('pula.title_with_target', { targetName: targetPlayer.name });
+                dom.pulaModalText.textContent = t('pula.description_with_target', { targetName: targetPlayer.name });
+                dom.pulaPathButtonsEl.innerHTML = availablePaths.map(p => `<button class="control-button" data-path-id="${p.id}">${t('pula.path_button', { pathNumber: p.id + 1 })}</button>`).join('');
+                dom.pulaModal.classList.remove('hidden');
+            } else {
+                 updateLog(`Não há caminhos vazios para usar 'Pula'.`);
+                 cancelPlayerAction();
             }
-            dom.pulaModalTitle.textContent = t('pula.title_with_target', { targetName: targetPlayer.name });
-            dom.pulaModalText.textContent = t('pula.description_with_target', { targetName: targetPlayer.name });
-            dom.pulaPathButtonsEl.innerHTML = availablePaths.map(p => `<button class="control-button" data-path-id="${p.id}">${t('pula.path_button', { pathNumber: p.id + 1 })}</button>`).join('');
-            dom.pulaModal.classList.remove('hidden');
         } else {
             if (gameState.isPvp) {
-                network.emitPlayCard({ cardId: card.id, targetId });
+                network.emitPlayCard({ cardId: card.id, targetId: targetId });
             } else {
-                const myPlayerId = getLocalPlayerId();
-                if (!myPlayerId) return;
-                await playCard(gameState.players[myPlayerId], card, targetId);
+                await playCard(player, card, targetId);
                 gameState.gamePhase = 'playing';
                 renderAll();
             }
         }
     });
 
-    // --- Reversus & Pula Modals ---
-    dom.reversusTargetScoreButton.addEventListener('click', async () => {
-        const { gameState } = getState();
-        if (gameState.isPvp) {
-            network.emitPlayCard({ cardId: gameState.selectedCard.id, targetId: gameState.reversusTarget, options: { effectType: 'score' } });
-        } else {
-            const myPlayerId = getLocalPlayerId();
-            if (!myPlayerId) return;
-            await playCard(gameState.players[myPlayerId], gameState.selectedCard, gameState.reversusTarget, 'score');
-            gameState.gamePhase = 'playing';
-            renderAll();
-        }
-        cancelPlayerAction();
-    });
-    dom.reversusTargetMovementButton.addEventListener('click', async () => {
-        const { gameState } = getState();
-        if (gameState.isPvp) {
-            network.emitPlayCard({ cardId: gameState.selectedCard.id, targetId: gameState.reversusTarget, options: { effectType: 'movement' } });
-        } else {
-            const myPlayerId = getLocalPlayerId();
-            if (!myPlayerId) return;
-            await playCard(gameState.players[myPlayerId], gameState.selectedCard, gameState.reversusTarget, 'movement');
-            gameState.gamePhase = 'playing';
-            renderAll();
-        }
-        cancelPlayerAction();
-    });
+    dom.targetCancelButton.addEventListener('click', cancelPlayerAction);
+    
     dom.pulaPathButtonsEl.addEventListener('click', async (e) => {
         if (e.target.tagName !== 'BUTTON') return;
-        const pathId = parseInt(e.target.dataset.pathId, 10);
+        const pathId = parseInt(e.target.dataset.pathId);
         const { gameState } = getState();
+        const myPlayerId = getLocalPlayerId();
+        const player = gameState.players[myPlayerId];
+        const card = gameState.selectedCard;
+        const targetId = gameState.pulaTarget;
+        
+        const targetPlayer = gameState.players[targetId];
+        targetPlayer.targetPathForPula = pathId;
+        
+        dom.pulaModal.classList.add('hidden');
+        
+        updateLog(`${player.name} usou 'Pula' em ${targetPlayer.name}, forçando-o a pular para o caminho ${pathId + 1}.`);
+        
         if (gameState.isPvp) {
-            network.emitPlayCard({ cardId: gameState.selectedCard.id, targetId: gameState.pulaTarget, options: { pulaPath: pathId } });
+            network.emitPlayCard({ cardId: card.id, targetId, options: { pulaPath: pathId } });
         } else {
-            const myPlayerId = getLocalPlayerId();
-            if (!myPlayerId) return;
-            const targetPlayer = gameState.players[gameState.pulaTarget];
-            if (targetPlayer) targetPlayer.targetPathForPula = pathId;
-            await playCard(gameState.players[myPlayerId], gameState.selectedCard, gameState.pulaTarget);
+            await playCard(player, card, targetId);
+            gameState.gamePhase = 'playing';
+            gameState.pulaTarget = null;
+            renderAll();
+        }
+    });
+
+    dom.pulaCancelButton.addEventListener('click', cancelPlayerAction);
+
+    dom.reversusTargetScoreButton.addEventListener('click', async () => {
+        const { gameState } = getState();
+        const myPlayerId = getLocalPlayerId();
+        const player = gameState.players[myPlayerId];
+        const card = gameState.selectedCard;
+        const targetId = gameState.reversusTarget;
+        dom.reversusTargetModal.classList.add('hidden');
+
+        if (gameState.isPvp) {
+            network.emitPlayCard({ cardId: card.id, targetId, options: { effectType: 'score' } });
+        } else {
+            await playCard(player, card, targetId, 'score');
             gameState.gamePhase = 'playing';
             renderAll();
         }
-        cancelPlayerAction();
     });
 
-    // --- Reversus Total ---
+    dom.reversusTargetMovementButton.addEventListener('click', async () => {
+        const { gameState } = getState();
+        const myPlayerId = getLocalPlayerId();
+        const player = gameState.players[myPlayerId];
+        const card = gameState.selectedCard;
+        const targetId = gameState.reversusTarget;
+        dom.reversusTargetModal.classList.add('hidden');
+
+        if (gameState.isPvp) {
+            network.emitPlayCard({ cardId: card.id, targetId, options: { effectType: 'movement' } });
+        } else {
+            await playCard(player, card, targetId, 'movement');
+            gameState.gamePhase = 'playing';
+            renderAll();
+        }
+    });
+
+    dom.reversusTargetCancelButton.addEventListener('click', cancelPlayerAction);
+    
     dom.reversusTotalGlobalButton.addEventListener('click', async () => {
         const { gameState } = getState();
         const myPlayerId = getLocalPlayerId();
-        if (!myPlayerId) return;
+        const player = gameState.players[myPlayerId];
+        const card = gameState.selectedCard;
+        dom.reversusTotalChoiceModal.classList.add('hidden');
         if (gameState.isPvp) {
-            network.emitPlayCard({ cardId: gameState.selectedCard.id, targetId: myPlayerId, options: { isGlobal: true } });
+            network.emitPlayCard({ cardId: card.id, targetId: player.id, options: { isGlobal: true } });
         } else {
-            await playCard(gameState.players[myPlayerId], gameState.selectedCard, myPlayerId, null, { isGlobal: true });
+            await playCard(player, card, player.id);
             gameState.gamePhase = 'playing';
             renderAll();
         }
-        cancelPlayerAction();
     });
+    
     dom.reversusTotalIndividualButton.addEventListener('click', () => {
         updateState('reversusTotalIndividualFlow', true);
         dom.reversusTotalChoiceModal.classList.add('hidden');
-        // Trigger the original target selection modal again for the lock effect
-        const allPlayers = getState().gameState.playerIdsInGame.filter(id => !getState().gameState.players[id].isEliminated);
-        dom.targetModalCardName.textContent = "Reversus Individual";
-        dom.targetPlayerButtonsEl.innerHTML = allPlayers.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${getState().gameState.players[id].name}</button>`).join('');
+        
+        const { gameState } = getState();
+        const allPlayers = gameState.playerIdsInGame.filter(id => !gameState.players[id].isEliminated);
+        
+        dom.targetModalCardName.textContent = 'Reversus Individual';
+        dom.targetPlayerButtonsEl.innerHTML = allPlayers.map(id => `<button class="control-button target-player-${id.split('-')[1]}" data-player-id="${id}">${gameState.players[id].name}</button>`).join('');
         dom.targetModal.classList.remove('hidden');
     });
+
+    dom.reversusTotalChoiceCancel.addEventListener('click', cancelPlayerAction);
+    
     dom.reversusIndividualEffectButtons.addEventListener('click', async (e) => {
         if (e.target.tagName !== 'BUTTON') return;
         const effect = e.target.dataset.effect;
+        dom.reversusIndividualEffectChoiceModal.classList.add('hidden');
+        
         const { gameState } = getState();
         const myPlayerId = getLocalPlayerId();
-        if (!myPlayerId) return;
-
+        const player = gameState.players[myPlayerId];
+        const card = gameState.selectedCard;
+        const targetId = gameState.reversusTarget;
+        
+        const options = { isIndividualLock: true, effectNameToApply: effect };
+        if (effect === 'Pula') {
+            const targetPlayer = gameState.players[targetId];
+            const availablePaths = gameState.boardPaths.filter(p => !Object.values(gameState.players).some(pl => pl.pathId === p.id));
+            if(availablePaths.length > 0) {
+                targetPlayer.targetPathForPula = availablePaths[0].id;
+                options.pulaPath = availablePaths[0].id;
+            } else {
+                 updateLog(`Não há caminhos vazios para usar 'Pula' Individual.`);
+                 cancelPlayerAction();
+                 return;
+            }
+        }
+        
         if (gameState.isPvp) {
-            network.emitPlayCard({
-                cardId: gameState.selectedCard.id,
-                targetId: gameState.reversusTarget,
-                options: { isIndividualLock: true, effectNameToApply: effect }
-            });
+             network.emitPlayCard({ cardId: card.id, targetId, options });
         } else {
-            await playCard(gameState.players[myPlayerId], gameState.selectedCard, gameState.reversusTarget, null, {
-                isIndividualLock: true,
-                effectNameToApply: effect
-            });
+            await playCard(player, card, targetId, null, options);
+            updateState('reversusTotalIndividualFlow', false);
             gameState.gamePhase = 'playing';
             renderAll();
         }
-        cancelPlayerAction();
+    });
+    
+    dom.reversusIndividualCancelButton.addEventListener('click', cancelPlayerAction);
+
+    dom.pathSelectionButtonsEl.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') return;
+        const pathId = parseInt(e.target.dataset.pathId, 10);
+        const { pathSelectionResolver } = getState();
+        if (pathSelectionResolver) {
+            pathSelectionResolver(pathId);
+            updateState('pathSelectionResolver', null);
+            dom.pathSelectionModal.classList.add('hidden');
+        }
     });
 
-    // --- Field Effect Target Modal ---
-    dom.fieldEffectTargetButtons.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'BUTTON') return;
+    dom.muteButton.addEventListener('click', sound.toggleMute);
+    dom.nextTrackButton.addEventListener('click', sound.changeTrack);
+    dom.volumeSlider.addEventListener('input', (e) => sound.setVolume(parseFloat(e.target.value)));
+    dom.fullscreenButton.addEventListener('click', () => {
+        const enterIcon = document.getElementById('fullscreen-icon-enter');
+        const exitIcon = document.getElementById('fullscreen-icon-exit');
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            enterIcon.classList.add('hidden');
+            exitIcon.classList.remove('hidden');
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+                enterIcon.classList.remove('hidden');
+                exitIcon.classList.add('hidden');
+            }
+        }
+    });
+
+    const langPtBrButton = document.getElementById('lang-pt-BR');
+    const langEnUsButton = document.getElementById('lang-en-US');
+
+    const handleLanguageChange = async (lang) => {
+        await setLanguage(lang);
+        const { userProfile } = getState();
+        if (!dom.profileModal.classList.contains('hidden') && userProfile) {
+            renderProfile(userProfile);
+            renderAchievementsModal();
+        }
+    };
+
+    if (langPtBrButton) langPtBrButton.addEventListener('click', () => handleLanguageChange('pt-BR'));
+    if (langEnUsButton) langEnUsButton.addEventListener('click', () => handleLanguageChange('en-US'));
+
+    dom.debugButton.addEventListener('click', () => dom.gameMenuModal.classList.remove('hidden'));
+    dom.gameMenuCloseButton.addEventListener('click', () => dom.gameMenuModal.classList.add('hidden'));
+    dom.menuSaveGameButton.addEventListener('click', () => {
+        dom.gameMenuModal.classList.add('hidden');
+        dom.saveGameConfirmModal.classList.remove('hidden');
+    });
+    dom.menuExitGameButton.addEventListener('click', () => {
+        dom.gameMenuModal.classList.add('hidden');
+        dom.exitGameConfirmModal.classList.remove('hidden');
+    });
+    
+    dom.saveGameYesButton.addEventListener('click', saveLoad.saveGameState);
+    dom.saveGameNoButton.addEventListener('click', () => dom.saveGameConfirmModal.classList.add('hidden'));
+    dom.exitGameYesButton.addEventListener('click', () => {
+        dom.exitGameConfirmModal.classList.add('hidden');
+        const { gameState } = getState();
+        if (gameState && gameState.isPvp) {
+            network.emitLeaveRoom();
+        } else {
+            showSplashScreen();
+        }
+    });
+    dom.exitGameNoButton.addEventListener('click', () => dom.exitGameConfirmModal.classList.add('hidden'));
+    
+    document.addEventListener('startStoryGame', (e) => initializeGame(e.detail.mode, e.detail.options));
+    document.addEventListener('showSplashScreen', showSplashScreen);
+    
+    document.addEventListener('storyWinLoss', async (e) => {
+        const { battle, won, reason } = e.detail;
+        const { gameState, storyState } = getState();
+        updateState('lastStoryGameOptions', { mode: gameState.gameMode, options: gameState.gameOptions });
+        
+        let title = won ? t('game_over.story_victory_title') : t('game_over.story_defeat_title');
+        let message;
+        let buttonAction = 'restart';
+
+        switch (battle) {
+            case 'tutorial_necroverso': if (won) { achievements.grantAchievement('tutorial_win'); setTimeout(() => renderStoryNode('post_tutorial'), 1000); return; } else { message = "Você foi derrotado, mas aprendeu o básico. Vamos tentar de novo."; } break;
+            case 'contravox': if (won) { achievements.grantAchievement('contravox_win'); setTimeout(() => renderStoryNode('post_contravox_victory'), 1000); return; } else { message = "O Contravox te venceu. Quer tentar de novo?"; } break;
+            case 'versatrix': if (won) { achievements.grantAchievement('versatrix_win'); setTimeout(() => renderStoryNode('post_versatrix_victory'), 1000); } else { storyState.lostToVersatrix = true; achievements.grantAchievement('versatrix_loss'); setTimeout(() => renderStoryNode('post_versatrix_defeat'), 1000); } return;
+            case 'reversum': if (won) { achievements.grantAchievement('reversum_win'); setTimeout(() => renderStoryNode('post_reversum_victory'), 1000); } else { message = "O Rei Reversum é muito poderoso. Tentar novamente?"; } break;
+            case 'necroverso_king': if (won) { achievements.grantAchievement('true_end_beta'); setTimeout(() => renderStoryNode('post_necroverso_king_victory'), 1000); } else { message = "O poder combinado dos reis é demais. Deseja tentar novamente?"; } break;
+            case 'necroverso_final': if (won) { achievements.grantAchievement('true_end_final'); playEndgameSequence(); } else { message = reason === 'time' ? "O tempo acabou! O Inversus foi consumido..." : "O Necroverso venceu. A escuridão consome tudo. Tentar novamente?"; } break;
+            case 'xael_challenge': if (won) { achievements.grantAchievement('xael_win'); message = "Você venceu o criador! Habilidade 'Revelação Estelar' desbloqueada no Modo História."; buttonAction = 'menu'; } else { message = "O criador conhece todos os truques. Tentar novamente?"; } break;
+            case 'narrador': if (won) { achievements.grantAchievement('120%_unlocked'); message = "Você derrotou o Narrador! O que acontece agora...?"; buttonAction = 'menu'; } else { message = "O Narrador reescreveu a história para te derrotar. Tentar de novo?"; } break;
+            default: message = won ? 'Você venceu o duelo!' : 'Você foi derrotado.';
+        }
+        showGameOver(message, title, { action: buttonAction });
+    });
+
+    dom.splashLogo.addEventListener('click', (e) => {
+        const { achievements } = getState();
+        if (!achievements.has('inversus_win')) return;
+        if(document.querySelector('.modal-overlay:not(.hidden)')) return;
+        e.preventDefault();
+        sound.playSoundEffect('x');
+        document.body.classList.add('screen-shaking');
+        setTimeout(() => document.body.classList.remove('screen-shaking'), 500);
+        setTimeout(() => {
+            const gameOptions = { story: { battle: 'narrador', playerIds: ['player-1', 'player-2'], overrides: { 'player-2': { name: 'Narrador', aiType: 'narrador' } } } };
+            initializeGame('solo', gameOptions);
+        }, 800);
+    });
+
+    dom.splashAnimationContainerEl.addEventListener('click', (e) => {
+        if (e.target.id === 'secret-versatrix-card') {
+            const { achievements } = getState();
+            if (achievements.has('versatrix_win') && !achievements.has('versatrix_card_collected')) {
+                sound.playSoundEffect('conquista');
+                achievements.grantAchievement('versatrix_card_collected');
+                const { versatrixCardInterval } = getState();
+                if (versatrixCardInterval) clearInterval(versatrixCardInterval);
+                e.target.remove();
+            }
+        }
+    });
+    
+    dom.xaelPopup.addEventListener('click', async () => {
+        dom.xaelPopup.classList.add('hidden');
+        await shatterImage(dom.xaelPopup.querySelector('img'));
+        renderStoryNode('xael_challenge_intro');
+        dom.splashScreenEl.classList.add('hidden');
+        dom.storyModeModalEl.classList.remove('hidden');
+    });
+
+    dom.xaelStarPowerButton.addEventListener('click', () => {
+        dom.xaelPowerConfirmModal.classList.remove('hidden');
+    });
+
+    dom.xaelPowerConfirmNo.addEventListener('click', () => dom.xaelPowerConfirmModal.classList.add('hidden'));
+
+    dom.xaelPowerConfirmYes.addEventListener('click', () => {
+        dom.xaelPowerConfirmModal.classList.add('hidden');
+        const { gameState } = getState();
+        const player1 = gameState.players['player-1'];
+        if (player1 && player1.hasXaelStarPower && player1.xaelStarPowerCooldown === 0) {
+            announceEffect('Revelação Estelar!', 'reversus');
+            sound.playSoundEffect('conquista');
+            player1.xaelStarPowerCooldown = 5;
+            gameState.revealedHands = gameState.playerIdsInGame.filter(id => id !== 'player-1' && !gameState.players[id].isEliminated);
+            updateLog("Poder Estelar ativado! As mãos dos oponentes foram reveladas por esta rodada.");
+            renderAll();
+        }
+    });
+
+    const sendChatMessage = () => {
+        const message = dom.chatInput.value.trim();
+        if (message) {
+            const { gameState, userProfile } = getState();
+            if (gameState.isPvp) {
+                 network.emitChatMessage(message);
+            } else {
+                updateLog({ type: 'dialogue', speaker: userProfile?.username || t('game.you'), message });
+            }
+            dom.chatInput.value = '';
+        }
+    };
+    dom.chatSendButton.addEventListener('click', sendChatMessage);
+    dom.chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+
+    dom.lobbyChatSendButton.addEventListener('click', () => {
+        const message = dom.lobbyChatInput.value.trim();
+        if(message) {
+            network.emitLobbyChat(message);
+            dom.lobbyChatInput.value = '';
+        }
+    });
+    
+    dom.lobbyChatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const message = dom.lobbyChatInput.value.trim();
+            if(message) {
+                network.emitLobbyChat(message);
+                dom.lobbyChatInput.value = '';
+            }
+        }
+    });
+
+    dom.pvpCreateRoomButton.addEventListener('click', () => network.emitCreateRoom());
+
+    dom.pvpRoomGridEl.addEventListener('click', (e) => {
+        if (e.target.classList.contains('join-room-button')) {
+            const roomId = e.target.dataset.roomId;
+            if (roomId) network.emitJoinRoom(roomId);
+        }
+    });
+
+    dom.pvpRoomListCloseButton.addEventListener('click', () => {
+        dom.pvpRoomListModal.classList.add('hidden');
+        showSplashScreen();
+    });
+    
+    dom.pvpLobbyCloseButton.addEventListener('click', () => network.emitLeaveRoom());
+    dom.lobbyGameModeEl.addEventListener('change', (e) => network.emitChangeMode(e.target.value));
+    dom.lobbyStartGameButton.addEventListener('click', () => network.emitStartGame());
+    
+    dom.fieldEffectTargetModal.addEventListener('click', (e) => {
+        const button = e.target.closest('button');
+        if (!button) return;
         const { fieldEffectTargetResolver } = getState();
         if (fieldEffectTargetResolver) {
-            fieldEffectTargetResolver(e.target.dataset.playerId);
+            let targetId = null;
+            if (button.id !== 'field-effect-target-cancel-button') {
+                targetId = button.dataset.playerId;
+            }
+            fieldEffectTargetResolver(targetId); // Resolve with null on cancel
             updateState('fieldEffectTargetResolver', null);
-        }
-    });
-
-    // --- Universal Cancel Buttons ---
-    [dom.targetCancelButton, dom.reversusTargetCancelButton, dom.reversusTotalChoiceCancel, dom.pulaCancelButton, dom.reversusIndividualCancelButton].forEach(btn => btn.addEventListener('click', cancelPlayerAction));
-
-    // --- Sound Controls ---
-    sound.setVolume(0.5); // Initial volume
-    dom.muteButton.addEventListener('click', sound.toggleMute);
-    dom.volumeSlider.addEventListener('input', (e) => sound.setVolume(parseFloat(e.target.value)));
-    dom.nextTrackButton.addEventListener('click', sound.changeTrack);
-    dom.musicPlayer.addEventListener('ended', sound.changeTrack);
-    dom.fullscreenButton.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`));
-            document.getElementById('fullscreen-icon-enter').classList.add('hidden');
-            document.getElementById('fullscreen-icon-exit').classList.remove('hidden');
-        } else {
-            document.exitFullscreen();
-            document.getElementById('fullscreen-icon-enter').classList.remove('hidden');
-            document.getElementById('fullscreen-icon-exit').classList.add('hidden');
-        }
-    });
-
-    // --- Info Tabs ---
-    dom.infoModal.querySelector('.info-tabs').addEventListener('click', (e) => {
-        if (e.target.classList.contains('info-tab-button')) {
-            const tab = e.target.dataset.tab;
-            dom.infoModal.querySelectorAll('.info-tab-button').forEach(b => b.classList.remove('active'));
-            dom.infoModal.querySelectorAll('.info-tab-content').forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
-            document.getElementById(`${tab}-tab-content`).classList.add('active');
+            dom.fieldEffectTargetModal.classList.add('hidden');
         }
     });
     
-    // --- Admin Panel Handlers ---
-    dom.adminButton.addEventListener('click', () => {
-        dom.adminPanelModal.classList.remove('hidden');
-        network.emitAdminGetReports(); // Fetch reports when opening
-    });
-    dom.closeAdminPanelButton.addEventListener('click', () => dom.adminPanelModal.classList.add('hidden'));
-
-    dom.adminPanelModal.querySelector('.info-tabs').addEventListener('click', (e) => {
-        if (e.target.classList.contains('admin-tab-button')) {
-            const tab = e.target.dataset.tab;
-            dom.adminPanelModal.querySelectorAll('.admin-tab-button').forEach(b => b.classList.remove('active'));
-            dom.adminPanelModal.querySelectorAll('.info-tab-content').forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
-            if (tab === 'reports') {
-                document.getElementById('admin-reports-tab-content').classList.add('active');
-                 network.emitAdminGetReports();
-            } else if (tab === 'users') {
-                document.getElementById('admin-users-tab-content').classList.add('active');
-            }
-        }
-    });
+    if (dom.profileFriendsTabContent) {
+        dom.profileFriendsTabContent.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (!button) return;
     
-    document.getElementById('admin-reports-container').addEventListener('click', (e) => {
-        const resolveButton = e.target.closest('.resolve-report-btn');
-        if (resolveButton) {
-            const reportId = resolveButton.dataset.reportId;
-            network.emitAdminUpdateReportStatus(reportId, 'resolved');
-        }
-        const banButton = e.target.closest('.ban-user-from-report-btn');
-        if (banButton) {
-            const googleId = banButton.dataset.googleId;
-            const username = banButton.dataset.username;
-            if (confirm(`Tem certeza que deseja banir PERMANENTEMENTE o usuário ${username}?`)) {
-                network.emitAdminBanUser(googleId);
+            if (button.matches('.add-friend-btn')) {
+                const userId = button.dataset.userId;
+                button.disabled = true;
+                network.emitSendFriendRequest(userId, (response) => {
+                    if (response.success) {
+                        button.textContent = t('profile.request_sent');
+                    } else {
+                        alert(response.error || 'Falha ao enviar pedido.');
+                        button.disabled = false;
+                    }
+                });
+                return;
             }
-        }
-    });
-
-    document.getElementById('admin-user-search-button').addEventListener('click', () => {
-        const query = document.getElementById('admin-user-search-input').value;
-        if(query.trim()) {
-            network.emitAdminSearchUsers(query.trim());
-        }
-    });
-
-    document.getElementById('admin-user-search-results').addEventListener('click', (e) => {
-        const banButton = e.target.closest('.ban-user-from-search-btn');
-        if (banButton) {
-            const googleId = banButton.dataset.googleId;
-            const username = banButton.dataset.username;
-            if (confirm(`Tem certeza que deseja banir PERMANENTEMENTE o usuário ${username}?`)) {
-                network.emitAdminBanUser(googleId);
-            }
-        }
-    });
     
-    // --- Story/Event Listeners ---
-    document.addEventListener('startStoryGame', (e) => {
-        updateState('lastStoryGameOptions', e.detail); // Save options for restart
-        initializeGame(e.detail.mode, e.detail.options);
-    });
-    document.addEventListener('storyWinLoss', (e) => {
-        const { battle, won, reason } = e.detail;
-        const { gameState } = getState();
-        const state = getState();
-
-        if (battle === 'tutorial_necroverso' && won) {
-            achievements.grantAchievement('tutorial_win');
-            renderStoryNode('post_tutorial');
-        } else if (battle === 'tutorial_necroverso' && !won) {
-            renderStoryNode('tutorial_loss');
-        } else if (battle === 'contravox' && won) {
-            achievements.grantAchievement('contravox_win');
-            renderStoryNode('post_contravox_victory');
-        } else if (battle === 'versatrix' && won) {
-            if (!state.storyState.lostToVersatrix) {
-                achievements.grantAchievement('versatrix_win');
+            if (button.matches('.remove-friend-btn')) {
+                const userId = button.dataset.userId;
+                const username = button.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este amigo';
+                if (confirm(t('confirm.remove_friend', { username }))) {
+                     network.emitRemoveFriend(userId);
+                }
+                return;
             }
-            renderStoryNode('post_versatrix_victory');
-        } else if (battle === 'versatrix' && !won) {
-            state.storyState.lostToVersatrix = true;
-            achievements.grantAchievement('versatrix_loss');
-            renderStoryNode('post_versatrix_defeat');
-        } else if (battle === 'reversum' && won) {
-            achievements.grantAchievement('reversum_win');
-            renderStoryNode('post_reversum_victory');
-        } else if (battle === 'necroverso_king' && won) {
-            achievements.grantAchievement('true_end_beta');
-            renderStoryNode('post_necroverso_king_victory');
-        } else if (battle.startsWith('event_')) {
-            if (won) {
-                const currentMonth = new Date().getMonth();
-                const progressKey = `event_progress_${currentMonth}`;
-                let progress = JSON.parse(localStorage.getItem(progressKey)) || 0;
-                progress++;
-                localStorage.setItem(progressKey, JSON.stringify(progress));
-                if (progress >= 3) {
-                    network.emitClaimEventReward(currentEventData.rewardCode);
+    
+            if (button.matches('.view-profile-btn')) {
+                const googleId = button.dataset.googleId;
+                if (googleId) {
+                    network.emitViewProfile(googleId);
+                }
+                return;
+            }
+    
+            if (button.matches('.send-message-btn')) {
+                const userId = button.dataset.userId;
+                const username = button.dataset.username;
+                if (userId && username) {
+                    openChatWindow(userId, username);
+                }
+                return;
+            }
+    
+            if (button.matches('.accept-request-btn') || button.matches('.decline-request-btn')) {
+                const requestId = button.dataset.requestId;
+                if (requestId) {
+                    const action = button.matches('.accept-request-btn') ? 'accept' : 'decline';
+                    network.emitRespondToRequest(requestId, action);
+                }
+                return;
+            }
+        });
+    }
+
+    if (dom.friendsSearchButton) {
+        dom.friendsSearchButton.addEventListener('click', () => {
+            const query = dom.friendsSearchInput ? dom.friendsSearchInput.value.trim() : '';
+            if (query) network.emitSearchUsers(query);
+        });
+    }
+
+    if (dom.profileModal) {
+        dom.profileModal.addEventListener('click', (e) => {
+             const button = e.target.closest('button.add-friend-btn, button.remove-friend-btn');
+             if (!button) return;
+
+             if (button.matches('.add-friend-btn')) {
+                const userId = button.dataset.userId;
+                button.disabled = true;
+                network.emitSendFriendRequest(userId, (response) => {
+                    if (response.success) {
+                        button.textContent = t('profile.request_sent');
+                    } else {
+                        alert(response.error || 'Falha ao enviar pedido.');
+                        button.disabled = false;
+                    }
+                });
+            } else if (button.matches('.remove-friend-btn')) {
+                const userId = button.dataset.userId;
+                network.emitRemoveFriend(userId);
+            }
+        });
+    }
+
+    if (dom.privateChatPanel) {
+        dom.privateChatPanel.addEventListener('click', (e) => {
+            if (e.target.matches('.chat-window-close')) {
+                const userId = e.target.dataset.userId;
+                const chatWindow = document.getElementById(`chat-window-${userId}`);
+                if (chatWindow) {
+                    chatWindow.remove();
+                    activeChatWindows.delete(userId);
+                    if (activeChatWindows.size === 0) {
+                        dom.privateChatPanel.classList.add('hidden');
+                    }
                 }
             }
-            showGameOver(won ? "Você venceu o desafio!" : "Você foi derrotado!", "Fim do Desafio", { text: 'Voltar ao Menu', action: 'menu' });
-        } else {
-             const buttonOptions = { text: 'Tentar Novamente', action: 'restart_duel' };
-             showGameOver("Você foi derrotado...", "Derrota...", buttonOptions);
-        }
-    });
-
-    // --- Language Switcher ---
-    document.querySelector('.language-switcher').addEventListener('click', (e) => {
-        if (e.target.classList.contains('lang-button')) {
-            const lang = e.target.id.split('-')[1] + '-' + e.target.id.split('-')[2];
-            setLanguage(lang);
-        }
-    });
-
-    // --- Delegated click handler for dynamically generated content ---
-    document.body.addEventListener('click', (e) => {
-        // --- CHAT MODERATION ---
-        if (e.target.closest('.chat-moderation-buttons')) {
-            handleChatModerationClick(e);
-        }
-        
-        // --- JOIN PVP ROOM ---
-        const joinButton = e.target.closest('.join-room-button');
-        if (joinButton) {
-            network.emitJoinRoom(joinButton.dataset.roomId);
-        }
-
-        // --- RANKING PAGINATION & PROFILE VIEW ---
-        const prevBtn = e.target.closest('#rank-prev-btn');
-        const nextBtn = e.target.closest('#rank-next-btn');
-        if (prevBtn || nextBtn) {
-            const currentPage = parseInt(document.querySelector('.ranking-pagination span').textContent.match(/(\d+)/)[0]);
-            const newPage = prevBtn ? currentPage - 1 : currentPage + 1;
-            network.emitGetRanking(newPage);
-        }
-        const rankName = e.target.closest('.rank-name.clickable');
-        if (rankName) {
-            network.emitViewProfile(rankName.dataset.googleId);
-        }
-
-        // --- PROFILE TABS & ACTIONS ---
-        const profileTab = e.target.closest('.profile-tab-button');
-        if (profileTab) {
-            const tab = profileTab.dataset.tab;
-            document.querySelectorAll('.profile-tab-button').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.info-tab-content').forEach(c => c.classList.remove('active'));
-            profileTab.classList.add('active');
-            document.getElementById(`${tab}-tab-content`).classList.add('active');
-        }
-        const lobbyProfileName = e.target.closest('.lobby-player-slot .player-name.clickable');
-        if (lobbyProfileName) {
-            network.emitViewProfile(lobbyProfileName.dataset.googleId);
-        }
-
-        // --- FRIEND ACTIONS (delegated) ---
-        const addFriendBtn = e.target.closest('.add-friend-btn');
-        if(addFriendBtn) {
-            const targetUserId = parseInt(addFriendBtn.dataset.userId, 10);
-            network.emitSendFriendRequest(targetUserId, (response) => {
-                if(response.success) {
-                    alert('Pedido de amizade enviado!');
-                    addFriendBtn.textContent = t('profile.request_sent');
-                    addFriendBtn.disabled = true;
-                } else {
-                    alert(`Erro: ${response.error}`);
-                }
-            });
-        }
-        const removeFriendBtn = e.target.closest('.remove-friend-btn');
-        if(removeFriendBtn) {
-            const targetUserId = parseInt(removeFriendBtn.dataset.userId, 10);
-            const username = removeFriendBtn.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este jogador';
-            if(confirm(t('confirm.remove_friend', { username }))) {
-                network.emitRemoveFriend(targetUserId);
-            }
-        }
-        const viewProfileBtn = e.target.closest('.view-profile-btn');
-        if(viewProfileBtn) {
-            network.emitViewProfile(viewProfileBtn.dataset.googleId);
-        }
-        const sendMessageBtn = e.target.closest('.send-message-btn');
-        if(sendMessageBtn) {
-            openChatWindow(sendMessageBtn.dataset.userId, sendMessageBtn.dataset.username);
-        }
-        const acceptRequestBtn = e.target.closest('.accept-request-btn');
-        if (acceptRequestBtn) {
-            network.emitRespondToRequest(parseInt(acceptRequestBtn.dataset.requestId, 10), 'accept');
-        }
-        const declineRequestBtn = e.target.closest('.decline-request-btn');
-        if (declineRequestBtn) {
-            network.emitRespondToRequest(parseInt(declineRequestBtn.dataset.requestId, 10), 'decline');
-        }
-        const closeChatBtn = e.target.closest('.chat-window-close');
-        if (closeChatBtn) {
-            const userId = closeChatBtn.dataset.userId;
-            const chatWindow = document.getElementById(`chat-window-${userId}`);
-            if (chatWindow) chatWindow.remove();
-            activeChatWindows.delete(userId);
-            if (activeChatWindows.size === 0) dom.privateChatPanel.classList.add('hidden');
-        }
-        
-        // --- FIELD EFFECT INDICATOR ---
-        if (e.target.closest('.field-effect-indicator')) {
-            handleFieldEffectIndicatorClick(e);
-        }
-    });
-};
+        });
+    }
+}
