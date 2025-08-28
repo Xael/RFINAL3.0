@@ -55,6 +55,9 @@
         <img id="user-avatar" src="" alt="User Avatar">
         <div class="user-info">
              <span id="user-name"></span>
+             <div id="user-coinversus-display" class="user-coinversus-display">
+                🪙 <span id="user-coinversus-balance">0</span>
+             </div>
              <div class="xp-bar-container">
                  <div id="xp-bar-fill"></div>
                  <span id="xp-bar-text"></span>
@@ -206,6 +209,8 @@
         <div class="modal-content">
             <div class="info-tabs">
                 <button class="info-tab-button active" data-tab="instructions" data-i18n="info.instructions_tab">Instruções</button>
+                <button class="info-tab-button" data-tab="conduct" data-i18n="info.conduct_tab">Regras de Conduta</button>
+                <button class="info-tab-button" data-tab="privacy" data-i18n="info.privacy_tab">Termos de Privacidade</button>
                 <button class="info-tab-button" data-tab="credits" data-i18n="info.credits_tab">Créditos</button>
             </div>
 
@@ -235,6 +240,47 @@
                         <li data-i18n="info.special_card_reversus_total"><strong>Reversus Total:</strong> A carta mais poderosa. Inverte TODOS os efeitos em TODOS os jogadores na rodada (efeito Global). Pode também ser usada para aplicar e travar um efeito básico ('Mais', 'Menos', etc.) em um único alvo por uma rodada (efeito Individual).</li>
                     </ul>
                      <p><strong data-i18n="info.field_effects_title">Efeitos de Campo:</strong> <span data-i18n="info.field_effects_text">Parar em casas coloridas no tabuleiro ativa efeitos especiais que duram a rodada inteira!</span></p>
+                </div>
+            </div>
+
+            <div id="conduct-tab-content" class="info-tab-content">
+                <h2 data-i18n="info.conduct_title">Regras de Conduta e Motivos para Banimento</h2>
+                <div class="rules-content">
+                    <p data-i18n="info.conduct_intro">O usuário concorda em não praticar as seguintes ações dentro do jogo, sob pena de suspensão ou banimento permanente da conta:</p>
+                    <ul>
+                        <li><strong data-i18n="info.conduct_item1_title">Linguagem ofensiva e violência verbal:</strong> <span data-i18n="info.conduct_item1_text">Uso de palavrões, ofensas, ameaças, assédio ou qualquer tipo de discriminação (raça, gênero, religião, orientação sexual etc.).</span></li>
+                        <li><strong data-i18n="info.conduct_item2_title">Assédio e má conduta:</strong> <span data-i18n="info.conduct_item2_text">Atos que causem desconforto a outros jogadores, incluindo perseguição, mensagens insistentes ou comportamento abusivo.</span></li>
+                        <li><strong data-i18n="info.conduct_item3_title">Práticas ilegais ou ilícitas:</strong> <span data-i18n="info.conduct_item3_text">Tentativa de fraude, estelionato, lavagem de dinheiro, compartilhamento de informações ilegais ou links maliciosos.</span></li>
+                        <li><strong data-i18n="info.conduct_item4_title">Trapaças e exploits:</strong> <span data-i18n="info.conduct_item4_text">Uso de hacks, cheats, bots, macros ou qualquer recurso que dê vantagem injusta sobre outros jogadores.</span></li>
+                        <li><strong data-i18n="info.conduct_item5_title">Spam e divulgação não autorizada:</strong> <span data-i18n="info.conduct_item5_text">Envio massivo de mensagens, propagandas, links externos ou qualquer tipo de marketing não autorizado no jogo.</span></li>
+                        <li><strong data-i18n="info.conduct_item6_title">Venda ou troca de contas:</strong> <span data-i18n="info.conduct_item6_text">Comercialização, empréstimo ou compartilhamento da conta com terceiros sem autorização oficial.</span></li>
+                        <li><strong data-i18n="info.conduct_item7_title">Uso de linguagem inapropriada no chat e canais oficiais:</strong> <span data-i18n="info.conduct_item7_text">Incluindo qualquer conteúdo sexual explícito, gore, incitação ao ódio ou discurso violento.</span></li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div id="privacy-tab-content" class="info-tab-content">
+                <h2 data-i18n="info.privacy_title">Termo de Concordância e Privacidade (LGPD)</h2>
+                <div class="rules-content">
+                     <p data-i18n="info.privacy_intro">Ao utilizar o jogo, o usuário declara estar ciente e de acordo com os seguintes pontos:</p>
+                     <p><strong data-i18n="info.privacy_item1_title">Coleta e uso de dados</strong></p>
+                     <ul>
+                        <li data-i18n="info.privacy_item1_text1">O jogo poderá coletar informações como e-mail, nickname, logs de mensagens no chat e interações dentro do jogo.</li>
+                        <li data-i18n="info.privacy_item1_text2">Esses dados são utilizados para garantir segurança, prevenir fraudes, aplicar as regras de conduta e melhorar a experiência do usuário.</li>
+                     </ul>
+                     <p><strong data-i18n="info.privacy_item2_title">Acesso a mensagens e comunicações internas</strong></p>
+                     <ul>
+                        <li data-i18n="info.privacy_item2_text1">A equipe do jogo poderá acessar chats e e-mails internos quando houver denúncia ou suspeita de violação das regras, sempre respeitando a LGPD.</li>
+                        <li data-i18n="info.privacy_item2_text2">Nenhuma comunicação será compartilhada com terceiros sem consentimento, exceto quando exigido por lei.</li>
+                     </ul>
+                     <p><strong data-i18n="info.privacy_item3_title">Direitos do usuário</strong></p>
+                     <ul>
+                        <li data-i18n="info.privacy_item3_text">O jogador pode solicitar a exclusão dos seus dados pessoais a qualquer momento, ciente de que isso pode resultar no encerramento definitivo da conta.</li>
+                     </ul>
+                     <p><strong data-i18n="info.privacy_item4_title">Consentimento</strong></p>
+                     <ul>
+                        <li data-i18n="info.privacy_item4_text">Ao criar a conta e continuar usando o jogo, o usuário concorda integralmente com estas regras e políticas de privacidade.</li>
+                     </ul>
                 </div>
             </div>
 
@@ -304,6 +350,7 @@
         <div class="center-panel">
             <div class="center-panel-header">
                 <div id="reversus-total-indicator" class="hidden" data-i18n="game.reversus_total_active">Reversus Total Ativo!</div>
+                <div id="pvp-pot-display" class="hidden"></div>
                 <div id="team-scores-container" class="team-scores-container hidden"></div>
             </div>
             <div class="board-and-scores-wrapper">
@@ -346,8 +393,29 @@
                 <button id="solo-3p-button" class="control-button" data-i18n="setup.solo_3p">1 vs 2</button>
                 <button id="solo-4p-button" class="control-button" data-i18n="setup.solo_4p">1 vs 3</button>
                 <button id="duo-mode-button" class="control-button secondary" data-i18n="setup.duo">2 vs 2</button>
+                <button id="quick-pvp-button" class="control-button btn-p3-color" data-i18n="splash.quick_pvp">PVP RÁPIDO</button>
             </div>
             <button id="close-setup-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.back">Voltar</button>
+        </div>
+    </div>
+
+    <div id="quick-pvp-mode-selection-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 data-i18n="quick_pvp.title">PVP Rápido - Escolha o Modo</h2>
+            <div class="button-group vertical">
+                <button id="quick-pvp-1v1-button" class="control-button" data-mode="1v1" data-i18n="quick_pvp.mode_1v1">1 vs 1</button>
+                <button id="quick-pvp-2v2-button" class="control-button" data-mode="2v2" data-i18n="quick_pvp.mode_2v2">2 vs 2 (Duplas)</button>
+                <button id="quick-pvp-4p-button" class="control-button" data-mode="4p" data-i18n="quick_pvp.mode_4p">4 Jogadores (Cada um por si)</button>
+            </div>
+            <button id="quick-pvp-mode-selection-close-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.back">Voltar</button>
+        </div>
+    </div>
+
+    <div id="quick-pvp-queue-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 data-i18n="quick_pvp_queue.title">Buscando Partida...</h2>
+            <p id="quick-pvp-queue-status-text" style="text-align: center; font-size: 1.2rem; margin: 1rem 0;"></p>
+            <button id="quick-pvp-queue-cancel-button" class="control-button cancel" data-i18n="common.cancel">Cancelar</button>
         </div>
     </div>
 

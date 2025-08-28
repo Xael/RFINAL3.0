@@ -204,6 +204,8 @@ export const xpBarFill = document.getElementById('xp-bar-fill');
 export const xpBarText = document.getElementById('xp-bar-text');
 export const pvpUsernameModal = document.getElementById('pvp-username-modal'); // Kept for potential future use
 export const pvpCreateRoomButton = document.getElementById('pvp-create-room-button');
+export const userCoinversusBalance = document.getElementById('user-coinversus-balance');
+export const pvpPotDisplay = document.getElementById('pvp-pot-display');
 
 // Event Modal
 export const eventButton = document.getElementById('event-button');
@@ -229,3 +231,14 @@ export const friendRequestBadge = document.getElementById('friend-request-badge'
 
 // Chat
 export const privateChatPanel = document.getElementById('private-chat-panel');
+
+// Quick PVP
+export const quickPvpButton = document.getElementById('quick-pvp-button');
+export const quickPvpModeSelectionModal = document.getElementById('quick-pvp-mode-selection-modal');
+export const quickPvp1v1Button = document.getElementById('quick-pvp-1v1-button');
+export const quickPvp2v2Button = document.getElementById('quick-pvp-2v2-button');
+export const quickPvp4pButton = document.getElementById('quick-pvp-4p-button');
+export const quickPvpModeSelectionCloseButton = document.getElementById('quick-pvp-mode-selection-close-button');
+export const quickPvpQueueModal = document.getElementById('quick-pvp-queue-modal');
+export const quickPvpQueueStatusText = document.getElementById('quick-pvp-queue-status-text');
+export const quickPvpQueueCancelButton = document.getElementById('quick-pvp-queue-cancel-button');

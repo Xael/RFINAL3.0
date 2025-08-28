@@ -276,31 +276,30 @@ function showCreditsRoll() {
     initializeFloatingItemsAnimation(creditsAnimationContainer, creditsImagePool);
 
     const creditsHtml = `
-        <h2>Créditos</h2>
-        <p class="credits-category">Roteiro/História/Game/Game Designer</p>
+        <h2>${t('credits.title')}</h2>
+        <p class="credits-category">${t('credits.category_script')}</p>
         <p>Xael</p>
-        <p class="credits-category">Músicas</p>
+        <p class="credits-category">${t('credits.category_music')}</p>
         <p>Suno Ai</p>
-        <p class="credits-category">Sound Designer</p>
+        <p class="credits-category">${t('credits.category_sound')}</p>
         <p>Xael + RPT RPG MAKER</p>
-        <p class="credits-category">Artes</p>
+        <p class="credits-category">${t('credits.category_art')}</p>
         <p>Gemini Ai + Chatgpt</p>
-        <p class="credits-category">Programação</p>
+        <p class="credits-category">${t('credits.category_programming')}</p>
         <p>Xael + Google AI Studio</p>
-        <p class="credits-category">Beta Testers</p>
-        <p>Vinicius, Ricardo e Rodrigo<br>(muito obrigado pelos feedbacks sz!)</p>
+        <p class="credits-category">${t('credits.category_beta_testers')}</p>
+        <p>${t('credits.beta_testers_names')}<br>(${t('credits.beta_testers_thanks')})</p>
         <br>
-        <p class="credits-category">Agradecimentos Especiais</p>
-        <p>Minha família, minha eterna Geminiana Versatrix Karol s2</p>
-        <p>Meus amigos e familiares que de alguma forma apoiaram a criação do jogo Reversus</p>
-        <p>Todos que apoiaram meu casamento e comparam a versão física do jogo de tabuleiro e cartas!</p>
-        <p>A minha sogra Vilma que bancou a produção integral da gráfica para transformar o jogo em realidade.</p>
-        <p>E a todos que jogaram o jogo ;)</p>
+        <p class="credits-category">${t('credits.category_special_thanks')}</p>
+        <p>${t('credits.special_thanks_1')}</p>
+        <p>${t('credits.special_thanks_2')}</p>
+        <p>${t('credits.special_thanks_3')}</p>
+        <p>${t('credits.special_thanks_4')}</p>
         <br>
-        <p class="credits-thanks">Muito obrigado!</p>
+        <p class="credits-thanks">${t('credits.final_thanks')}</p>
         <p>Xael - Alex</p>
         <br><br><br>
-        <p>Fim.</p>
+        <p>${t('credits.the_end')}</p>
     `;
     dom.creditsContent.innerHTML = creditsHtml;
 

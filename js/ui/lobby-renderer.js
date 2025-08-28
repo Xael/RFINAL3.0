@@ -52,7 +52,7 @@ export const renderRanking = (rankingData) => {
                 <tr>
                     <th>${t('ranking.header_rank')}</th>
                     <th colspan="2">${t('ranking.header_player')}</th>
-                    <th>${t('ranking.header_victories')}</th>
+                    <th>${t('ranking.header_coinversus')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,7 +69,7 @@ export const renderRanking = (rankingData) => {
                             <span class="rank-name clickable" data-google-id="${player.google_id}">${player.username}</span>
                             <span class="rank-player-title">${titleText}</span>
                         </td>
-                        <td>${player.victories}</td>
+                        <td>🪙 ${player.coinversus}</td>
                     </tr>
                 `}).join('')}
             </tbody>

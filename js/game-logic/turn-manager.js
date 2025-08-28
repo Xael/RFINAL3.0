@@ -5,7 +5,7 @@ import { renderAll, showTurnIndicator, showRoundSummaryModal, showGameOver } fro
 import { renderCard } from '../ui/card-renderer.js';
 import { executeAiTurn } from '../ai/ai-controller.js';
 import { triggerFieldEffects, checkAndTriggerPawnLandingAbilities } from '../story/story-abilities.js';
-import { updateLog, dealCard } from '../core/utils.js';
+import { updateLog, dealCard, shuffle } from '../core/utils.js';
 import { grantAchievement } from '../core/achievements.js';
 import { showSplashScreen } from '../ui/splash-screen.js';
 import { toggleReversusTotalBackground, clearInversusScreenEffects } from '../ui/animations.js';
@@ -67,10 +67,6 @@ export async function showPvpDrawSequence(gameState) {
  */
 export async function initiateGameStartSequence() {
     const { gameState } = getState();
-    if (gameState.isInversusMode) {
-        await startNewRound(true);
-        return;
-    }
     
     // Skip initial draw for the final battle or Xael challenge
     if (gameState.isFinalBoss || gameState.isXaelChallenge) {
@@ -351,21 +347,37 @@ async function startNewRound(isFirstRound = false) {
     dom.appContainerEl.classList.remove('reversus-total-active');
     dom.reversusTotalIndicatorEl.classList.add('hidden');
 
-    // Inversus screen effects
+    // Inversus screen effects with escalating chaos
     clearInversusScreenEffects();
     if (gameState.isInversusMode) {
-        const effectChance = Math.random();
-        if (effectChance < 0.15) { // 15% chance to flip
-            dom.scalableContainer.classList.add('screen-flipped');
-            announceEffect('TELA INVERTIDA', 'reversus');
-            playSoundEffect('campoinverso');
-        } else if (effectChance < 0.30) { // 15% chance to invert colors
-            dom.scalableContainer.classList.add('screen-inverted');
-            announceEffect('CORES INVERTIDAS', 'reversus');
-            playSoundEffect('campoinverso');
-        } else if (effectChance < 0.45) { // 15% chance to mirror
-            dom.scalableContainer.classList.add('screen-mirrored');
-            announceEffect('TELA ESPELHADA', 'reversus');
+        const turn = gameState.turn;
+        const effects = ['screen-flipped', 'screen-inverted', 'screen-mirrored'];
+        shuffle(effects);
+        let effectApplied = false;
+
+        if (turn >= 7) {
+            dom.scalableContainer.classList.add(effects[0], effects[1], effects[2]);
+            announceEffect('REALIDADE DISTORCIDA', 'reversus');
+            effectApplied = true;
+        } else if (turn >= 4) {
+            dom.scalableContainer.classList.add(effects[0], effects[1]);
+            announceEffect('CONFUSÃO DUPLA', 'reversus');
+            effectApplied = true;
+        } else if (turn >= 1) {
+            const effectChance = Math.random();
+            if (effectChance < 0.6) { // 60% chance for an effect on early turns
+                dom.scalableContainer.classList.add(effects[0]);
+                const effectNameMap = {
+                    'screen-flipped': 'TELA INVERTIDA',
+                    'screen-inverted': 'CORES INVERTIDAS',
+                    'screen-mirrored': 'TELA ESPELHADA'
+                };
+                announceEffect(effectNameMap[effects[0]], 'reversus');
+                effectApplied = true;
+            }
+        }
+
+        if (effectApplied) {
             playSoundEffect('campoinverso');
         }
     }
@@ -576,8 +588,11 @@ async function calculateScoresAndEndRound() {
     // Handle INVERSUS heart loss
     if (gameState.isInversusMode && !checkGameEnd()) {
         const player1Won = winners.includes('player-1');
-        if (!player1Won) {
-            const player1 = gameState.players['player-1'];
+        const inversusWon = winners.includes('player-2');
+        const player1 = gameState.players['player-1'];
+        const inversus = gameState.players['player-2'];
+    
+        if (inversusWon && player1) {
             player1.hearts = Math.max(0, player1.hearts - 1);
             updateLog(`Você perdeu a rodada e 1 coração! Restam: ${player1.hearts}.`);
             playSoundEffect('coracao');
@@ -585,8 +600,16 @@ async function calculateScoresAndEndRound() {
             if (player1.hearts === 0) {
                 player1.isEliminated = true;
             }
+        } else if (player1Won && inversus) {
+            inversus.hearts = Math.max(0, inversus.hearts - 1);
+            updateLog(`Inversus perdeu a rodada e 1 coração! Restam: ${inversus.hearts}.`);
+            playSoundEffect('coracao');
+            announceEffect('💔', 'heartbreak', 1500);
+            if (inversus.hearts === 0) {
+                inversus.isEliminated = true;
+            }
         }
-        if(checkGameEnd()) return; // Stop if game ended
+        if(checkGameEnd()) return;
     }
     
     // Handle King Necro Battle punishment
@@ -639,56 +662,58 @@ async function calculateScoresAndEndRound() {
         if (checkGameEnd()) return; // Stop if game ended due to heart loss
     }
     
-    // 5. Apply pawn movements using a consolidated approach
-    for (const id of gameState.playerIdsInGame) {
-        const p = gameState.players[id];
-        if (p.isEliminated) continue;
+    // 5. Apply pawn movements using a consolidated approach (skip for heart-based battles)
+    if (!gameState.isInversusMode && !gameState.isKingNecroBattle) {
+        for (const id of gameState.playerIdsInGame) {
+            const p = gameState.players[id];
+            if (p.isEliminated) continue;
 
-        // First, handle path changes from 'Pula'
-        if (p.effects.movement === 'Pula' && p.targetPathForPula !== null) {
-            p.pathId = p.targetPathForPula;
-            updateLog(`${p.name} foi forçado a pular para o caminho ${p.targetPathForPula + 1}.`);
-        }
+            // First, handle path changes from 'Pula'
+            if (p.effects.movement === 'Pula' && p.targetPathForPula !== null) {
+                p.pathId = p.targetPathForPula;
+                updateLog(`${p.name} foi forçado a pular para o caminho ${p.targetPathForPula + 1}.`);
+            }
 
-        let netMovement = 0;
-        const isWinner = winners.includes(id);
-        const isLoser = !isWinner && winners.length > 0;
+            let netMovement = 0;
+            const isWinner = winners.includes(id);
+            const isLoser = !isWinner && winners.length > 0;
 
-        // A. Card Effects
-        if (p.effects.movement === 'Sobe') netMovement++;
-        if (p.effects.movement === 'Desce') {
-            let movementModifier = gameState.activeFieldEffects.some(fe => fe.name === 'Super Exposto' && fe.appliesTo === id) ? 2 : 1;
-            netMovement -= (1 * movementModifier);
-        }
+            // A. Card Effects
+            if (p.effects.movement === 'Sobe') netMovement++;
+            if (p.effects.movement === 'Desce') {
+                let movementModifier = gameState.activeFieldEffects.some(fe => fe.name === 'Super Exposto' && fe.appliesTo === id) ? 2 : 1;
+                netMovement -= (1 * movementModifier);
+            }
 
-        // B. Win/Loss Effects (Field & Standard)
-        if (isWinner) {
-            if (gameState.activeFieldEffects.some(fe => fe.name === 'Parada' && fe.appliesTo === id)) {
-                updateLog(`Efeito 'Parada' impede ${p.name} de avançar.`);
-            } else {
-                let advanceAmount = 1;
-                if (gameState.activeFieldEffects.some(fe => fe.name === 'Desafio' && fe.appliesTo === id) && p.effects.score !== 'Mais' && p.effects.movement !== 'Sobe') {
-                    advanceAmount = 3;
-                    updateLog(`Efeito 'Desafio' completo! ${p.name} ganha um bônus de avanço!`);
+            // B. Win/Loss Effects (Field & Standard)
+            if (isWinner) {
+                if (gameState.activeFieldEffects.some(fe => fe.name === 'Parada' && fe.appliesTo === id)) {
+                    updateLog(`Efeito 'Parada' impede ${p.name} de avançar.`);
+                } else {
+                    let advanceAmount = 1;
+                    if (gameState.activeFieldEffects.some(fe => fe.name === 'Desafio' && fe.appliesTo === id) && p.effects.score !== 'Mais' && p.effects.movement !== 'Sobe') {
+                        advanceAmount = 3;
+                        updateLog(`Efeito 'Desafio' completo! ${p.name} ganha um bônus de avanço!`);
+                    }
+                    netMovement += advanceAmount;
                 }
-                netMovement += advanceAmount;
+            } else if (isLoser) {
+                if (gameState.activeFieldEffects.some(fe => fe.name === 'Castigo' && fe.appliesTo === id)) {
+                    netMovement -= 3;
+                    updateLog(`Efeito 'Castigo' ativado para ${p.name}.`);
+                }
+                if (gameState.activeFieldEffects.some(fe => fe.name === 'Impulso' && fe.appliesTo === id)) {
+                    netMovement += 1;
+                    updateLog(`Efeito 'Impulso' ativado para ${p.name}.`);
+                }
             }
-        } else if (isLoser) {
-            if (gameState.activeFieldEffects.some(fe => fe.name === 'Castigo' && fe.appliesTo === id)) {
-                netMovement -= 3;
-                updateLog(`Efeito 'Castigo' ativado para ${p.name}.`);
-            }
-            if (gameState.activeFieldEffects.some(fe => fe.name === 'Impulso' && fe.appliesTo === id)) {
-                netMovement += 1;
-                updateLog(`Efeito 'Impulso' ativado para ${p.name}.`);
-            }
-        }
 
-        // C. Apply the final calculated movement
-        if (netMovement !== 0) {
-            const oldPosition = p.position;
-            p.position = Math.min(config.WINNING_POSITION, Math.max(1, p.position + netMovement));
-            updateLog(`${p.name} ${netMovement > 0 ? 'avançou' : 'voltou'} de ${oldPosition} para ${p.position}.`);
+            // C. Apply the final calculated movement
+            if (netMovement !== 0) {
+                const oldPosition = p.position;
+                p.position = Math.min(config.WINNING_POSITION, Math.max(1, p.position + netMovement));
+                updateLog(`${p.name} ${netMovement > 0 ? 'avançou' : 'voltou'} de ${oldPosition} para ${p.position}.`);
+            }
         }
     }
 

@@ -79,20 +79,9 @@ export const initializeGame = async (mode, options) => {
     Object.assign(config.PLAYER_CONFIG, structuredClone(config.originalPlayerConfig));
     updateState('reversusTotalIndividualFlow', false); // Reset flow state
     
-    // Handle overrides from either PvP lobby or Story Mode
-    const overrides = options.story ? options.story.overrides : options.overrides;
-    if (overrides) {
-        for (const id in overrides) {
-            if (config.PLAYER_CONFIG[id]) {
-                Object.assign(config.PLAYER_CONFIG[id], overrides[id]);
-            }
-        }
-    }
-    
     let playerIdsInGame, numPlayers, modeText, isStoryMode = false, isFinalBoss = false, storyBattle = null, storyBattleType = null, isInversusMode = false, isXaelChallenge = false;
     let isKingNecroBattle = false;
     let eventData = null;
-
 
     // Clean up special background effects from previous games
     dom.cosmicGlowOverlay.classList.add('hidden');
@@ -107,6 +96,8 @@ export const initializeGame = async (mode, options) => {
         playerIdsInGame = config.MASTER_PLAYER_IDS.slice(0, numPlayers);
         modeText = 'Modo Inversus';
         await playStoryMusic('inversus.ogg');
+        // Ensure the correct AI type is set for the Inversus opponent
+        options.overrides = { 'player-2': { name: 'Inversus', aiType: 'inversus' } };
     } else if (options.story) { // Covers both Story Mode and Events
         isStoryMode = true; // We use the story mode flag to handle shared logic like win/loss events.
         storyBattle = options.story.battle;
@@ -151,6 +142,16 @@ export const initializeGame = async (mode, options) => {
         stopStoryMusic();
     }
 
+    // Handle overrides from either PvP lobby or Story Mode
+    const overrides = options.story ? options.story.overrides : options.overrides;
+    if (overrides) {
+        for (const id in overrides) {
+            if (config.PLAYER_CONFIG[id]) {
+                Object.assign(config.PLAYER_CONFIG[id], overrides[id]);
+            }
+        }
+    }
+    
     // Clear any leftover complex state
     updateState('pathSelectionResolver', null);
     
@@ -212,7 +213,7 @@ export const initializeGame = async (mode, options) => {
                 name: playerName,
                 id,
                 aiType: playerConfig.aiType || 'default',
-                pathId: isInversusMode ? -1 : index,
+                pathId: index,
                 position: 1,
                 hand: [],
                 resto: null,
@@ -256,7 +257,7 @@ export const initializeGame = async (mode, options) => {
     );
     
     const boardPaths = generateBoardPaths({ storyBattle, isFinalBoss, isXaelChallenge, isKingNecroBattle });
-    if (!isFinalBoss && !isInversusMode && !isXaelChallenge) {
+    if (!isFinalBoss && !isXaelChallenge) {
         playerIdsInGame.forEach((id, index) => { 
             if(boardPaths[index]) boardPaths[index].playerId = id; 
         });

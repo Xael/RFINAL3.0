@@ -36,11 +36,14 @@
         "achievements": "Achievements",
         "friends": "Friends",
         "inversus": "INVERSUS",
-        "version": "Version 3.0"
+        "version": "Version 3.0",
+        "quick_pvp": "QUICK PVP"
     },
     "info": {
         "instructions_tab": "Instructions",
         "credits_tab": "Credits",
+        "conduct_tab": "Rules of Conduct",
+        "privacy_tab": "Privacy Policy",
         "instructions_title": "How to Play Reversus",
         "objective_title": "Objective:",
         "objective_text": "Be the first player (or duo) to move their pawn to space 10 on the board.",
@@ -71,7 +74,53 @@
         "feature_ranking": "Online Ranking",
         "feature_events": "Monthly Events",
         "credits_line_3": "And soon: mobile version! o/",
-        "credits_line_4": "My special thanks to everyone who supported this project from the beginning."
+        "credits_line_4": "My special thanks to everyone who supported this project from the beginning.",
+        "conduct_title": "Rules of Conduct and Reasons for Banning",
+        "conduct_intro": "The user agrees not to engage in the following actions within the game, under penalty of suspension or permanent account ban:",
+        "conduct_item1_title": "Offensive language and verbal violence:",
+        "conduct_item1_text": "Use of profanity, insults, threats, harassment, or any type of discrimination (race, gender, religion, sexual orientation, etc.).",
+        "conduct_item2_title": "Harassment and misconduct:",
+        "conduct_item2_text": "Acts that cause discomfort to other players, including stalking, insistent messaging, or abusive behavior.",
+        "conduct_item3_title": "Illegal or illicit practices:",
+        "conduct_item3_text": "Attempted fraud, scams, money laundering, sharing of illegal information, or malicious links.",
+        "conduct_item4_title": "Cheating and exploits:",
+        "conduct_item4_text": "Use of hacks, cheats, bots, macros, or any resource that provides an unfair advantage over other players.",
+        "conduct_item5_title": "Spam and unauthorized advertising:",
+        "conduct_item5_text": "Mass sending of messages, advertisements, external links, or any type of unauthorized marketing in the game.",
+        "conduct_item6_title": "Account selling or trading:",
+        "conduct_item6_text": "Commercialization, lending, or sharing of the account with third parties without official authorization.",
+        "conduct_item7_title": "Use of inappropriate language in chat and official channels:",
+        "conduct_item7_text": "Including any sexually explicit content, gore, incitement to hatred, or violent speech.",
+        "privacy_title": "Terms of Agreement and Privacy (GDPR)",
+        "privacy_intro": "By using the game, the user declares to be aware of and in agreement with the following points:",
+        "privacy_item1_title": "Data collection and use",
+        "privacy_item1_text1": "The game may collect information such as email, nickname, chat message logs, and in-game interactions.",
+        "privacy_item1_text2": "This data is used to ensure security, prevent fraud, enforce the rules of conduct, and improve the user experience.",
+        "privacy_item2_title": "Access to messages and internal communications",
+        "privacy_item2_text1": "The game team may access internal chats and emails when there is a report or suspicion of a rules violation, always respecting GDPR.",
+        "privacy_item2_text2": "No communication will be shared with third parties without consent, except when required by law.",
+        "privacy_item3_title": "User rights",
+        "privacy_item3_text": "The player can request the deletion of their personal data at any time, aware that this may result in the permanent closure of the account.",
+        "privacy_item4_title": "Consent",
+        "privacy_item4_text": "By creating an account and continuing to use the game, the user fully agrees to these rules and privacy policies."
+    },
+     "credits": {
+        "title": "Credits",
+        "category_script": "Story/Game/Game Designer",
+        "category_music": "Music",
+        "category_sound": "Sound Designer",
+        "category_art": "Art",
+        "category_programming": "Programming",
+        "category_beta_testers": "Beta Testers",
+        "beta_testers_names": "Vinicius, Ricardo, and Rodrigo",
+        "beta_testers_thanks": "thank you so much for the feedback!",
+        "category_special_thanks": "Special Thanks",
+        "special_thanks_1": "My family, my eternal Gemini Versatrix Karol s2",
+        "special_thanks_2": "My friends and family who supported the creation of the Reversus game in some way",
+        "special_thanks_3": "Everyone who supported my wedding and bought the physical version of the board and card game!",
+        "special_thanks_4": "To my mother-in-law Vilma who fully funded the printing production to make the game a reality.",
+        "final_thanks": "Thank you very much!",
+        "the_end": "The End."
     },
     "game": {
         "log_title": "Game Log",
@@ -94,7 +143,8 @@
         "house_header_title": "Position on the path",
         "effect_header_title": "Active card effects",
         "field_effect_indicator": "Field",
-        "field_effect_indicator_title": "Active field effect: {effectName}"
+        "field_effect_indicator_title": "Active field effect: {effectName}",
+        "pvp_pot": "Total Bet"
     },
     "setup": {
         "title": "Game Mode",
@@ -103,6 +153,16 @@
         "solo_3p": "1 vs 2",
         "solo_4p": "1 vs 3",
         "duo": "2 vs 2"
+    },
+    "quick_pvp": {
+        "title": "Quick PVP - Choose Mode",
+        "mode_1v1": "1 vs 1",
+        "mode_2v2": "2 vs 2 (Duos)",
+        "mode_4p": "4 Players (Free for All)"
+    },
+    "quick_pvp_queue": {
+        "title": "Searching for Match...",
+        "status_text": "Searching... ({current}/{required})"
     },
     "one_v_one": {
         "title": "1 vs 1 Mode",
@@ -229,7 +289,7 @@
         "empty": "The ranking is still empty. Be the first to win!",
         "header_rank": "#",
         "header_player": "Player",
-        "header_victories": "Victories"
+        "header_coinversus": "CoinVersus"
     },
     "profile": {
         "title": "Player Profile",
@@ -239,6 +299,7 @@
         "experience": "Experience",
         "victories": "Victories",
         "defeats": "Defeats",
+        "coinversus": "CoinVersus",
         "select_title": "Select Title",
         "unlocked_titles": "Unlocked Titles",
         "no_titles": "No titles unlocked yet.",
@@ -396,23 +457,6 @@
         "true_end_final": "True Ending",
         "inversus_win": "100% of the game",
         "120%_unlocked": "120% Unlocked!"
-    },
-    "achievement_descriptions": {
-        "first_win": "Congratulations, you won your first match.",
-        "first_defeat": "Life is made of defeats... don't be discouraged or the game ends.",
-        "versatrix_loss": "Did Versatrix really want to beat you?",
-        "speed_run": "Win a match in under 5 minutes.",
-        "contravox_win": ".mih ni gnitseretni gnihton s'ereht esuaceb txet siht gnidaer emit etsaw t'noD",
-        "versatrix_win": "You defeated Versatrix... Maybe she left something for you.",
-        "versatrix_card_collected": "You found and collected Versatrix's special card!",
-        "reversum_win": "He thought he was the most powerful, but there's a new King now.",
-        "tutorial_win": "Learning and winning in the tutorial is for the few.",
-        "xael_win": "Defeated the game's creator in a special duel.",
-        "quick_duel_win": "Winning a quick match is also an achievement!",
-        "true_end_beta": "You defeated a king... but not the master behind the shadows.",
-        "true_end_final": "Congratulations, tell me how you managed to win later.",
-        "inversus_win": "You defeated the dark reflection of Reversus. The secret is in the game's logo.",
-        "120%_unlocked": "The secret of the secret, the password is \"Final\""
     },
     "achievement_hints": {
         "first_win": "The first step to glory is simply... to win.",
