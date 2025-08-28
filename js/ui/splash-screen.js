@@ -1,6 +1,7 @@
 import * as dom from '../core/dom.js';
 import { getState, updateState } from '../core/state.js';
-import { playStoryMusic } from '../core/sound.js';
+import { playStoryMusic, stopStoryMusic, updateMusic } from '../core/sound.js';
+import { checkForSavedGame } from '../core/save-load.js';
 import { checkAndShowSpecialFeatures } from '../core/achievements.js';
 import { initializeFloatingItemsAnimation } from './animations.js';
 

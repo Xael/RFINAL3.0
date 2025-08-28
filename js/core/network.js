@@ -28,83 +28,158 @@ function setupPlayerPerspective() {
     const player1Container = document.getElementById('player-1-area-container');
     const opponentsContainer = document.getElementById('opponent-zones-container');
     const createPlayerAreaHTML = (id) => `<div class="player-area" id="player-area-${id}"></div>`;
-
-    player1Container.innerHTML = createPlayerAreaHTML(orderedPlayerIds[0]);
-    opponentsContainer.innerHTML = orderedPlayerIds.slice(1).map(id => createPlayerAreaHTML(id)).join('');
+    
+    if(player1Container) player1Container.innerHTML = createPlayerAreaHTML(orderedPlayerIds[0]);
+    if(opponentsContainer) opponentsContainer.innerHTML = orderedPlayerIds.slice(1).map(id => createPlayerAreaHTML(id)).join('');
 }
 
 
 export function connectToServer() {
-    const state = getState();
-    if (state.socket || state.isConnectionAttempted) return;
-    updateState('isConnectionAttempted', true);
-    
-    const socket = io("https://reversus-game.dke42d.easypanel.host", {
-        withCredentials: true // Essencial para o login com Google via CORS
+    const SERVER_URL = "https://reversus-node.dke42d.easypanel.host";
+    const socket = io(SERVER_URL, {
+        reconnectionAttempts: 3,
+        timeout: 10000,
     });
     updateState('socket', socket);
 
     socket.on('connect', () => {
-        console.log('Connected to server with ID:', socket.id);
-        updateState('clientId', socket.id);
+        const clientId = socket.id;
+        console.log('Conectado ao servidor com ID:', clientId);
+        updateState('clientId', clientId);
+    });
+    
+    socket.on('connect_error', (err) => {
+        console.error("Falha na conexão:", err.message);
+        showSplashScreen();
     });
 
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server.');
-        alert('Você foi desconectado do servidor. Retornando ao menu principal.');
-        showSplashScreen();
+    socket.on('loginSuccess', (userProfile) => {
+        console.log('Login successful on client:', userProfile);
+        updateState('isLoggedIn', true);
+        updateState('userProfile', userProfile);
+        
+        dom.googleSignInContainer.classList.add('hidden');
+        dom.userProfileDisplay.classList.remove('hidden');
+        renderProfile(userProfile);
+        dom.rankingButton.classList.remove('hidden'); 
+        dom.eventButton.classList.remove('hidden');
+        emitGetFriendsList(); // Carrega a lista de amigos após o login
+        emitGetPendingRequests(); // Carrega pedidos pendentes
+    });
+
+    socket.on('loginError', (message) => {
+        console.error('Login failed:', message);
+        alert(`Erro de login: ${message}`);
     });
 
     socket.on('forceDisconnect', (message) => {
         alert(message);
-        socket.disconnect();
+        window.location.reload();
     });
 
-    socket.on('loginSuccess', (userProfile) => {
-        console.log('Login successful:', userProfile);
-        updateState('isLoggedIn', true);
-        updateState('userProfile', userProfile);
-        dom.googleSignInContainer.classList.add('hidden');
-        dom.userProfileDisplay.classList.remove('hidden');
-        dom.eventButton.classList.remove('hidden');
-        renderProfile(userProfile);
+    socket.on('roomCreated', (roomId) => {
+        emitJoinRoom(roomId);
+    });
+    
+    socket.on('rankingData', (rankingData) => {
+        renderRanking(rankingData);
     });
 
-    socket.on('loginError', (message) => {
-        alert(message);
+    socket.on('profileData', (profile) => {
+        const { userProfile } = getState();
+        if (userProfile && profile.google_id === userProfile.google_id) {
+            updateState('userProfile', profile);
+        }
+        renderProfile(profile);
+    });
+    
+    socket.on('viewProfileData', (profile) => {
+        renderProfile(profile);
+        dom.profileModal.classList.remove('hidden');
     });
 
+    socket.on('rewardClaimed', ({ titleCode }) => {
+        // A atualização do perfil via 'profileData' cuidará da UI.
+    });
+
+    // --- Social Listeners ---
+    socket.on('searchResults', (results) => {
+        renderSearchResults(results);
+    });
+
+    socket.on('friendsList', (friends) => {
+        renderFriendsList(friends);
+    });
+
+    socket.on('pendingRequestsData', (requests) => {
+        renderFriendRequests(requests);
+        dom.friendRequestBadge.classList.toggle('hidden', requests.length === 0);
+    });
+
+    socket.on('newFriendRequest', (request) => {
+        alert(t('friends.new_request_alert', { username: request.username }));
+        dom.friendRequestBadge.classList.remove('hidden');
+        if (!dom.profileModal.classList.contains('hidden')) {
+            emitGetPendingRequests();
+        }
+    });
+
+    socket.on('friendRequestResponded', ({ username, action }) => {
+        if (action === 'accept') {
+            alert(t('friends.request_accepted_alert', { username }));
+        }
+        // Refresh both lists to show new friend or updated request list
+        emitGetFriendsList();
+        emitGetPendingRequests();
+    });
+    
+    socket.on('friendStatusUpdate', () => {
+        // A simple status change for one friend requires a full refresh to guarantee
+        // that the online status and message buttons are always correct.
+        emitGetFriendsList();
+    });
+
+    socket.on('privateMessage', (message) => {
+        addPrivateChatMessage(message);
+    });
+
+
+    // --- Room & Game Listeners ---
     socket.on('roomList', (rooms) => {
         renderRoomList(rooms);
     });
     
-    socket.on('roomCreated', (roomId) => {
-        emitJoinRoom(roomId);
-    });
-
-    socket.on('joinedRoom', (roomData) => {
+    socket.on('lobbyUpdate', async (roomData) => {
         updateState('currentRoomId', roomData.id);
-        const myPlayerData = roomData.players.find(p => p.id === state.clientId);
-        if (myPlayerData) updateState('playerId', myPlayerData.playerId);
+        const { clientId, userProfile } = getState();
+        const myPlayerData = roomData.players.find(p => p.id === clientId);
+        if (myPlayerData) {
+            updateState('playerId', myPlayerData.playerId);
+            if (userProfile) {
+                userProfile.playerId = myPlayerData.playerId;
+                updateState('userProfile', userProfile);
+            }
+        }
         
         dom.pvpRoomListModal.classList.add('hidden');
         dom.pvpLobbyModal.classList.remove('hidden');
-        updateLobbyUi(roomData);
-    });
-    
-    socket.on('lobbyUpdate', (roomData) => {
+        
         updateLobbyUi(roomData);
     });
 
-    socket.on('lobbyChat', ({ speaker, message }) => {
+    socket.on('lobbyChatMessage', ({ speaker, message }) => {
         addLobbyChatMessage(speaker, message);
     });
 
+    socket.on('chatMessage', ({ speaker, message }) => {
+        updateLog({ type: 'dialogue', speaker, message });
+    });
+
     socket.on('gameStarted', async (initialGameState) => {
-        console.log("Game started by server:", initialGameState);
+        updateState('gameState', initialGameState);
+        
         dom.pvpLobbyModal.classList.add('hidden');
         dom.appContainerEl.classList.remove('hidden');
-        updateState('gameState', initialGameState);
         
         const state = getState();
         if (state.gameTimerInterval) clearInterval(state.gameTimerInterval);
@@ -112,112 +187,104 @@ export function connectToServer() {
         updateGameTimer();
         updateState('gameTimerInterval', setInterval(updateGameTimer, 1000));
         
-        setupPlayerPerspective();
-        renderAll();
-        
         if (initialGameState.gamePhase === 'initial_draw') {
             await showPvpDrawSequence(initialGameState);
+            // The server will send a gameStateUpdate with gamePhase: 'playing' after this.
+        } else {
+             // Fallback for games that might not have a draw phase
+            setupPlayerPerspective();
+            renderAll();
         }
     });
 
-    socket.on('gameStateUpdate', (newGameState) => {
+    socket.on('cardPlayedAnimation', async ({ casterId, targetId, card, targetSlotLabel }) => {
+        const startElement = document.querySelector(`#hand-${casterId} [data-card-id="${card.id}"]`);
+        await animateCardPlay(card, startElement, targetId, targetSlotLabel);
+    });
+
+    socket.on('gameStateUpdate', (gameState) => {
+        const { gameState: localGameState } = getState();
+        const localUiState = localGameState ? {
+            selectedCard: localGameState.selectedCard,
+            reversusTarget: localGameState.reversusTarget,
+            pulaTarget: localGameState.pulaTarget,
+        } : {};
+        const newGameState = { ...gameState, ...localUiState };
         updateState('gameState', newGameState);
+        setupPlayerPerspective();
         renderAll();
-    });
-
-    socket.on('cardPlayedAnimation', async ({ card, startPlayerId, targetPlayerId, targetSlotLabel }) => {
-        const startElement = document.querySelector(`#hand-${startPlayerId} [data-card-id="${card.id}"]`);
-        if (startElement) {
-            await animateCardPlay(card, startElement, targetPlayerId, targetSlotLabel);
-        }
     });
 
     socket.on('gameOver', ({ message, winnerId }) => {
         const { gameState } = getState();
-        showGameOver(message, "Fim de Jogo!", { action: 'menu' });
-        // Emit event for the winner to update stats
-        if (winnerId === getState().playerId) {
-            socket.emit('gameFinished', { winnerId, roomId: getState().currentRoomId, mode: gameState.gameMode });
+        if (gameState) {
+             emitGameFinished(winnerId, gameState.gameMode);
         }
-    });
-
-    socket.on('chatMessage', ({ speaker, message }) => {
-        updateLog({ type: 'dialogue', speaker, message });
-    });
-
-    socket.on('rankingData', (rankingData) => {
-        renderRanking(rankingData);
-    });
-
-    socket.on('profileData', (profileData) => {
-        renderProfile(profileData);
-    });
-    
-    socket.on('viewProfileData', (profileData) => {
-        dom.profileModal.classList.remove('hidden');
-        renderProfile(profileData);
+        showGameOver(message, "Fim de Jogo!", { action: 'menu' });
     });
 
     socket.on('error', (message) => {
-        alert(message);
-    });
-
-    // Friend system events
-    socket.on('searchResults', (results) => renderSearchResults(results));
-    socket.on('friendsList', (friends) => renderFriendsList(friends));
-    socket.on('newFriendRequest', (request) => {
-        alert(t('friends.new_request_alert', { username: request.username }));
-        dom.friendRequestBadge.classList.remove('hidden');
-    });
-    socket.on('pendingRequestsData', (requests) => {
-        renderFriendRequests(requests);
-        dom.friendRequestBadge.classList.toggle('hidden', requests.length === 0);
-    });
-    socket.on('friendRequestResponded', ({ username, action }) => {
-        if(action === 'accept') alert(t('friends.request_accepted_alert', { username }));
-        emitGetFriendsList(); // Refresh list on any change
-    });
-    socket.on('friendStatusUpdate', ({ userId, isOnline }) => updateFriendStatusIndicator(userId, isOnline));
-    
-    // Private Chat events
-    socket.on('privateMessage', (message) => addPrivateChatMessage(message));
-
-    // Quick PVP events
-    socket.on('queueUpdate', ({ inQueue, mode, current, required }) => {
-        if (inQueue) {
-            dom.quickPvpQueueModal.classList.remove('hidden');
-            dom.quickPvpQueueStatusText.textContent = t('quick_pvp_queue.status_text', { current, required });
-        } else {
-            dom.quickPvpQueueModal.classList.add('hidden');
-        }
+        console.error('Server Error:', message);
+        alert(`Erro do Servidor: ${message}`);
     });
 }
 
-// --- EMITTERS ---
-export function emitListRooms() { getState().socket?.emit('listRooms'); }
-export function emitCreateRoom() { getState().socket?.emit('createRoom'); }
-export function emitJoinRoom(roomId) { getState().socket?.emit('joinRoom', { roomId }); }
-export function emitLeaveRoom() { getState().socket?.emit('leaveRoom'); }
-export function emitChangeMode(mode) { getState().socket?.emit('changeMode', { mode }); }
-export function emitStartGame() { getState().socket?.emit('startGame'); }
-export function emitPlayCard(data) { getState().socket?.emit('playCard', data); }
-export function emitEndTurn() { getState().socket?.emit('endTurn'); }
-export function emitChatMessage(message) { getState().socket?.emit('chatMessage', { message }); }
-export function emitLobbyChat(message) { getState().socket?.emit('lobbyChat', { message }); }
-export function emitGetRanking(page = 1) { getState().socket?.emit('getRanking', { page }); }
-export function emitGetProfile() { getState().socket?.emit('getProfile'); }
-export function emitViewProfile(googleId) { getState().socket?.emit('viewProfile', { googleId }); }
-export function emitSetSelectedTitle(titleCode) { getState().socket?.emit('setSelectedTitle', { titleCode }); }
+// --- EMISSORES DE EVENTOS ---
+export function emitGetRanking(page = 1) { const { socket } = getState(); if (socket) socket.emit('getRanking', { page }); }
+export function emitGetProfile() { const { socket } = getState(); if (socket) socket.emit('getProfile'); }
+export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
+export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
+export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
+export function emitGameFinished(winnerId, mode) {
+    const { socket, currentRoomId } = getState();
+    if (socket && winnerId && currentRoomId) {
+        socket.emit('gameFinished', { winnerId, roomId: currentRoomId, mode });
+    }
+}
+export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
+export function emitCreateRoom() { const { socket } = getState(); if (socket) socket.emit('createRoom'); }
+export function emitJoinRoom(roomId) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId }); }
+export function emitLobbyChat(message) { const { socket } = getState(); if(socket) socket.emit('lobbyChatMessage', message); }
+export function emitChatMessage(message) { const { socket } = getState(); if (socket) socket.emit('chatMessage', message); }
+export function emitChangeMode(mode) { const { socket } = getState(); if (socket) socket.emit('changeMode', mode); }
+export function emitStartGame() { const { socket } = getState(); if (socket) socket.emit('startGame'); }
+export function emitPlayCard({ cardId, targetId, options = {} }) { const { socket } = getState(); if (socket) socket.emit('playCard', { cardId, targetId, options }); }
+export function emitSearchUsers(query) { const { socket } = getState(); if (socket) socket.emit('searchUsers', { query }); }
+export function emitSendFriendRequest(targetUserId, callback) { 
+    const { socket } = getState(); 
+    if (socket) {
+        socket.emit('sendFriendRequest', { targetUserId }, callback);
+    } else {
+        callback({ success: false, error: 'Sem conexão com o servidor.' });
+    }
+}
+export function emitRespondToRequest(requestId, action) { const { socket } = getState(); if(socket) socket.emit('respondToRequest', { requestId, action }); }
+export function emitGetPendingRequests() { const { socket } = getState(); if(socket) socket.emit('getPendingRequests'); }
+export function emitRemoveFriend(targetUserId) { const { socket } = getState(); if (socket) socket.emit('removeFriend', { targetUserId }); }
+export function emitGetFriendsList() { const { socket } = getState(); if (socket) socket.emit('getFriendsList'); }
+export function emitSendPrivateMessage(recipientId, content) { const { socket } = getState(); if (socket) socket.emit('sendPrivateMessage', { recipientId, content }); }
 
-// Friend Emitters
-export function emitSearchUsers(query) { getState().socket?.emit('searchUsers', { query }); }
-export function emitSendFriendRequest(targetUserId, callback) { getState().socket?.emit('sendFriendRequest', { targetUserId }, callback); }
-export function emitRespondToRequest(requestId, action) { getState().socket?.emit('respondToRequest', { requestId, action }); }
-export function emitGetPendingRequests() { getState().socket?.emit('getPendingRequests'); }
-export function emitGetFriendsList() { getState().socket?.emit('getFriendsList'); }
-export function emitRemoveFriend(targetUserId) { getState().socket?.emit('removeFriend', { targetUserId }); }
-export function emitSendPrivateMessage(recipientId, content) { getState().socket?.emit('sendPrivateMessage', { recipientId, content }); }
+export function emitLeaveRoom() {
+    const { socket, currentRoomId } = getState();
+    if (socket && currentRoomId) {
+        socket.emit('leaveRoom');
+        updateState('currentRoomId', null);
+        updateState('gameState', null);
+        dom.pvpLobbyModal.classList.add('hidden');
+        dom.appContainerEl.classList.add('hidden');
+        showSplashScreen();
+    }
+}
 
-// Quick PVP Emitters
-export function emitJoinQuickPvpQueue(mode) { getState().socket?.emit('joinQuickPvpQueue', { mode }); }
-export function emitLeaveQuickPvpQueue() { getState().socket?.emit('leaveQuickPvpQueue'); }
+export function emitEndTurn() {
+    const { socket, gameState, playerId } = getState();
+    if (!socket || !gameState || gameState.currentPlayer !== playerId) return;
+    const player = gameState.players[playerId];
+    if(!player) return;
+    const valueCardsInHandCount = player.hand.filter(c => c.type === 'value').length;
+    if (valueCardsInHandCount > 1 && !player.playedValueCardThisTurn) {
+        alert("Você precisa jogar uma carta de valor neste turno!");
+        return;
+    }
+    socket.emit('endTurn');
+}

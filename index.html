@@ -55,9 +55,6 @@
         <img id="user-avatar" src="" alt="User Avatar">
         <div class="user-info">
              <span id="user-name"></span>
-             <div id="user-coinversus-display" class="user-coinversus-display">
-                🪙 <span id="user-coinversus-balance">0</span>
-             </div>
              <div class="xp-bar-container">
                  <div id="xp-bar-fill"></div>
                  <span id="xp-bar-text"></span>
@@ -350,7 +347,6 @@
         <div class="center-panel">
             <div class="center-panel-header">
                 <div id="reversus-total-indicator" class="hidden" data-i18n="game.reversus_total_active">Reversus Total Ativo!</div>
-                <div id="pvp-pot-display" class="hidden"></div>
                 <div id="team-scores-container" class="team-scores-container hidden"></div>
             </div>
             <div class="board-and-scores-wrapper">
@@ -393,29 +389,8 @@
                 <button id="solo-3p-button" class="control-button" data-i18n="setup.solo_3p">1 vs 2</button>
                 <button id="solo-4p-button" class="control-button" data-i18n="setup.solo_4p">1 vs 3</button>
                 <button id="duo-mode-button" class="control-button secondary" data-i18n="setup.duo">2 vs 2</button>
-                <button id="quick-pvp-button" class="control-button btn-p3-color" data-i18n="splash.quick_pvp">PVP RÁPIDO</button>
             </div>
             <button id="close-setup-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.back">Voltar</button>
-        </div>
-    </div>
-
-    <div id="quick-pvp-mode-selection-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h2 data-i18n="quick_pvp.title">PVP Rápido - Escolha o Modo</h2>
-            <div class="button-group vertical">
-                <button id="quick-pvp-1v1-button" class="control-button" data-mode="1v1" data-i18n="quick_pvp.mode_1v1">1 vs 1</button>
-                <button id="quick-pvp-2v2-button" class="control-button" data-mode="2v2" data-i18n="quick_pvp.mode_2v2">2 vs 2 (Duplas)</button>
-                <button id="quick-pvp-4p-button" class="control-button" data-mode="4p" data-i18n="quick_pvp.mode_4p">4 Jogadores (Cada um por si)</button>
-            </div>
-            <button id="quick-pvp-mode-selection-close-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.back">Voltar</button>
-        </div>
-    </div>
-
-    <div id="quick-pvp-queue-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h2 data-i18n="quick_pvp_queue.title">Buscando Partida...</h2>
-            <p id="quick-pvp-queue-status-text" style="text-align: center; font-size: 1.2rem; margin: 1rem 0;"></p>
-            <button id="quick-pvp-queue-cancel-button" class="control-button cancel" data-i18n="common.cancel">Cancelar</button>
         </div>
     </div>
 

@@ -36,8 +36,7 @@
         "achievements": "Achievements",
         "friends": "Friends",
         "inversus": "INVERSUS",
-        "version": "Version 3.0",
-        "quick_pvp": "QUICK PVP"
+        "version": "Version 3.0"
     },
     "info": {
         "instructions_tab": "Instructions",
@@ -143,8 +142,7 @@
         "house_header_title": "Position on the path",
         "effect_header_title": "Active card effects",
         "field_effect_indicator": "Field",
-        "field_effect_indicator_title": "Active field effect: {effectName}",
-        "pvp_pot": "Total Bet"
+        "field_effect_indicator_title": "Active field effect: {effectName}"
     },
     "setup": {
         "title": "Game Mode",
@@ -153,16 +151,6 @@
         "solo_3p": "1 vs 2",
         "solo_4p": "1 vs 3",
         "duo": "2 vs 2"
-    },
-    "quick_pvp": {
-        "title": "Quick PVP - Choose Mode",
-        "mode_1v1": "1 vs 1",
-        "mode_2v2": "2 vs 2 (Duos)",
-        "mode_4p": "4 Players (Free for All)"
-    },
-    "quick_pvp_queue": {
-        "title": "Searching for Match...",
-        "status_text": "Searching... ({current}/{required})"
     },
     "one_v_one": {
         "title": "1 vs 1 Mode",
@@ -289,7 +277,7 @@
         "empty": "The ranking is still empty. Be the first to win!",
         "header_rank": "#",
         "header_player": "Player",
-        "header_coinversus": "CoinVersus"
+        "header_victories": "Victories"
     },
     "profile": {
         "title": "Player Profile",
@@ -299,7 +287,6 @@
         "experience": "Experience",
         "victories": "Victories",
         "defeats": "Defeats",
-        "coinversus": "CoinVersus",
         "select_title": "Select Title",
         "unlocked_titles": "Unlocked Titles",
         "no_titles": "No titles unlocked yet.",

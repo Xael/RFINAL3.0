@@ -444,41 +444,6 @@ export function initializeUiHandlers() {
     dom.solo4pButton.addEventListener('click', () => initializeGame('solo', { numPlayers: 4 }));
     dom.duoModeButton.addEventListener('click', () => initializeGame('duo', { numPlayers: 4 }));
 
-    // --- Quick PVP Handlers ---
-    dom.quickPvpButton.addEventListener('click', () => {
-        const { isLoggedIn } = getState();
-        if (!isLoggedIn) {
-            alert("É necessário fazer login com o Google para jogar no modo PVP.");
-            return;
-        }
-        dom.gameSetupModal.classList.add('hidden');
-        dom.quickPvpModeSelectionModal.classList.remove('hidden');
-    });
-    
-    const joinQueueHandler = (e) => {
-        const mode = e.target.dataset.mode;
-        if (mode) {
-            dom.quickPvpModeSelectionModal.classList.add('hidden');
-            network.emitJoinQuickPvpQueue(mode);
-        }
-    };
-
-    dom.quickPvp1v1Button.addEventListener('click', joinQueueHandler);
-    dom.quickPvp2v2Button.addEventListener('click', joinQueueHandler);
-    dom.quickPvp4pButton.addEventListener('click', joinQueueHandler);
-
-    dom.quickPvpModeSelectionCloseButton.addEventListener('click', () => {
-        dom.quickPvpModeSelectionModal.classList.add('hidden');
-        dom.gameSetupModal.classList.remove('hidden');
-    });
-
-    dom.quickPvpQueueCancelButton.addEventListener('click', () => {
-        network.emitLeaveQuickPvpQueue();
-        dom.quickPvpQueueModal.classList.add('hidden');
-        dom.quickPvpModeSelectionModal.classList.remove('hidden');
-    });
-    // --- End Quick PVP Handlers ---
-
     dom.oneVOneBackButton.addEventListener('click', () => {
         dom.oneVOneSetupModal.classList.add('hidden');
         dom.gameSetupModal.classList.remove('hidden');

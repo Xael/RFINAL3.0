@@ -23,7 +23,6 @@ export function renderProfile(profileData) {
         }
         dom.userAvatar.src = profileData.avatar_url || '';
         dom.userName.textContent = profileData.username || t('game.you');
-        dom.userCoinversusBalance.textContent = profileData.coinversus || 0;
         dom.userLevel.textContent = profileData.level || 1;
         const currentLevelXp = xpForLevel(profileData.level);
         const nextLevelXp = xpForLevel(profileData.level + 1);
@@ -88,7 +87,6 @@ export function renderProfile(profileData) {
                     <div class="profile-stat-item"><h4>${t('profile.experience')}</h4><p>${profileData.xp}</p></div>
                     <div class="profile-stat-item"><h4>${t('profile.victories')}</h4><p>${profileData.victories}</p></div>
                     <div class="profile-stat-item"><h4>${t('profile.defeats')}</h4><p>${profileData.defeats}</p></div>
-                    <div class="profile-stat-item"><h4>${t('profile.coinversus')}</h4><p>🪙 ${profileData.coinversus || 0}</p></div>
                 </div>
                 ${titlesSectionHTML}
                 <div class="profile-section">

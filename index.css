@@ -589,11 +589,6 @@ body.screen-shaking {
     border: 1px solid rgba(168, 218, 220, 0.2);
     flex-shrink: 0;
     min-height: 40px; /* Give it a minimum height to avoid layout shifts */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 .actions-container {
@@ -615,6 +610,7 @@ body.screen-shaking {
     display: flex;
     justify-content: space-around;
     width: 100%;
+    margin-top: 0.5rem;
     padding: 0.25rem;
     gap: 1rem;
 }
@@ -653,18 +649,8 @@ body.screen-shaking {
     font-weight: 600;
     text-transform: uppercase;
     animation: pulse-red 1.5s infinite;
+    margin-top: 0.5rem;
 }
-
-#pvp-pot-display {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--accent-yellow);
-    animation: golden-text-glow 2.5s infinite ease-in-out;
-}
-#pvp-pot-display span {
-    color: var(--text-primary);
-}
-
 
 #player-1-area-container {
     flex-grow: 1;
@@ -2073,14 +2059,8 @@ body.screen-shaking {
 /* --- Game Menu and Confirmation Modals --- */
 #game-menu-modal .modal-content,
 #save-game-confirm-modal .modal-content,
-#exit-game-confirm-modal .modal-content,
-#quick-pvp-mode-selection-modal .modal-content {
+#exit-game-confirm-modal .modal-content {
     width: 450px;
-}
-
-#quick-pvp-queue-modal .modal-content {
-    width: 400px;
-    text-align: center;
 }
 
 /* Round Summary Modal */
@@ -2304,12 +2284,6 @@ body.screen-shaking {
     color: var(--text-primary);
     text-shadow: 0 0 5px var(--text-primary);
     box-shadow: 0 0 10px var(--accent-purple);
-}
-
-#quick-pvp-button {
-    margin-top: 1rem;
-    background-color: var(--accent-green);
-    width: 100%;
 }
 
 
@@ -2776,17 +2750,9 @@ body.screen-shaking {
     flex-direction: column;
     gap: 4px;
     padding: 0 10px 0 5px;
-    align-items: flex-start;
 }
 #user-name { font-weight: 600; }
 #user-avatar { width: 40px; height: 40px; border-radius: 50%; }
-
-.user-coinversus-display {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--accent-yellow);
-    margin-top: -2px;
-}
 
 .xp-bar-container {
     width: 120px;
