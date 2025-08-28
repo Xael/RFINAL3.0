@@ -39,7 +39,9 @@ export function connectToServer() {
     if (state.socket || state.isConnectionAttempted) return;
     updateState('isConnectionAttempted', true);
     
-    const socket = io("https://reversus-game.dke42d.easypanel.host");
+    const socket = io("https://reversus-game.dke42d.easypanel.host", {
+        withCredentials: true
+    });
     updateState('socket', socket);
 
     socket.on('connect', () => {
