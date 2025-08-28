@@ -40,7 +40,7 @@ export function connectToServer() {
     updateState('isConnectionAttempted', true);
     
     const socket = io("https://reversus-game.dke42d.easypanel.host", {
-        withCredentials: true
+        withCredentials: true // Essencial para o login com Google via CORS
     });
     updateState('socket', socket);
 
@@ -79,7 +79,7 @@ export function connectToServer() {
     });
     
     socket.on('roomCreated', (roomId) => {
-        emitJoinRoom({ roomId });
+        emitJoinRoom(roomId);
     });
 
     socket.on('joinedRoom', (roomData) => {
