@@ -5,11 +5,11 @@ import * as dom from './dom.js';
 import { renderAll, showGameOver } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel } from '../ui/profile-renderer.js';
-import { showSplashScreen } from './splash-screen.js';
+import { showSplashScreen } from '../ui/splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
-import { t } from './i18n.js';
+import { t } from '../core/i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
 
 /**

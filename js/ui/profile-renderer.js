@@ -4,7 +4,7 @@ import * as dom from '../core/dom.js';
 import { t, getCurrentLanguage } from '../core/i18n.js';
 import * as network from '../core/network.js';
 import { getState } from '../core/state.js';
-import { openChatWindow } from './ui-handlers.js';
+import { openChatWindow } from './chat-handler.js';
 
 function xpForLevel(level) {
     if (level <= 1) return 0;
