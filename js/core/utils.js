@@ -47,10 +47,15 @@ export const shuffle = (array) => {
  * @param {string | object} [logEntry] - The message string or a log object with metadata.
  */
 export const updateLog = (logEntry) => {
-    const { gameState } = getState();
+    const { gameState, isChatMuted, userProfile } = getState();
     if (!gameState) return;
 
     if (logEntry) {
+        const isPlayerChat = typeof logEntry === 'object' && logEntry.type === 'dialogue';
+        if (isChatMuted && isPlayerChat) {
+            return; // If chat is muted, ignore player messages.
+        }
+
         // In PvP, we only add real-time chat messages from the 'chatMessage' event.
         // Full log synchronization is handled by the 'gameStateUpdate' event,
         // which calls renderAll(), which in turn calls this function without arguments.
@@ -83,13 +88,19 @@ export const updateLog = (logEntry) => {
         const emojiMessage = sanitizedMessage.replace(/:\)|:\(|;\(|s2|&lt;3|<3/gi, (match) => emojiMap[match.toLowerCase()] || match);
 
         if (m.type === 'dialogue' && m.speaker) {
-            // Use a specific class for story characters, and a generic one for PvP players.
+            const myGoogleId = userProfile?.google_id;
+            const isMyMessage = m.googleId === myGoogleId || (m.speaker === userProfile?.username && !m.googleId);
+
+            const reportButton = !isMyMessage && m.googleId ? 
+                `<button class="report-button" title="Denunciar jogador por má conduta" data-google-id="${m.googleId}" data-username="${m.speaker}" data-message="${sanitizedMessage}">🚩</button>` 
+                : '';
+
             const speakerClass = config.AI_CHAT_PERSONALITIES.hasOwnProperty(m.speaker) 
                 ? `speaker-${m.speaker}` 
-                : `speaker-player-1`; // Using a distinct color class for all PvP chat
+                : `speaker-player-1`;
             
             const speakerName = `<strong>${m.speaker}:</strong> `;
-            return `<div class="log-message dialogue ${speakerClass}">${speakerName}${emojiMessage}</div>`;
+            return `<div class="log-message dialogue ${speakerClass}">${speakerName}<span>${emojiMessage}</span>${reportButton}</div>`;
         }
         return `<div class="log-message system">${emojiMessage}</div>`;
     }).join('');

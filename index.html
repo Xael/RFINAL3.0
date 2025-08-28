@@ -155,10 +155,11 @@
     <!-- Profile Modal -->
     <div id="profile-modal" class="modal-overlay hidden">
         <div class="modal-content profile-modal-content">
-            <div class="info-tabs">
+            <div class="info-tabs" id="profile-tabs-container">
                 <button class="profile-tab-button active" data-tab="profile-main" data-i18n="splash.profile">Perfil</button>
                 <button class="profile-tab-button" data-tab="profile-achievements" data-i18n="splash.achievements">Conquistas</button>
                 <button class="profile-tab-button" data-tab="profile-friends" data-i18n="splash.friends">Amigos</button>
+                <!-- Admin tab will be injected here by JS -->
             </div>
             <div id="profile-main-tab-content" class="info-tab-content active">
                 <div id="profile-data-container">
@@ -166,6 +167,9 @@
                 </div>
                  <div id="profile-action-buttons" class="profile-action-buttons">
                     <!-- Add/Remove Friend buttons will be injected here -->
+                </div>
+                 <div id="profile-settings-container" class="profile-action-buttons">
+                    <!-- Mute Chat button will be injected here -->
                 </div>
             </div>
             <div id="profile-achievements-tab-content" class="info-tab-content">
@@ -196,6 +200,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div id="profile-admin-tab-content" class="info-tab-content">
+                <!-- Admin panel content will be rendered here by JS -->
             </div>
             <button id="close-profile-button" class="control-button" data-i18n="common.close">Fechar</button>
         </div>
@@ -347,6 +354,7 @@
         <div class="center-panel">
             <div class="center-panel-header">
                 <div id="reversus-total-indicator" class="hidden" data-i18n="game.reversus_total_active">Reversus Total Ativo!</div>
+                <div id="pvp-pot-container" class="pvp-pot-container hidden"></div>
                 <div id="team-scores-container" class="team-scores-container hidden"></div>
             </div>
             <div class="board-and-scores-wrapper">
@@ -393,6 +401,42 @@
             <button id="close-setup-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.back">Voltar</button>
         </div>
     </div>
+
+    <!-- Quick Start & Matchmaking Modals -->
+    <div id="quick-start-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 data-i18n="quick_start.title">Início Rápido</h2>
+            <p data-i18n="quick_start.description">Escolha como deseja jogar.</p>
+            <div class="button-group vertical">
+                <button id="quick-start-pvp-button" class="control-button btn-p2-color" data-i18n="quick_start.pvp">PVP (Matchmaking)</button>
+                <button id="quick-start-ai-button" class="control-button btn-p1-color" data-i18n="quick_start.ai">Contra I.A.</button>
+            </div>
+            <button id="quick-start-close-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.back">Voltar</button>
+        </div>
+    </div>
+    
+    <div id="pvp-matchmaking-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 data-i18n="matchmaking.title">PVP Matchmaking</h2>
+            <p data-i18n="matchmaking.description">Escolha a modalidade para encontrar uma partida.</p>
+            <div id="pvp-matchmaking-buttons" class="button-group vertical">
+                <button class="control-button" data-mode="1v1">1 vs 1</button>
+                <button class="control-button" data-mode="1v4">1 vs 4 (Cada um por si)</button>
+                <button class="control-button" data-mode="2v2">2 vs 2 (Duplas)</button>
+            </div>
+            <button id="pvp-matchmaking-close-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.back">Voltar</button>
+        </div>
+    </div>
+    
+    <div id="matchmaking-status-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="text-align: center;">
+            <h2 data-i18n="matchmaking.searching_title">Buscando Partida...</h2>
+            <div class="spinner"></div>
+            <p id="matchmaking-status-text" data-i18n="matchmaking.searching_text">Procurando jogadores...</p>
+            <button id="matchmaking-cancel-button" class="control-button cancel" style="margin-top: 1rem;" data-i18n="common.cancel">Cancelar</button>
+        </div>
+    </div>
+
 
     <div id="one-v-one-setup-modal" class="modal-overlay hidden">
         <div class="modal-content">

@@ -132,6 +132,18 @@ export const scalableContainer = document.getElementById('scalable-container');
 export const achievementUnlockedToast = document.getElementById('achievement-unlocked-toast');
 export const toastText = document.getElementById('toast-text');
 
+// Quick Start & Matchmaking Modals
+export const quickStartModal = document.getElementById('quick-start-modal');
+export const quickStartPvpButton = document.getElementById('quick-start-pvp-button');
+export const quickStartAiButton = document.getElementById('quick-start-ai-button');
+export const quickStartCloseButton = document.getElementById('quick-start-close-button');
+export const pvpMatchmakingModal = document.getElementById('pvp-matchmaking-modal');
+export const pvpMatchmakingButtons = document.getElementById('pvp-matchmaking-buttons');
+export const pvpMatchmakingCloseButton = document.getElementById('pvp-matchmaking-close-button');
+export const matchmakingStatusModal = document.getElementById('matchmaking-status-modal');
+export const matchmakingStatusText = document.getElementById('matchmaking-status-text');
+export const matchmakingCancelButton = document.getElementById('matchmaking-cancel-button');
+
 // Story Start Options Modal
 export const storyStartOptionsModal = document.getElementById('story-start-options-modal');
 export const storyNewGameButton = document.getElementById('story-new-game-button');
@@ -204,6 +216,7 @@ export const xpBarFill = document.getElementById('xp-bar-fill');
 export const xpBarText = document.getElementById('xp-bar-text');
 export const pvpUsernameModal = document.getElementById('pvp-username-modal'); // Kept for potential future use
 export const pvpCreateRoomButton = document.getElementById('pvp-create-room-button');
+export const pvpPotContainer = document.getElementById('pvp-pot-container');
 
 // Event Modal
 export const eventButton = document.getElementById('event-button');

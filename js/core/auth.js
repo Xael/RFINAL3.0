@@ -1,5 +1,6 @@
+
 // js/core/auth.js
-import { getState } from './state.js';
+import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import * as network from './network.js';
 

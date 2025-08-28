@@ -1,3 +1,4 @@
+
 // js/ui/profile-renderer.js
 import * as dom from '../core/dom.js';
 import { t, getCurrentLanguage } from '../core/i18n.js';
@@ -15,6 +16,32 @@ export function renderProfile(profileData) {
     const { userProfile: myProfile } = getState();
     if (!myProfile) return;
     const isMyProfile = myProfile.google_id === profileData.google_id;
+
+    // --- Dynamically add Admin Tab if user is admin ---
+    const tabsContainer = document.getElementById('profile-tabs-container');
+    let adminTab = tabsContainer.querySelector('[data-tab="profile-admin"]');
+    if (isMyProfile && profileData.isAdmin) {
+        if (!adminTab) {
+            adminTab = document.createElement('button');
+            adminTab.className = 'profile-tab-button';
+            adminTab.dataset.tab = 'profile-admin';
+            adminTab.setAttribute('data-i18n', 'admin.tab_title');
+            adminTab.textContent = t('admin.tab_title');
+            tabsContainer.appendChild(adminTab);
+        }
+    } else {
+        if (adminTab) {
+            adminTab.remove();
+            // Ensure admin content is hidden if tab is removed
+            document.getElementById('profile-admin-tab-content').classList.remove('active');
+            // Switch back to main profile tab if admin tab was active
+            if (adminTab.classList.contains('active')) {
+                tabsContainer.querySelector('[data-tab="profile-main"]').classList.add('active');
+                document.getElementById('profile-main-tab-content').classList.add('active');
+            }
+        }
+    }
+
 
     // --- 1. Renderizar o Display do Cabeçalho (se for meu perfil) ---
     if (isMyProfile) {
@@ -73,7 +100,7 @@ export function renderProfile(profileData) {
         </li>`
     ).join('');
 
-    dom.profileDataContainer.innerHTML = `
+    let finalHTML = `
         <div class="profile-grid">
             <div class="profile-sidebar">
                 <img src="${profileData.avatar_url}" alt="${t('profile.avatar_alt')}" class="profile-avatar">
@@ -86,7 +113,7 @@ export function renderProfile(profileData) {
                     <div class="profile-stat-item"><h4>${t('profile.level')}</h4><p>${profileData.level}</p></div>
                     <div class="profile-stat-item"><h4>${t('profile.experience')}</h4><p>${profileData.xp}</p></div>
                     <div class="profile-stat-item"><h4>${t('profile.victories')}</h4><p>${profileData.victories}</p></div>
-                    <div class="profile-stat-item"><h4>${t('profile.defeats')}</h4><p>${profileData.defeats}</p></div>
+                    <div class="profile-stat-item"><h4>${t('profile.coinversus')}</h4><p>${profileData.coinversus || 0}</p></div>
                 </div>
                 ${titlesSectionHTML}
                 <div class="profile-section">
@@ -95,14 +122,22 @@ export function renderProfile(profileData) {
                 </div>
             </div>
         </div>`;
+    
+    dom.profileDataContainer.innerHTML = finalHTML;
 
-    if (isMyProfile) {
-        document.getElementById('title-selection-form')?.addEventListener('change', (e) => {
-            if (e.target.name === 'selected-title') network.emitSetSelectedTitle(e.target.value);
-        });
-    }
-
+    // Adicionar botões de ação (amigo/silenciar) fora do grid principal de dados
     const actionButtonsContainer = document.getElementById('profile-action-buttons');
+    const settingsContainer = document.getElementById('profile-settings-container') || (() => {
+        const container = document.createElement('div');
+        container.id = 'profile-settings-container';
+        container.className = 'profile-action-buttons'; // Reutiliza o estilo
+        actionButtonsContainer.parentNode.insertBefore(container, actionButtonsContainer.nextSibling);
+        return container;
+    })();
+
+    settingsContainer.innerHTML = ''; // Limpa configurações anteriores
+    actionButtonsContainer.innerHTML = ''; // Limpa botões de amizade anteriores
+
     if (!isMyProfile) {
         let buttonHTML = '';
         switch(profileData.friendshipStatus) {
@@ -118,8 +153,63 @@ export function renderProfile(profileData) {
         }
         actionButtonsContainer.innerHTML = buttonHTML;
     } else {
-        actionButtonsContainer.innerHTML = '';
+        const { isChatMuted } = getState();
+        settingsContainer.innerHTML = `
+            <button id="toggle-chat-mute-button" class="control-button secondary">
+                ${t(isChatMuted ? 'profile.unmute_chat' : 'profile.mute_chat')}
+            </button>
+        `;
+
+        document.getElementById('title-selection-form')?.addEventListener('change', (e) => {
+            if (e.target.name === 'selected-title') network.emitSetSelectedTitle(e.target.value);
+        });
     }
+}
+
+export function renderAdminPanel({ online, banned }) {
+    const adminTabContent = document.getElementById('profile-admin-tab-content');
+    if (!adminTabContent) return;
+
+    const onlineUsersHTML = online.length > 0 ? online.map(user => `
+        <div class="admin-user-item">
+            <div class="admin-user-info">
+                <img src="${user.avatar_url}" alt="Avatar" class="friend-avatar">
+                <div class="admin-user-details">
+                    <span class="friend-name">${user.username}</span>
+                    <span class="friend-title">ID: ${user.id}</span>
+                </div>
+            </div>
+            <div class="admin-actions">
+                <button class="control-button cancel admin-ban-btn" data-user-id="${user.id}" data-username="${user.username}">${t('admin.ban_button')}</button>
+            </div>
+        </div>
+    `).join('') : `<p>${t('admin.no_online_users')}</p>`;
+
+    const bannedUsersHTML = banned.length > 0 ? banned.map(user => `
+         <div class="admin-user-item">
+            <div class="admin-user-info">
+                <img src="${user.avatar_url}" alt="Avatar" class="friend-avatar">
+                <div class="admin-user-details">
+                    <span class="friend-name">${user.username}</span>
+                     <span class="friend-title">ID: ${user.id}</span>
+                </div>
+            </div>
+            <div class="admin-actions">
+                <button class="control-button btn-p3-color admin-unban-btn" data-user-id="${user.id}" data-username="${user.username}">${t('admin.unban_button')}</button>
+            </div>
+        </div>
+    `).join('') : `<p>${t('admin.no_banned_users')}</p>`;
+
+    adminTabContent.innerHTML = `
+        <div class="admin-section">
+            <h3 data-i18n="admin.online_users">${t('admin.online_users')}</h3>
+            <div class="admin-user-list">${onlineUsersHTML}</div>
+        </div>
+        <div class="admin-section">
+            <h3 data-i18n="admin.banned_users">${t('admin.banned_users')}</h3>
+            <div class="admin-user-list">${bannedUsersHTML}</div>
+        </div>
+    `;
 }
 
 

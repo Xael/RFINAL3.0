@@ -1,9 +1,10 @@
+
 // js/ui/ui-handlers.js
 import * as dom from '../core/dom.js';
 import { getState, updateState } from '../core/state.js';
 import { initializeGame, restartLastDuel } from '../game-controller.js';
 import { renderAchievementsModal } from './achievements-renderer.js';
-import { renderAll } from './ui-renderer.js';
+import { renderAll, showGameOver } from './ui-renderer.js';
 import * as sound from '../core/sound.js';
 import { startStoryMode, renderStoryNode, playEndgameSequence } from '../story/story-controller.js';
 import * as saveLoad from '../core/save-load.js';
@@ -270,17 +271,86 @@ export function initializeUiHandlers() {
     document.body.addEventListener('click', (e) => {
         if (e.target.closest('.player-hand')) handleCardClick(e);
         if (e.target.closest('.field-effect-indicator')) handleFieldEffectIndicatorClick(e);
+        if (e.target.matches('.report-button')) {
+            const button = e.target;
+            const googleId = button.dataset.googleId;
+            const username = button.dataset.username;
+            const message = button.dataset.message;
+            if (confirm(t('confirm.report_player', { username }))) {
+                network.emitReportPlayer(googleId, message);
+                alert(t('admin.report_received'));
+            }
+        }
+        if (e.target.matches('.admin-ban-btn')) {
+            const button = e.target;
+            const userId = button.dataset.userId;
+            const username = button.dataset.username;
+            if (confirm(t('confirm.ban_player', { username }))) {
+                network.emitAdminBanUser(userId);
+            }
+        }
+        if (e.target.matches('.admin-unban-btn')) {
+            const button = e.target;
+            const userId = button.dataset.userId;
+            const username = button.dataset.username;
+            if (confirm(t('confirm.unban_player', { username }))) {
+                network.emitAdminUnbanUser(userId);
+            }
+        }
     });
 
     dom.playButton.addEventListener('click', handlePlayButtonClick);
     dom.endTurnButton.addEventListener('click', handleEndTurnButtonClick);
     dom.cardViewerCloseButton.addEventListener('click', () => dom.cardViewerModalEl.classList.add('hidden'));
     
+    // --- NEW QUICK START FLOW ---
     dom.quickStartButton.addEventListener('click', () => {
         sound.initializeMusic();
         dom.splashScreenEl.classList.add('hidden');
+        dom.quickStartModal.classList.remove('hidden');
+    });
+
+    dom.quickStartAiButton.addEventListener('click', () => {
+        dom.quickStartModal.classList.add('hidden');
         dom.gameSetupModal.classList.remove('hidden');
     });
+
+    dom.quickStartPvpButton.addEventListener('click', () => {
+        const { isLoggedIn } = getState();
+        if (!isLoggedIn) {
+            alert(t('common.login_required', { feature: 'PVP Matchmaking' }));
+            return;
+        }
+        dom.quickStartModal.classList.add('hidden');
+        dom.pvpMatchmakingModal.classList.remove('hidden');
+    });
+
+    dom.quickStartCloseButton.addEventListener('click', () => {
+        dom.quickStartModal.classList.add('hidden');
+        showSplashScreen();
+    });
+
+    dom.pvpMatchmakingButtons.addEventListener('click', (e) => {
+        const button = e.target.closest('button[data-mode]');
+        if (!button) return;
+
+        const mode = button.dataset.mode;
+        network.emitJoinMatchmaking(mode);
+        dom.pvpMatchmakingModal.classList.add('hidden');
+        dom.matchmakingStatusModal.classList.remove('hidden');
+        dom.matchmakingStatusText.textContent = t('matchmaking.searching_text');
+    });
+
+    dom.pvpMatchmakingCloseButton.addEventListener('click', () => {
+        dom.pvpMatchmakingModal.classList.add('hidden');
+        dom.quickStartModal.classList.remove('hidden');
+    });
+
+    dom.matchmakingCancelButton.addEventListener('click', () => {
+        network.emitCancelMatchmaking();
+    });
+
+    // --- END NEW QUICK START FLOW ---
     
     dom.storyModeButton.addEventListener('click', () => {
         sound.initializeMusic();
@@ -400,20 +470,31 @@ export function initializeUiHandlers() {
     });
 
     dom.closeRankingButton.addEventListener('click', () => dom.rankingModal.classList.add('hidden'));
-    dom.closeProfileButton.addEventListener('click', () => dom.profileModal.classList.add('hidden'));
+    
+    dom.closeProfileButton.addEventListener('click', () => {
+        dom.profileModal.classList.add('hidden');
+        const { isChatMuted } = getState();
+        dom.chatInput.placeholder = t(isChatMuted ? 'chat.chat_muted_message' : 'game.chat_placeholder');
+        dom.chatInput.disabled = isChatMuted;
+    });
+
     dom.closeEventButton.addEventListener('click', () => {
         dom.eventModal.classList.add('hidden');
         sound.playStoryMusic('tela.ogg');
     });
 
-    dom.profileModal.querySelectorAll('.profile-tab-button').forEach(button => {
-        button.addEventListener('click', () => {
+    dom.profileModal.addEventListener('click', (e) => {
+        const button = e.target.closest('.profile-tab-button');
+        if (button) {
             const tabId = button.dataset.tab;
+            if (tabId === 'profile-admin') {
+                network.emitAdminGetData();
+            }
             dom.profileModal.querySelectorAll('.profile-tab-button').forEach(btn => btn.classList.remove('active'));
             dom.profileModal.querySelectorAll('.info-tab-content').forEach(content => content.classList.remove('active'));
             button.classList.add('active');
             document.getElementById(`${tabId}-tab-content`).classList.add('active');
-        });
+        }
     });
 
     dom.infoButton.addEventListener('click', () => dom.infoModal.classList.remove('hidden'));
@@ -432,7 +513,7 @@ export function initializeUiHandlers() {
     
     dom.closeSetupButton.addEventListener('click', () => {
         dom.gameSetupModal.classList.add('hidden');
-        dom.splashScreenEl.classList.remove('hidden');
+        dom.quickStartModal.classList.remove('hidden');
     });
     
     dom.solo2pButton.addEventListener('click', () => {
@@ -770,6 +851,36 @@ export function initializeUiHandlers() {
         const { gameState, storyState } = getState();
         updateState('lastStoryGameOptions', { mode: gameState.gameMode, options: gameState.gameOptions });
         
+        if (battle.startsWith('event_')) {
+            const currentMonth = new Date().getMonth();
+            const eventConfig = config.MONTHLY_EVENTS.find(evt => evt.month === currentMonth);
+            
+            let title = won ? t('game_over.story_victory_title') : t('game_over.story_defeat_title');
+            let message;
+    
+            if (won) {
+                const progressKey = `reversus-event-progress-${currentMonth}`;
+                let wins = parseInt(localStorage.getItem(progressKey) || '0', 10);
+                
+                if (wins < 3) {
+                    wins++;
+                    localStorage.setItem(progressKey, wins);
+                }
+    
+                if (wins >= 3) {
+                    const rewardName = eventConfig ? t(eventConfig.rewardTitleKey) : "";
+                    message = t('event.victory_completed_message', { rewardName });
+                } else {
+                    message = t('event.victory_progress_message', { wins });
+                }
+            } else {
+                message = t('event.defeat_message');
+            }
+            
+            showGameOver(message, title, { action: 'menu', text: t('game_over.back_to_menu') });
+            return;
+        }
+
         let title = won ? t('game_over.story_victory_title') : t('game_over.story_defeat_title');
         let message;
         let buttonAction = 'restart';
@@ -783,6 +894,15 @@ export function initializeUiHandlers() {
             case 'necroverso_final': if (won) { achievements.grantAchievement('true_end_final'); playEndgameSequence(); } else { message = reason === 'time' ? "O tempo acabou! O Inversus foi consumido..." : "O Necroverso venceu. A escuridão consome tudo. Tentar novamente?"; } break;
             case 'xael_challenge': if (won) { achievements.grantAchievement('xael_win'); message = "Você venceu o criador! Habilidade 'Revelação Estelar' desbloqueada no Modo História."; buttonAction = 'menu'; } else { message = "O criador conhece todos os truques. Tentar novamente?"; } break;
             case 'narrador': if (won) { achievements.grantAchievement('120%_unlocked'); message = "Você derrotou o Narrador! O que acontece agora...?"; buttonAction = 'menu'; } else { message = "O Narrador reescreveu a história para te derrotar. Tentar de novo?"; } break;
+            case 'inversus':
+                if (won) {
+                    achievements.grantAchievement('inversus_win');
+                    message = "Você derrotou o Inversus! 100% do jogo completo. Um segredo foi revelado...";
+                    buttonAction = 'menu';
+                } else {
+                    message = "O reflexo sombrio do Reversus te derrotou. Tentar novamente?";
+                }
+                break;
             default: message = won ? 'Você venceu o duelo!' : 'Você foi derrotado.';
         }
         showGameOver(message, title, { action: buttonAction });
@@ -844,13 +964,16 @@ export function initializeUiHandlers() {
     });
 
     const sendChatMessage = () => {
+        const { isChatMuted } = getState();
+        if (isChatMuted) return;
+
         const message = dom.chatInput.value.trim();
         if (message) {
             const { gameState, userProfile } = getState();
-            if (gameState.isPvp) {
+            if (gameState && gameState.isPvp) {
                  network.emitChatMessage(message);
             } else {
-                updateLog({ type: 'dialogue', speaker: userProfile?.username || t('game.you'), message });
+                updateLog({ type: 'dialogue', speaker: userProfile?.username || t('game.you'), message, googleId: userProfile?.google_id });
             }
             dom.chatInput.value = '';
         }
@@ -881,7 +1004,7 @@ export function initializeUiHandlers() {
     dom.pvpRoomGridEl.addEventListener('click', (e) => {
         if (e.target.classList.contains('join-room-button')) {
             const roomId = e.target.dataset.roomId;
-            if (roomId) network.emitJoinRoom(roomId);
+            if (roomId) network.emitJoinRoom({ roomId });
         }
     });
 
@@ -974,23 +1097,30 @@ export function initializeUiHandlers() {
 
     if (dom.profileModal) {
         dom.profileModal.addEventListener('click', (e) => {
-             const button = e.target.closest('button.add-friend-btn, button.remove-friend-btn');
-             if (!button) return;
+             const actionButton = e.target.closest('button.add-friend-btn, button.remove-friend-btn, button#toggle-chat-mute-button');
+             if (!actionButton) return;
 
-             if (button.matches('.add-friend-btn')) {
-                const userId = button.dataset.userId;
-                button.disabled = true;
+             if (actionButton.matches('.add-friend-btn')) {
+                const userId = actionButton.dataset.userId;
+                actionButton.disabled = true;
                 network.emitSendFriendRequest(userId, (response) => {
                     if (response.success) {
-                        button.textContent = t('profile.request_sent');
+                        actionButton.textContent = t('profile.request_sent');
                     } else {
                         alert(response.error || 'Falha ao enviar pedido.');
-                        button.disabled = false;
+                        actionButton.disabled = false;
                     }
                 });
-            } else if (button.matches('.remove-friend-btn')) {
-                const userId = button.dataset.userId;
+            } else if (actionButton.matches('.remove-friend-btn')) {
+                const userId = actionButton.dataset.userId;
                 network.emitRemoveFriend(userId);
+            } else if (actionButton.matches('#toggle-chat-mute-button')) {
+                const state = getState();
+                const newMuteState = !state.isChatMuted;
+                updateState('isChatMuted', newMuteState);
+                localStorage.setItem('reversus-chat-muted', JSON.stringify(newMuteState));
+                
+                actionButton.textContent = t(newMuteState ? 'profile.unmute_chat' : 'profile.mute_chat');
             }
         });
     }

@@ -6,6 +6,7 @@ import { loadAchievements } from './achievements.js';
 import { initializeGoogleSignIn } from './auth.js';
 import { connectToServer } from './network.js';
 import { initI18n } from './i18n.js';
+import { updateState } from './state.js';
 
 // This is the main entry point of the application.
 document.addEventListener('DOMContentLoaded', async () => {
@@ -26,6 +27,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Checks if a saved game exists to enable the 'Continue' button.
     checkForSavedGame();
+    
+    // Load chat mute preference from local storage
+    const savedMutePref = localStorage.getItem('reversus-chat-muted');
+    if (savedMutePref) {
+        updateState('isChatMuted', JSON.parse(savedMutePref));
+    }
     
     // Displays the initial splash screen.
     showSplashScreen();

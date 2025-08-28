@@ -374,6 +374,10 @@
     50% { opacity: 0.8; transform: scale(1.02); }
 }
 
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 
 /* --- GENERAL --- */
 body {
@@ -544,6 +548,33 @@ body.screen-shaking {
     width: 100%;
 }
 
+.log-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.log-message:hover .report-button {
+    opacity: 1;
+}
+
+.report-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    padding: 0 5px;
+    color: var(--accent-red);
+    text-shadow: 0 0 3px black;
+}
+
+.report-button:hover {
+    transform: scale(1.2);
+}
+
+
 .log-message.dialogue {
     font-size: 1.1rem;
     font-weight: bold;
@@ -590,6 +621,19 @@ body.screen-shaking {
     flex-shrink: 0;
     min-height: 40px; /* Give it a minimum height to avoid layout shifts */
 }
+
+.pvp-pot-container {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-yellow);
+    text-shadow: 0 0 5px var(--accent-yellow), 0 0 10px var(--accent-yellow);
+    animation: golden-text-glow 2.5s infinite ease-in-out;
+}
+.pvp-pot-container span {
+    vertical-align: middle;
+    margin-left: 0.5rem;
+}
+
 
 .actions-container {
     display: flex;
@@ -1457,6 +1501,17 @@ body.screen-shaking {
     font-size: 1.5rem;
     font-weight: 700;
 }
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(168, 218, 220, 0.3);
+    border-top-color: var(--text-secondary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 1rem auto;
+}
+
 
 #cosmic-glow-overlay {
     position: fixed;
@@ -3190,4 +3245,56 @@ body.screen-shaking {
     border-radius: 5px;
     padding: 8px;
     color: var(--text-primary);
+}
+
+/* --- ADMIN PANEL --- */
+.admin-section {
+    margin-top: 1.5rem;
+}
+.admin-section h3 {
+    color: var(--accent-red);
+    border-bottom: 1px solid var(--accent-red);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+.admin-user-list {
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.admin-user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(255,255,255,0.05);
+    padding: 0.75rem;
+    border-radius: 5px;
+}
+.admin-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.admin-user-item .friend-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+.admin-user-details .friend-name {
+    font-weight: 600;
+}
+.admin-user-details .friend-title {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+.admin-actions .control-button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
 }

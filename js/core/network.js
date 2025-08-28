@@ -1,10 +1,11 @@
+
 // js/core/network.js
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
-import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests } from '../ui/profile-renderer.js';
-import { showSplashScreen } from '../ui/splash-screen.js';
+import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel } from '../ui/profile-renderer.js';
+import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
@@ -102,6 +103,11 @@ export function connectToServer() {
         // A atualização do perfil via 'profileData' cuidará da UI.
     });
 
+    // --- Admin Listeners ---
+    socket.on('adminData', (data) => {
+        renderAdminPanel(data);
+    });
+
     // --- Social Listeners ---
     socket.on('searchResults', (results) => {
         renderSearchResults(results);
@@ -171,8 +177,8 @@ export function connectToServer() {
         addLobbyChatMessage(speaker, message);
     });
 
-    socket.on('chatMessage', ({ speaker, message }) => {
-        updateLog({ type: 'dialogue', speaker, message });
+    socket.on('chatMessage', ({ speaker, message, googleId }) => {
+        updateLog({ type: 'dialogue', speaker, message, googleId });
     });
 
     socket.on('gameStarted', async (initialGameState) => {
@@ -227,9 +233,52 @@ export function connectToServer() {
         console.error('Server Error:', message);
         alert(`Erro do Servidor: ${message}`);
     });
+
+    // --- Matchmaking Listeners ---
+    socket.on('matchmakingStatus', ({ mode, current, needed }) => {
+        if (dom.matchmakingStatusText) {
+            dom.matchmakingStatusText.textContent = t('matchmaking.status_update', { mode, current, needed });
+        }
+    });
+
+    socket.on('matchmakingCancelled', () => {
+        updateState('currentQueueMode', null);
+        dom.matchmakingStatusModal.classList.add('hidden');
+        dom.pvpMatchmakingModal.classList.remove('hidden');
+        alert(t('matchmaking.cancel_success'));
+    });
+
+    socket.on('matchFound', (initialGameState) => {
+        console.log("Partida encontrada!", initialGameState);
+        updateState('currentQueueMode', null);
+        updateState('gameState', initialGameState);
+        
+        // Find my player ID from the new game state
+        const myPlayerData = initialGameState.playerIdsInGame
+            .map(id => initialGameState.players[id])
+            .find(p => p.username === getState().userProfile?.username);
+        if(myPlayerData) {
+             updateState('playerId', myPlayerData.id);
+        }
+
+        // Hide all modals and show the game
+        document.querySelectorAll('.modal-overlay').forEach(modal => modal.classList.add('hidden'));
+        dom.appContainerEl.classList.remove('hidden');
+
+        // Start game timer
+        const state = getState();
+        if (state.gameTimerInterval) clearInterval(state.gameTimerInterval);
+        updateState('gameStartTime', Date.now());
+        updateGameTimer();
+        updateState('gameTimerInterval', setInterval(updateGameTimer, 1000));
+        
+        // Setup UI from local player's perspective and render everything
+        setupPlayerPerspective();
+        renderAll();
+    });
 }
 
-// --- EMISSORES DE EVENTOS ---
+// --- EMITTERS ---
 export function emitGetRanking(page = 1) { const { socket } = getState(); if (socket) socket.emit('getRanking', { page }); }
 export function emitGetProfile() { const { socket } = getState(); if (socket) socket.emit('getProfile'); }
 export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
@@ -243,7 +292,7 @@ export function emitGameFinished(winnerId, mode) {
 }
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
 export function emitCreateRoom() { const { socket } = getState(); if (socket) socket.emit('createRoom'); }
-export function emitJoinRoom(roomId) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId }); }
+export function emitJoinRoom({ roomId }) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId }); }
 export function emitLobbyChat(message) { const { socket } = getState(); if(socket) socket.emit('lobbyChatMessage', message); }
 export function emitChatMessage(message) { const { socket } = getState(); if (socket) socket.emit('chatMessage', message); }
 export function emitChangeMode(mode) { const { socket } = getState(); if (socket) socket.emit('changeMode', mode); }
@@ -263,6 +312,23 @@ export function emitGetPendingRequests() { const { socket } = getState(); if(soc
 export function emitRemoveFriend(targetUserId) { const { socket } = getState(); if (socket) socket.emit('removeFriend', { targetUserId }); }
 export function emitGetFriendsList() { const { socket } = getState(); if (socket) socket.emit('getFriendsList'); }
 export function emitSendPrivateMessage(recipientId, content) { const { socket } = getState(); if (socket) socket.emit('sendPrivateMessage', { recipientId, content }); }
+export function emitReportPlayer(reportedGoogleId, message) { const { socket } = getState(); if (socket) socket.emit('reportPlayer', { reportedGoogleId, message }); }
+
+// --- Matchmaking Emitters ---
+export function emitJoinMatchmaking(mode) {
+    const { socket } = getState();
+    if (socket) {
+        updateState('currentQueueMode', mode);
+        socket.emit('joinMatchmaking', { mode });
+    }
+}
+export function emitCancelMatchmaking() {
+    const { socket } = getState();
+    if (socket) {
+        socket.emit('cancelMatchmaking');
+    }
+}
+
 
 export function emitLeaveRoom() {
     const { socket, currentRoomId } = getState();
@@ -287,4 +353,20 @@ export function emitEndTurn() {
         return;
     }
     socket.emit('endTurn');
+}
+
+// --- Admin Emitters ---
+export function emitAdminGetData() {
+    const { socket } = getState();
+    if (socket) socket.emit('admin:getData');
+}
+
+export function emitAdminBanUser(userId) {
+    const { socket } = getState();
+    if (socket) socket.emit('admin:banUser', { userId });
+}
+
+export function emitAdminUnbanUser(userId) {
+    const { socket } = getState();
+    if (socket) socket.emit('admin:unbanUser', { userId });
 }

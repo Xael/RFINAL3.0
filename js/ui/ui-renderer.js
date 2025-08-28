@@ -8,6 +8,7 @@ import { renderBoard } from './board-renderer.js';
 import { grantAchievement } from '../core/achievements.js';
 import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from '../core/utils.js';
+import { t } from '../core/i18n.js';
 
 /**
  * Updates the UI for Xael's Star Power ability.
@@ -32,6 +33,22 @@ export const updateXaelStarPowerUI = () => {
         dom.xaelStarPowerButton.classList.add('hidden');
     }
 };
+
+/**
+ * Renders the current PvP pot.
+ */
+function renderPvpPot() {
+    const { gameState } = getState();
+    const potEl = dom.pvpPotContainer;
+    if (!potEl) return;
+
+    if (gameState.isPvp && gameState.pot !== undefined) {
+        potEl.classList.remove('hidden');
+        potEl.innerHTML = `🏆 <span>${t('game.pot')}: ${gameState.pot}</span>`;
+    } else {
+        potEl.classList.add('hidden');
+    }
+}
 
 
 /**
@@ -59,6 +76,9 @@ export const renderAll = () => {
 
     // Update live scores and side panel statuses
     updateLiveScoresAndWinningStatus();
+
+    // Render the PvP pot if applicable
+    renderPvpPot();
     
     // Update Xael's Star Power button if in that challenge
     if (gameState.isStoryMode) {

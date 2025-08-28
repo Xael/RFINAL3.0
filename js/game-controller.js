@@ -74,6 +74,10 @@ const showFullscreenAnnounce = async (text, imageSrc) => {
  * The core game state creation is now handled by the server for PvP.
  */
 export const initializeGame = async (mode, options) => {
+    const { isChatMuted } = getState();
+    dom.chatInput.disabled = isChatMuted;
+    dom.chatInput.placeholder = t(isChatMuted ? 'chat.chat_muted_message' : 'game.chat_placeholder');
+
     // This function now ONLY handles non-PvP game setup.
     // The server will create and manage the gameState for PvP.
     Object.assign(config.PLAYER_CONFIG, structuredClone(config.originalPlayerConfig));

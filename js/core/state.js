@@ -1,3 +1,4 @@
+
 // This object holds the single source of truth for the application's state.
 const appState = {
     // Core game state object, holds all data about the current match.
@@ -41,6 +42,8 @@ const appState = {
     isAnnouncing: false,
     // Holds the options for the last story duel, for a safe restart.
     lastStoryGameOptions: null,
+    // Flag to control general chat visibility.
+    isChatMuted: false,
 
     // --- PVP/Network State ---
     isConnectionAttempted: false, // Flag to ensure we only try to connect once.
@@ -48,9 +51,12 @@ const appState = {
     clientId: null, // The unique ID for this client, assigned by the server
     playerId: null, // Which player this client is controlling (e.g., 'player-1')
     username: null, // Player's chosen username
-    userProfile: null, // Holds profile data from the server (name, avatar, stats)
+    userProfile: {
+        isAdmin: false, // Holds profile data from the server (name, avatar, stats)
+    }, 
     isLoggedIn: false, // Flag to indicate if the user is authenticated
     currentRoomId: null, // The ID of the room the player is currently in
+    currentQueueMode: null, // The mode ('1v1', '1v4', '2v2') the player is queuing for
 };
 
 /**
