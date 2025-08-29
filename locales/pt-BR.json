@@ -504,5 +504,61 @@
         "true_end_final": "Para enfrentar a escuridão final, você precisará de uma aliança inesperada.",
         "inversus_win": "O reflexo sombrio do Reversus o aguarda. A vitória final revela este caminho.",
         "120%_unlocked": "Quando o narrador se cansa de contar a história, ele entra nela. Uma vitória sobre o reflexo abre esta porta."
+    },
+    "event_names": {
+        "january": "O Profeta Sombrio",
+        "february": "O Cupido do Caos",
+        "march": "O Goblin da Fortuna",
+        "april": "O Dragão Dourado",
+        "may": "O Espectro",
+        "june": "A Salamandra",
+        "july": "O Capitão Barbacurta",
+        "august": "O Astrônomo Perdido",
+        "september": "O Detetive Misterioso",
+        "october": "A Bruxa do Resto",
+        "november": "O Yeti",
+        "december": "O Guardião da Aurora"
+    },
+    "event_chars": {
+        "dark_prophet": "O Profeta Sombrio",
+        "chaos_cupid": "O Cupido do Caos",
+        "fortune_goblin": "O Goblin da Fortuna",
+        "golden_dragon": "O Dragão Dourado",
+        "the_specter": "O Espectro",
+        "salamander": "A Salamandra",
+        "captain_shortbeard": "O Capitão Barbacurta",
+        "lost_astronomer": "O Astrônomo Perdido",
+        "mysterious_detective": "O Detetive Misterioso",
+        "witch_of_rest": "A Bruxa do Resto",
+        "yeti": "O Yeti",
+        "guardian_of_dawn": "O Guardião da Aurora"
+    },
+    "event_rewards": {
+        "visionary": "O Visionário",
+        "uniter_of_rests": "Unidor de Restos",
+        "blessed_by_rest": "Abençoado pelo Resto",
+        "guardian_of_runes": "Guardião das Runas",
+        "shadows_on_board": "Sombras no Tabuleiro",
+        "the_ardent": "O Ardente",
+        "thief_of_rests": "Ladrão de Restos",
+        "the_eternal": "O Eterno",
+        "secret_hunter": "Caçador de Segredos",
+        "board_sorcerer": "Feiticeiro do Tabuleiro",
+        "freezer_of_fates": "Congelador de Destinos",
+        "year_end_light": "Luz do Fim de Ano"
+    },
+    "event_abilities": {
+        "january": "Visão do Futuro: No início da rodada, revela a carta de maior valor na mão do oponente.",
+        "february": "Flecha da Troca: No início do jogo, troca as cartas de Resto iniciais com o oponente.",
+        "march": "Sorte de Goblin: Se vencer a rodada com uma pontuação exata de 10, avança 2 casas extras.",
+        "april": "Escamas Rúnicas: Imune a efeitos negativos como 'Menos', 'Desce' e 'Pula'.",
+        "may": "Manto Espectral: Se o oponente usar 'Pula', O Espectro pode escolher voltar para o mesmo caminho.",
+        "june": "Calor Intenso: Todas as cartas 'Menos' jogadas contra a Salamandra são descartadas sem efeito.",
+        "july": "Pilhagem: Ao vencer uma rodada, rouba uma carta de valor aleatória da mão do oponente.",
+        "august": "Caos Cósmico: Uma vez por partida, se estiver 3 ou mais casas atrás, pode trocar de lugar com o oponente.",
+        "september": "Dedução: Se o oponente jogar uma carta de valor, o Detetive pode forçá-lo a descartar uma carta de efeito aleatória.",
+        "october": "Poção do Resto: Uma vez por partida, pode transformar o Resto do oponente em uma carta de valor 2.",
+        "november": "Nevasca: Uma vez por partida, pode forçar todos os jogadores a passarem o turno.",
+        "december": "Bênção da Aurora: Ao começar uma rodada, pode reviver a última carta de Resto usada, adicionando-a à mão."
     }
 }

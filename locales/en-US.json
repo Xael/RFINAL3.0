@@ -504,5 +504,61 @@
         "true_end_final": "To face the final darkness, you will need an unexpected alliance.",
         "inversus_win": "The dark reflection of Reversus awaits you. The final victory reveals this path.",
         "120%_unlocked": "When the narrator gets tired of telling the story, he enters it. A victory over the reflection opens this door."
+    },
+    "event_names": {
+        "january": "The Dark Prophet",
+        "february": "The Chaos Cupid",
+        "march": "The Fortune Goblin",
+        "april": "The Golden Dragon",
+        "may": "The Specter",
+        "june": "The Salamander",
+        "july": "Captain Shortbeard",
+        "august": "The Lost Astronomer",
+        "september": "The Mysterious Detective",
+        "october": "The Witch of the Rest",
+        "november": "The Yeti",
+        "december": "The Guardian of Dawn"
+    },
+    "event_chars": {
+        "dark_prophet": "The Dark Prophet",
+        "chaos_cupid": "The Chaos Cupid",
+        "fortune_goblin": "The Fortune Goblin",
+        "golden_dragon": "The Golden Dragon",
+        "the_specter": "The Specter",
+        "salamander": "The Salamander",
+        "captain_shortbeard": "Captain Shortbeard",
+        "lost_astronomer": "The Lost Astronomer",
+        "mysterious_detective": "The Mysterious Detective",
+        "witch_of_rest": "The Witch of the Rest",
+        "yeti": "The Yeti",
+        "guardian_of_dawn": "The Guardian of Dawn"
+    },
+    "event_rewards": {
+        "visionary": "The Visionary",
+        "uniter_of_rests": "Uniter of Rests",
+        "blessed_by_rest": "Blessed by the Rest",
+        "guardian_of_runes": "Guardian of the Runes",
+        "shadows_on_board": "Shadows on the Board",
+        "the_ardent": "The Ardent",
+        "thief_of_rests": "Thief of Rests",
+        "the_eternal": "The Eternal",
+        "secret_hunter": "Secret Hunter",
+        "board_sorcerer": "Board Sorcerer",
+        "freezer_of_fates": "Freezer of Fates",
+        "year_end_light": "Year-End Light"
+    },
+    "event_abilities": {
+        "january": "Vision of the Future: At the start of the round, reveals the highest value card in the opponent's hand.",
+        "february": "Arrow of Exchange: At the start of the game, swaps the initial Rest cards with the opponent.",
+        "march": "Goblin's Luck: If it wins the round with an exact score of 10, it advances 2 extra spaces.",
+        "april": "Runic Scales: Immune to negative effects like 'Less', 'Down', and 'Jump'.",
+        "may": "Spectral Cloak: If the opponent uses 'Jump', The Specter can choose to return to the same path.",
+        "june": "Intense Heat: All 'Less' cards played against the Salamander are discarded without effect.",
+        "july": "Plunder: Upon winning a round, steals a random value card from the opponent's hand.",
+        "august": "Cosmic Chaos: Once per match, if 3 or more spaces behind, can switch places with the opponent.",
+        "september": "Deduction: If the opponent plays a value card, the Detective can force them to discard a random effect card.",
+        "october": "Potion of the Rest: Once per match, can turn the opponent's Rest into a value 2 card.",
+        "november": "Blizzard: Once per match, can force all players to pass their turn.",
+        "december": "Blessing of Dawn: When starting a round, can revive the last used Rest card, adding it to its hand."
     }
 }
