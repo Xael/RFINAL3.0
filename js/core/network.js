@@ -201,6 +201,14 @@ export function connectToServer() {
     });
 
     socket.on('gameStarted', async (initialGameState) => {
+        // Determine this client's player ID from the map sent by the server.
+        if (initialGameState.playerSocketMap) {
+            const myEntry = Object.entries(initialGameState.playerSocketMap).find(([socketId, pId]) => socketId === getState().clientId);
+            if (myEntry) {
+                updateState('playerId', myEntry[1]);
+            }
+        }
+
         updateState('gameState', initialGameState);
         
         dom.pvpLobbyModal.classList.add('hidden');

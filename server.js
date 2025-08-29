@@ -694,8 +694,13 @@ io.on('connection', (socket) => {
             if(boardPaths[index]) boardPaths[index].playerId = id; 
         });
     
+        const playerSocketMap = {};
+        room.players.forEach(p => {
+            playerSocketMap[p.id] = p.playerId;
+        });
+
         const gameState = {
-            players, playerIdsInGame,
+            players, playerIdsInGame, playerSocketMap,
             decks: { value: valueDeck, effect: effectDeck },
             discardPiles: { value: [], effect: [] },
             boardPaths: boardPaths, 
@@ -866,7 +871,7 @@ io.on('connection', (socket) => {
                 playerState.isEliminated = true;
                 room.gameState.log.unshift({type: 'system', message: `${disconnectedPlayer.username} se desconectou e foi eliminado.`});
                 
-                const activePlayers = room.gameState.playerIdsInGame.filter(id => !room.gameState.players[id].isEliminated);
+                const activePlayers = room.gameState.playerIdsInGame.filter(pId => !room.gameState.players[pId].isEliminated);
                 if (activePlayers.length <= 1) {
                     const winnerId = activePlayers.length === 1 ? activePlayers[0] : null;
                     const winnerName = winnerId ? room.gameState.players[winnerId].name : "Ninguém";
@@ -1085,8 +1090,13 @@ function checkAndStartMatch(mode) {
         const boardPaths = generateBoardPaths();
         playerIdsInGame.forEach((id, index) => { if(boardPaths[index]) boardPaths[index].playerId = id; });
         
+        const playerSocketMap = {};
+        room.players.forEach(p => {
+            playerSocketMap[p.id] = p.playerId;
+        });
+
         const gameState = {
-            players, playerIdsInGame,
+            players, playerIdsInGame, playerSocketMap,
             decks: { value: valueDeck, effect: effectDeck },
             discardPiles: { value: [], effect: [] },
             boardPaths, gamePhase: 'initial_draw', gameMode: room.mode,

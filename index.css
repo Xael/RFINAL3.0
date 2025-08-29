@@ -1279,14 +1279,14 @@ body.screen-shaking {
 /* Story Battle Character Portrait */
 .player-area-character-portrait {
     position: absolute;
-    top: 70px; /* Positioned below the header */
+    bottom: -20px; /* Anchored to bottom, slightly offset */
     left: 50%;
-    transform: translateX(-50%) scale(2.2);
+    transform: translateX(-50%) scale(1.8);
     width: 90%;
     height: auto;
-    max-height: 50%; /* Adjust max height */
+    max-height: 70%;
     object-fit: contain;
-    object-position: top center; /* Show top part of image */
+    object-position: bottom center; /* Show bottom part of image */
     opacity: 1;
     pointer-events: none;
     z-index: 1;
@@ -1335,14 +1335,14 @@ body.screen-shaking {
 
 .inversus-character-portrait {
   position: absolute;
-  top: 70px; /* Positioned below the header */
+  bottom: 0; /* Anchored to bottom */
   left: 50%;
   transform: translateX(-50%) scale(2.0);
   width: 90%;
   height: auto;
-  max-height: 50%; /* Adjust max height */
+  max-height: 50%;
   object-fit: contain;
-  object-position: top center; /* Show top part of image */
+  object-position: bottom center; /* Show bottom part of image */
   pointer-events: none;
   z-index: 1;
   animation: inversus-glow-pulse 4s infinite ease-in-out, inversus-scale-pulse 2.5s infinite ease-in-out;
