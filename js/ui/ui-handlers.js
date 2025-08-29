@@ -1,4 +1,3 @@
-
 // js/ui/ui-handlers.js
 import * as dom from '../core/dom.js';
 import { getState, updateState } from '../core/state.js';
@@ -236,7 +235,6 @@ export function initializeUiHandlers() {
             const message = button.dataset.message;
             if (confirm(t('confirm.report_player', { username }))) {
                 network.emitReportPlayer(googleId, message);
-                alert(t('admin.report_received'));
             }
         }
         if (e.target.matches('.admin-ban-btn')) {
@@ -254,6 +252,11 @@ export function initializeUiHandlers() {
             if (confirm(t('confirm.unban_player', { username }))) {
                 network.emitAdminUnbanUser(userId);
             }
+        }
+        if (e.target.matches('.admin-dismiss-report-btn')) {
+            const button = e.target;
+            const reportId = button.dataset.reportId;
+            network.emitAdminResolveReport(reportId);
         }
     });
 

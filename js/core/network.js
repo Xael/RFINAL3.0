@@ -4,13 +4,15 @@ import * as dom from './dom.js';
 import { renderAll, showGameOver } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel } from '../ui/profile-renderer.js';
-import { showSplashScreen } from '../ui/splash-screen.js';
+import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
-import { t } from '../core/i18n.js';
+import { t } from './i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
 import { showDailyRewardNotification } from '../ui/toast-renderer.js';
+import { playSoundEffect, announceEffect } from './sound.js';
+import * as sound from './sound.js';
 
 /**
  * Sets up the player areas in the UI so the local player is always at the bottom.
@@ -113,6 +115,18 @@ export function connectToServer() {
         renderAdminPanel(data);
     });
 
+    socket.on('newReport', () => {
+        const { userProfile } = getState();
+        if (userProfile?.isAdmin && !dom.profileModal.classList.contains('hidden') && document.getElementById('profile-admin-tab-content')?.classList.contains('active')) {
+            emitAdminGetData();
+        }
+    });
+
+    socket.on('reportSuccess', (message) => {
+        alert(message);
+    });
+
+
     // --- Social Listeners ---
     socket.on('searchResults', (results) => {
         renderSearchResults(results);
@@ -190,7 +204,9 @@ export function connectToServer() {
         updateState('gameState', initialGameState);
         
         dom.pvpLobbyModal.classList.add('hidden');
+        dom.matchmakingStatusModal.classList.add('hidden');
         dom.appContainerEl.classList.remove('hidden');
+        sound.stopStoryMusic(); // Restore default playlist and enable next track button
         
         const state = getState();
         if (state.gameTimerInterval) clearInterval(state.gameTimerInterval);
@@ -211,6 +227,21 @@ export function connectToServer() {
     socket.on('cardPlayedAnimation', async ({ casterId, targetId, card, targetSlotLabel }) => {
         const startElement = document.querySelector(`#hand-${casterId} [data-card-id="${card.id}"]`);
         await animateCardPlay(card, startElement, targetId, targetSlotLabel);
+    
+        // Adiciona som e anúncio visual para cartas de efeito
+        const soundToPlay = card.name.toLowerCase().replace(/\s/g, '');
+        const effectsWithSounds = ['mais', 'menos', 'sobe', 'desce', 'pula', 'reversus'];
+    
+        if (card.isLocked) {
+            announceEffect("REVERSUS INDIVIDUAL!", 'reversus');
+            playSoundEffect('reversustotal');
+        } else if (card.name === 'Reversus Total') {
+            announceEffect('Reversus Total!', 'reversus-total');
+            playSoundEffect('reversustotal');
+        } else if (effectsWithSounds.includes(soundToPlay)) {
+            setTimeout(() => playSoundEffect(soundToPlay), 100);
+            setTimeout(() => announceEffect(card.name), 150);
+        }
     });
 
     socket.on('gameStateUpdate', (gameState) => {
@@ -251,35 +282,6 @@ export function connectToServer() {
         dom.matchmakingStatusModal.classList.add('hidden');
         dom.pvpMatchmakingModal.classList.remove('hidden');
         alert(t('matchmaking.cancel_success'));
-    });
-
-    socket.on('matchFound', (initialGameState) => {
-        console.log("Partida encontrada!", initialGameState);
-        updateState('currentQueueMode', null);
-        updateState('gameState', initialGameState);
-        
-        // Find my player ID from the new game state
-        const myPlayerData = initialGameState.playerIdsInGame
-            .map(id => initialGameState.players[id])
-            .find(p => p.username === getState().userProfile?.username);
-        if(myPlayerData) {
-             updateState('playerId', myPlayerData.id);
-        }
-
-        // Hide all modals and show the game
-        document.querySelectorAll('.modal-overlay').forEach(modal => modal.classList.add('hidden'));
-        dom.appContainerEl.classList.remove('hidden');
-
-        // Start game timer
-        const state = getState();
-        if (state.gameTimerInterval) clearInterval(state.gameTimerInterval);
-        updateState('gameStartTime', Date.now());
-        updateGameTimer();
-        updateState('gameTimerInterval', setInterval(updateGameTimer, 1000));
-        
-        // Setup UI from local player's perspective and render everything
-        setupPlayerPerspective();
-        renderAll();
     });
 }
 
@@ -375,4 +377,9 @@ export function emitAdminBanUser(userId) {
 export function emitAdminUnbanUser(userId) {
     const { socket } = getState();
     if (socket) socket.emit('admin:unbanUser', { userId });
+}
+
+export function emitAdminResolveReport(reportId) {
+    const { socket } = getState();
+    if (socket) socket.emit('admin:resolveReport', { reportId });
 }

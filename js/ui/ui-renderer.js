@@ -50,6 +50,22 @@ function renderPvpPot() {
     }
 }
 
+/**
+ * Renders the turn countdown timer for PvP matches.
+ */
+function renderTurnTimer() {
+    const { gameState } = getState();
+    const timerEl = dom.turnCountdownTimer;
+    if (!timerEl) return;
+
+    if (gameState && gameState.isPvp && gameState.remainingTurnTime !== undefined && gameState.remainingTurnTime <= 10) {
+        timerEl.textContent = gameState.remainingTurnTime;
+        timerEl.classList.remove('hidden');
+    } else {
+        timerEl.classList.add('hidden');
+    }
+}
+
 
 /**
  * Renders all dynamic UI components of the game.
@@ -79,6 +95,9 @@ export const renderAll = () => {
 
     // Render the PvP pot if applicable
     renderPvpPot();
+
+    // Render the turn timer for PvP
+    renderTurnTimer();
     
     // Update Xael's Star Power button if in that challenge
     if (gameState.isStoryMode) {

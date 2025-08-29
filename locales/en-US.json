@@ -1,4 +1,3 @@
-
 {
     "document": {
         "title": "Reversus - 4 Players"
@@ -354,7 +353,11 @@
         "no_banned_users": "No users have been banned.",
         "ban_button": "Ban",
         "unban_button": "Unban",
-        "report_received": "Report received. Thank you for your contribution."
+        "report_received": "Report received. Thank you for your contribution.",
+        "player_reports": "Player Reports",
+        "no_reports": "No pending reports.",
+        "report_from": "Reported by: {username}",
+        "dismiss_report": "Dismiss"
     },
     "chat": {
         "placeholder": "Type a message...",

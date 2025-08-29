@@ -620,7 +620,23 @@ body.screen-shaking {
     border: 1px solid rgba(168, 218, 220, 0.2);
     flex-shrink: 0;
     min-height: 40px; /* Give it a minimum height to avoid layout shifts */
+    position: relative; /* For countdown timer positioning */
 }
+
+.turn-countdown-timer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--accent-red);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px var(--accent-red);
+    animation: pulse-red 1s infinite ease-in-out;
+    z-index: 10;
+    pointer-events: none;
+}
+
 
 .pvp-pot-container {
     font-size: 1.2rem;

@@ -1,4 +1,3 @@
-
 {
     "document": {
         "title": "Reversus - 4 Jogadores"
@@ -354,7 +353,11 @@
         "no_banned_users": "Nenhum usuário banido.",
         "ban_button": "Banir",
         "unban_button": "Remover Ban",
-        "report_received": "Denúncia recebida. Obrigado pela sua contribuição."
+        "report_received": "Denúncia recebida. Obrigado pela sua contribuição.",
+        "player_reports": "Denúncias de Jogadores",
+        "no_reports": "Nenhuma denúncia pendente.",
+        "report_from": "Denunciado por: {username}",
+        "dismiss_report": "Dispensar"
     },
     "chat": {
         "placeholder": "Digite uma mensagem...",
@@ -400,7 +403,7 @@
         "round_tie": "A rodada terminou em empate. Ninguém avança por pontuação.",
         "pawn_move": "{playerName} {direction} de {oldPos} para {newPos}.",
         "advanced": "avançou",
-        "retreated": "voltou",
+        "retreated": "retreated",
         "deck_reshuffled": "O baralho de {deckType} e o descarte estavam vazios. Um novo baralho foi criado."
     },
     "player_names": {

@@ -143,7 +143,16 @@ export const initializeGame = async (mode, options) => {
         numPlayers = options.numPlayers;
         playerIdsInGame = config.MASTER_PLAYER_IDS.slice(0, numPlayers);
         modeText = mode === 'solo' ? `Solo (${numPlayers}p)` : 'Duplas';
-        stopStoryMusic();
+        
+        // Check if the opponent is Inversus from a random match
+        const isRandomInversus = options.overrides && options.overrides['player-2']?.aiType === 'inversus';
+
+        if (isRandomInversus) {
+            isInversusMode = true;
+            await playStoryMusic('inversus.ogg');
+        } else {
+            stopStoryMusic();
+        }
     }
 
     // Handle overrides from either PvP lobby or Story Mode

@@ -1,4 +1,3 @@
-
 // js/ui/profile-renderer.js
 import * as dom from '../core/dom.js';
 import { t, getCurrentLanguage } from '../core/i18n.js';
@@ -167,9 +166,26 @@ export function renderProfile(profileData) {
     }
 }
 
-export function renderAdminPanel({ online, banned }) {
+export function renderAdminPanel({ online, banned, pendingReports }) {
     const adminTabContent = document.getElementById('profile-admin-tab-content');
     if (!adminTabContent) return;
+
+    const reportsHTML = pendingReports && pendingReports.length > 0 ? pendingReports.map(report => `
+        <div class="admin-user-item">
+            <div class="admin-user-info">
+                <img src="${report.reported_avatar_url}" alt="Avatar" class="friend-avatar">
+                <div class="admin-user-details" style="flex-grow: 1;">
+                    <span class="friend-name">${report.reported_username}</span>
+                    <span class="friend-title" style="word-break: break-word;">${t('admin.report_from', { username: report.reporter_username })}</span>
+                    <p class="friend-title" style="margin-top: 5px; font-style: italic; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 4px;">“${report.message}”</p>
+                </div>
+            </div>
+            <div class="admin-actions" style="flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+                <button class="control-button cancel admin-ban-btn" data-user-id="${report.reported_user_id}" data-username="${report.reported_username}">${t('admin.ban_button')}</button>
+                <button class="control-button secondary admin-dismiss-report-btn" data-report-id="${report.id}">${t('admin.dismiss_report')}</button>
+            </div>
+        </div>
+    `).join('') : `<p>${t('admin.no_reports')}</p>`;
 
     const onlineUsersHTML = online.length > 0 ? online.map(user => `
         <div class="admin-user-item">
@@ -203,11 +219,15 @@ export function renderAdminPanel({ online, banned }) {
 
     adminTabContent.innerHTML = `
         <div class="admin-section">
-            <h3 data-i18n="admin.online_users">${t('admin.online_users')}</h3>
+            <h3 style="color: var(--accent-yellow); border-bottom-color: var(--accent-yellow);">${t('admin.player_reports')}</h3>
+            <div class="admin-user-list">${reportsHTML}</div>
+        </div>
+        <div class="admin-section">
+            <h3>${t('admin.online_users')}</h3>
             <div class="admin-user-list">${onlineUsersHTML}</div>
         </div>
         <div class="admin-section">
-            <h3 data-i18n="admin.banned_users">${t('admin.banned_users')}</h3>
+            <h3>${t('admin.banned_users')}</h3>
             <div class="admin-user-list">${bannedUsersHTML}</div>
         </div>
     `;

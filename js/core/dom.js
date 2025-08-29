@@ -219,6 +219,7 @@ export const xpBarText = document.getElementById('xp-bar-text');
 export const pvpUsernameModal = document.getElementById('pvp-username-modal'); // Kept for potential future use
 export const pvpCreateRoomButton = document.getElementById('pvp-create-room-button');
 export const pvpPotContainer = document.getElementById('pvp-pot-container');
+export const turnCountdownTimer = document.getElementById('turn-countdown-timer');
 
 // Event Modal
 export const eventButton = document.getElementById('event-button');
