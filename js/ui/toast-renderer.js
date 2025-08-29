@@ -19,3 +19,16 @@ export const showAchievementNotification = (achievementData, overrideDescription
         dom.achievementUnlockedToast.classList.add('hidden');
     }, 4500); // This duration must match the 'toast-in-down-out' animation in index.css.
 };
+
+/**
+ * Shows a toast notification for a daily login reward.
+ * @param {number} amount - The amount of CoinVersus received.
+ */
+export const showDailyRewardNotification = (amount) => {
+    dom.rewardToastText.textContent = t('rewards.daily_login_toast', { amount });
+    dom.dailyRewardToast.classList.remove('hidden');
+
+    setTimeout(() => {
+        dom.dailyRewardToast.classList.add('hidden');
+    }, 4500);
+};

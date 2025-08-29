@@ -113,6 +113,7 @@ export function renderProfile(profileData) {
                     <div class="profile-stat-item"><h4>${t('profile.level')}</h4><p>${profileData.level}</p></div>
                     <div class="profile-stat-item"><h4>${t('profile.experience')}</h4><p>${profileData.xp}</p></div>
                     <div class="profile-stat-item"><h4>${t('profile.victories')}</h4><p>${profileData.victories}</p></div>
+                    <div class="profile-stat-item"><h4>${t('profile.defeats')}</h4><p>${profileData.defeats}</p></div>
                     <div class="profile-stat-item"><h4>${t('profile.coinversus')}</h4><p>${profileData.coinversus || 0}</p></div>
                 </div>
                 ${titlesSectionHTML}

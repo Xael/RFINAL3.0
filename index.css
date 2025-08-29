@@ -2212,14 +2212,14 @@ body.screen-shaking {
 }
 .field-effect-card.versatrix h3 { color: var(--text-primary); }
 
-/* --- Achievements --- */
-#achievement-unlocked-toast {
+/* --- Achievements & Rewards --- */
+#achievement-unlocked-toast,
+#daily-reward-toast {
     position: fixed;
     top: 20px;
     left: 50%;
     z-index: 2500;
     background-color: var(--bg-panel);
-    border: 1px solid var(--accent-yellow);
     color: var(--text-primary);
     padding: 1rem 1.5rem;
     border-radius: 10px;
@@ -2232,10 +2232,20 @@ body.screen-shaking {
     transform: translate(-50%, -150%);
     animation: toast-in-down-out 4.5s ease-in-out forwards;
 }
-
+#achievement-unlocked-toast {
+    border: 1px solid var(--accent-yellow);
+}
+#daily-reward-toast {
+    border: 1px solid gold;
+}
 .toast-icon {
     font-size: 1.5rem;
+}
+#achievement-unlocked-toast .toast-icon {
     color: var(--accent-yellow);
+}
+#daily-reward-toast .toast-icon {
+    color: gold;
 }
 
 #achievements-modal .modal-content {

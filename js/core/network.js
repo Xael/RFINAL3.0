@@ -1,4 +1,3 @@
-
 // js/core/network.js
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
@@ -11,6 +10,7 @@ import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
 import { t } from '../core/i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
+import { showDailyRewardNotification } from '../ui/toast-renderer.js';
 
 /**
  * Sets up the player areas in the UI so the local player is always at the bottom.
@@ -66,6 +66,11 @@ export function connectToServer() {
         dom.eventButton.classList.remove('hidden');
         emitGetFriendsList(); // Carrega a lista de amigos após o login
         emitGetPendingRequests(); // Carrega pedidos pendentes
+        emitClaimDailyLoginReward(); // Solicita a recompensa diária
+    });
+
+    socket.on('dailyRewardSuccess', ({ amount }) => {
+        showDailyRewardNotification(amount);
     });
 
     socket.on('loginError', (message) => {
@@ -313,6 +318,7 @@ export function emitRemoveFriend(targetUserId) { const { socket } = getState(); 
 export function emitGetFriendsList() { const { socket } = getState(); if (socket) socket.emit('getFriendsList'); }
 export function emitSendPrivateMessage(recipientId, content) { const { socket } = getState(); if (socket) socket.emit('sendPrivateMessage', { recipientId, content }); }
 export function emitReportPlayer(reportedGoogleId, message) { const { socket } = getState(); if (socket) socket.emit('reportPlayer', { reportedGoogleId, message }); }
+export function emitClaimDailyLoginReward() { const { socket } = getState(); if(socket) socket.emit('claimDailyLoginReward'); }
 
 // --- Matchmaking Emitters ---
 export function emitJoinMatchmaking(mode) {

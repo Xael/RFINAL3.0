@@ -375,6 +375,9 @@
         "victory_completed_message": "Desafio concluído! Você desbloqueou o título: \"{rewardName}\"!",
         "defeat_message": "Você foi derrotado. Volte amanhã para uma nova tentativa."
     },
+    "rewards": {
+        "daily_login_toast": "Recompensa Diária! Você ganhou +{amount} CoinVersus."
+    },
     "log": {
         "welcome": "Bem-vindo ao Reversus! Modo: {modeText}.",
         "duo_teams": "Equipe Azul/Verde (Você & Jogador 3) vs. Equipe Vermelho/Amarelo (Jogador 2 & Jogador 4)",

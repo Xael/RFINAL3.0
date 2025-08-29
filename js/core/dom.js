@@ -131,6 +131,8 @@ export const inversusModeButton = document.getElementById('inversus-mode-button'
 export const scalableContainer = document.getElementById('scalable-container');
 export const achievementUnlockedToast = document.getElementById('achievement-unlocked-toast');
 export const toastText = document.getElementById('toast-text');
+export const dailyRewardToast = document.getElementById('daily-reward-toast');
+export const rewardToastText = document.getElementById('reward-toast-text');
 
 // Quick Start & Matchmaking Modals
 export const quickStartModal = document.getElementById('quick-start-modal');

@@ -375,6 +375,9 @@
         "victory_completed_message": "Challenge completed! You've unlocked the title: \"{rewardName}\"!",
         "defeat_message": "You were defeated. Come back tomorrow for another try."
     },
+     "rewards": {
+        "daily_login_toast": "Daily Reward! You earned +{amount} CoinVersus."
+    },
     "log": {
         "welcome": "Welcome to Reversus! Mode: {modeText}.",
         "duo_teams": "Blue/Green Team (You & Player 3) vs. Red/Yellow Team (Player 2 & Player 4)",
