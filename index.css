@@ -620,20 +620,19 @@ body.screen-shaking {
     border: 1px solid rgba(168, 218, 220, 0.2);
     flex-shrink: 0;
     min-height: 40px; /* Give it a minimum height to avoid layout shifts */
-    position: relative; /* For countdown timer positioning */
 }
 
 .turn-countdown-timer {
-    position: absolute;
+    position: fixed; /* Changed to fixed for screen centering */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 3.5rem;
+    font-size: 10rem; /* Increased font size */
     font-weight: 700;
     color: var(--accent-red);
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px var(--accent-red);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px var(--accent-red);
     animation: pulse-red 1s infinite ease-in-out;
-    z-index: 10;
+    z-index: 2500; /* High z-index to be on top of everything */
     pointer-events: none;
 }
 
@@ -1046,7 +1045,7 @@ body.screen-shaking {
     position: relative;
     z-index: 2; /* Ensure header is above portrait */
     flex-shrink: 0; /* Prevent header from shrinking */
-    order: 1; /* NEW: Flexbox order */
+    order: 1;
 }
 .player-area.xael-portrait-bg .player-header,
 .player-area-necro-final .player-header,
@@ -1196,7 +1195,7 @@ body.screen-shaking {
     align-content: flex-start;
     position: relative;
     z-index: 2;
-    order: 3; /* NEW: Flexbox order */
+    order: 4; /* Corrected order */
     flex-shrink: 0; /* Prevent vertical shrinking */
 }
 
@@ -1215,7 +1214,7 @@ body.screen-shaking {
     min-height: 115px;
     position: relative;
     z-index: 2;
-    order: 4; /* NEW: Flexbox order */
+    order: 3; /* Corrected order */
     flex-shrink: 0; /* Prevent vertical shrinking */
 }
 
@@ -1281,20 +1280,17 @@ body.screen-shaking {
 
 /* Story Battle Character Portrait */
 .player-area-character-portrait {
-    position: relative; /* Changed from absolute */
-    order: 2; /* NEW: Flexbox order */
-    margin-top: auto; /* NEW: Pushes this and subsequent items to the bottom */
-    align-self: center; /* Center horizontally */
-    max-height: 140px; /* Set a max height to prevent overflow */
-    width: auto; /* Let height control width */
+    position: relative;
+    order: 2;
+    align-self: center;
+    flex-grow: 1;
+    min-height: 0;
+    width: 95%;
     object-fit: contain;
     object-position: bottom center;
     pointer-events: none;
     z-index: 1;
     filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.5));
-}
-.player-area-character-portrait.necro-tutorial-portrait {
-    max-height: 120px;
 }
 .player-area-character-portrait.xael-glow {
     filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 15px #fff);
@@ -2385,7 +2381,7 @@ body.screen-shaking {
 }
 .room-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1rem;
     padding: 1rem;
     overflow-y: auto;
@@ -2396,17 +2392,52 @@ body.screen-shaking {
 .room-card {
     border-radius: 8px;
     padding: 1rem;
-    text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 0.5rem;
+    gap: 0.75rem;
     border: 2px solid;
     background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
 }
 .room-card h3 {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
+.room-card h3 .password-icon {
+    font-size: 1rem;
+    color: var(--accent-yellow);
+}
+
+.room-card-players-list {
+    background: rgba(0,0,0,0.2);
+    padding: 0.5rem;
+    border-radius: 5px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.room-player-name {
+    font-size: 0.9rem;
+}
+.room-player-name.clickable {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.room-player-name.clickable:hover {
+    color: var(--accent-yellow);
+}
+
+.room-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
 .room-card.color-1 { border-color: var(--accent-blue); }
 .room-card.color-2 { border-color: var(--accent-red); }
 .room-card.color-3 { border-color: var(--accent-green); }
@@ -2416,12 +2447,25 @@ body.screen-shaking {
     box-shadow: 0 0 10px var(--accent-purple);
 }
 
-#pvp-username-modal .modal-content,
+#pvp-create-room-modal .form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+#pvp-create-room-modal input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--text-secondary);
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
 #pvp-password-modal .modal-content {
     width: 400px;
 }
-
-#pvp-username-input,
 #pvp-password-input {
     width: 100%;
     padding: 12px;
@@ -2470,6 +2514,7 @@ body.screen-shaking {
     font-size: 1.5rem;
     font-weight: 600;
     gap: 0.5rem;
+    position: relative;
 }
 .lobby-player-slot .master-star { color: var(--accent-yellow); }
 .lobby-player-slot .player-title {
@@ -2478,6 +2523,29 @@ body.screen-shaking {
     color: var(--text-secondary);
     font-weight: normal;
 }
+.kick-player-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--accent-red);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+.kick-player-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
 .lobby-player-slot .player-name.clickable {
     cursor: pointer;
     text-decoration: underline;

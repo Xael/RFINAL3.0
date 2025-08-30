@@ -342,6 +342,7 @@
     
     <!-- Main Game UI -->
     <div id="app-container" class="app-container hidden">
+        <div id="turn-countdown-timer" class="turn-countdown-timer hidden"></div>
         <div class="left-panel">
             <div class="logo-container">
                 <img src="logo.png" alt="Reversus Logo" class="game-logo">
@@ -361,7 +362,6 @@
                 <div id="reversus-total-indicator" class="hidden" data-i18n="game.reversus_total_active">Reversus Total Ativo!</div>
                 <div id="pvp-pot-container" class="pvp-pot-container hidden"></div>
                 <div id="team-scores-container" class="team-scores-container hidden"></div>
-                <div id="turn-countdown-timer" class="turn-countdown-timer hidden"></div>
             </div>
             <div class="board-and-scores-wrapper">
                 <div id="left-score-box" class="side-score-box player-1-score hidden">
@@ -625,12 +625,30 @@
                 <!-- Room cards will be rendered here -->
             </div>
              <div class="button-group" style="margin-top: 1rem;">
-                <button id="pvp-create-room-button" class="control-button btn-p3-color" data-i18n="pvp.create_room">Criar Sala</button>
+                <button id="pvp-show-create-room-button" class="control-button btn-p3-color" data-i18n="pvp.create_room">Criar Sala</button>
                 <button id="pvp-room-list-close-button" class="control-button cancel" data-i18n="pvp.back_to_menu">Voltar ao Menu</button>
              </div>
         </div>
     </div>
     
+    <div id="pvp-create-room-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="width: 450px;">
+            <h2 data-i18n="pvp.create_room_title">Criar Nova Sala</h2>
+            <div class="form-item">
+                <label for="room-name-input" data-i18n="pvp.room_name">Nome da Sala:</label>
+                <input type="text" id="room-name-input" maxlength="30">
+            </div>
+            <div class="form-item">
+                <label for="room-password-input" data-i18n="pvp.room_password">Senha (opcional):</label>
+                <input type="password" id="room-password-input" maxlength="20">
+            </div>
+            <div class="button-group">
+                <button id="pvp-create-room-confirm-button" class="control-button" data-i18n="pvp.create_room">Criar</button>
+                <button id="pvp-create-room-cancel-button" class="control-button cancel" data-i18n="common.cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="pvp-password-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h2 data-i18n="pvp.password_title">Senha da Sala</h2>

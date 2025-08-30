@@ -1,5 +1,4 @@
-
-
+// js/ui/ui-renderer.js
 import * as dom from '../core/dom.js';
 import { getState, updateState } from '../core/state.js';
 import { updateLiveScoresAndWinningStatus } from '../game-logic/score.js';

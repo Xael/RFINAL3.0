@@ -20,12 +20,20 @@ export const renderRoomList = (rooms) => {
     dom.pvpRoomGridEl.innerHTML = rooms.map((room, index) => {
         const colorClass = `color-${(index % 4) + 1}`;
         const modeText = t(modeKeyMap[room.mode] || room.mode);
+        const passwordIcon = room.hasPassword ? '<span class="password-icon" title="Sala com senha">🔒</span>' : '';
+        const playersHTML = room.players.map(p => `<span class="room-player-name clickable" data-google-id="${p.googleId}">${p.username}</span>`).join('') || `<span class="room-player-name">${t('pvp.empty_room')}</span>`;
+
         return `
             <div class="room-card ${colorClass}">
-                <h3>${room.name}</h3>
-                <p>${t('pvp.room_card_mode', { mode: modeText })}</p>
-                <p>${t('pvp.room_card_players', { count: room.playerCount })}</p>
-                <button class="control-button join-room-button" data-room-id="${room.id}">${t('pvp.enter')}</button>
+                <h3>${room.name} ${passwordIcon}</h3>
+                <div class="room-card-players-list">
+                    ${playersHTML}
+                </div>
+                <div class="room-card-footer">
+                    <span>${t('pvp.room_card_mode', { mode: modeText })}</span>
+                    <span>${t('pvp.room_card_players', { count: room.playerCount, max: 4 })}</span>
+                </div>
+                <button class="control-button join-room-button" data-room-id="${room.id}" data-has-password="${room.hasPassword}">${t('pvp.enter')}</button>
             </div>
         `;
     }).join('');
@@ -112,7 +120,10 @@ export const updateLobbyUi = (roomData) => {
                 playerTitleText = player.title_code;
             }
             const playerTitle = playerTitleText ? `<span class="player-title">${playerTitleText}</span>` : '';
+            const kickButton = (isHost && player.id !== clientId) ? `<button class="kick-player-button" data-kick-id="${player.id}" title="${t('pvp.kick_player_title', { username: player.username })}">×</button>` : '';
+
             slotEl.innerHTML = `
+                ${kickButton}
                 <div>
                     <span class="player-name clickable" data-google-id="${player.googleId}">${player.username}</span>${hostStar}
                 </div>
