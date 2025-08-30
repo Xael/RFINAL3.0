@@ -4,7 +4,7 @@ import * as dom from './dom.js';
 import { renderAll, showGameOver } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel } from '../ui/profile-renderer.js';
-import { showSplashScreen } from '../ui/splash-screen.js';
+import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
@@ -83,10 +83,6 @@ export function connectToServer() {
     socket.on('forceDisconnect', (message) => {
         alert(message);
         window.location.reload();
-    });
-
-    socket.on('roomCreated', ({ roomId }) => {
-        emitJoinRoom({ roomId });
     });
     
     socket.on('rankingData', (rankingData) => {
