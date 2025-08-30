@@ -217,7 +217,12 @@ export const userLevel = document.getElementById('user-level');
 export const xpBarFill = document.getElementById('xp-bar-fill');
 export const xpBarText = document.getElementById('xp-bar-text');
 export const pvpUsernameModal = document.getElementById('pvp-username-modal'); // Kept for potential future use
-export const pvpCreateRoomButton = document.getElementById('pvp-create-room-button');
+export const pvpShowCreateRoomButton = document.getElementById('pvp-show-create-room-button');
+export const pvpCreateRoomModal = document.getElementById('pvp-create-room-modal');
+export const roomNameInput = document.getElementById('room-name-input');
+export const roomPasswordInput = document.getElementById('room-password-input');
+export const pvpCreateRoomConfirmButton = document.getElementById('pvp-create-room-confirm-button');
+export const pvpCreateRoomCancelButton = document.getElementById('pvp-create-room-cancel-button');
 export const pvpPotContainer = document.getElementById('pvp-pot-container');
 export const turnCountdownTimer = document.getElementById('turn-countdown-timer');
 
@@ -242,6 +247,17 @@ export const profileFriendsTabContent = document.getElementById('profile-friends
 export const friendsListContainer = document.getElementById('friends-list-container');
 export const friendRequestsListContainer = document.getElementById('friend-requests-list-container');
 export const friendRequestBadge = document.getElementById('friend-request-badge');
+
+// Invite Friends Modal
+export const inviteFriendsModal = document.getElementById('invite-friends-modal');
+export const inviteFriendsList = document.getElementById('invite-friends-list');
+export const inviteFriendsCloseButton = document.getElementById('invite-friends-close-button');
+
+// Lobby Invite Notification Modal
+export const lobbyInviteNotificationModal = document.getElementById('lobby-invite-notification-modal');
+export const lobbyInviteNotificationText = document.getElementById('lobby-invite-notification-text');
+export const lobbyInviteAcceptButton = document.getElementById('lobby-invite-accept-button');
+export const lobbyInviteDeclineButton = document.getElementById('lobby-invite-decline-button');
 
 // Chat
 export const privateChatPanel = document.getElementById('private-chat-panel');

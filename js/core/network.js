@@ -11,7 +11,7 @@ import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
 import { t } from './i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
 import { showDailyRewardNotification } from '../ui/toast-renderer.js';
-import { playSoundEffect, announceEffect } from './sound.js';
+import { playSoundEffect, announceEffect } from '../core/sound.js';
 import * as sound from './sound.js';
 
 /**
@@ -85,8 +85,8 @@ export function connectToServer() {
         window.location.reload();
     });
 
-    socket.on('roomCreated', (roomId) => {
-        emitJoinRoom(roomId);
+    socket.on('roomCreated', ({ roomId }) => {
+        emitJoinRoom({ roomId });
     });
     
     socket.on('rankingData', (rankingData) => {
@@ -306,8 +306,8 @@ export function emitGameFinished(winnerId, mode) {
     }
 }
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
-export function emitCreateRoom() { const { socket } = getState(); if (socket) socket.emit('createRoom'); }
-export function emitJoinRoom({ roomId }) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId }); }
+export function emitCreateRoom({ name, password }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password }); }
+export function emitJoinRoom({ roomId, password }) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId, password }); }
 export function emitLobbyChat(message) { const { socket } = getState(); if(socket) socket.emit('lobbyChatMessage', message); }
 export function emitChatMessage(message) { const { socket } = getState(); if (socket) socket.emit('chatMessage', message); }
 export function emitChangeMode(mode) { const { socket } = getState(); if (socket) socket.emit('changeMode', mode); }

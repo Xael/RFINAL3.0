@@ -130,7 +130,11 @@ export const updateLobbyUi = (roomData) => {
                 ${playerTitle}
             `;
         } else {
-            slotEl.textContent = t('pvp.waiting_player');
+            if (isHost) {
+                slotEl.innerHTML = `<button class="control-button invite-friend-slot-btn">${t('pvp.invite_friend')}</button>`;
+            } else {
+                slotEl.textContent = t('pvp.waiting_player');
+            }
         }
         playerGrid.appendChild(slotEl);
     });

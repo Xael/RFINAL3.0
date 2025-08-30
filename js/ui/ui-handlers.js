@@ -960,13 +960,58 @@ export function initializeUiHandlers() {
         }
     });
 
-    dom.pvpCreateRoomButton.addEventListener('click', () => network.emitCreateRoom());
+    dom.pvpShowCreateRoomButton.addEventListener('click', () => {
+        dom.pvpCreateRoomModal.classList.remove('hidden');
+    });
 
-    dom.pvpRoomGridEl.addEventListener('click', (e) => {
-        if (e.target.classList.contains('join-room-button')) {
-            const roomId = e.target.dataset.roomId;
-            if (roomId) network.emitJoinRoom({ roomId });
+    dom.pvpCreateRoomCancelButton.addEventListener('click', () => {
+        dom.pvpCreateRoomModal.classList.add('hidden');
+    });
+
+    dom.pvpCreateRoomConfirmButton.addEventListener('click', () => {
+        const name = dom.roomNameInput.value.trim();
+        const password = dom.roomPasswordInput.value.trim();
+
+        if (!name) {
+            alert(t('pvp.room_name_required'));
+            return;
         }
+
+        network.emitCreateRoom({ name, password });
+        dom.pvpCreateRoomModal.classList.add('hidden');
+        dom.roomNameInput.value = '';
+        dom.roomPasswordInput.value = '';
+    });
+    
+    let selectedRoomIdForPassword = null;
+    dom.pvpRoomGridEl.addEventListener('click', (e) => {
+        const button = e.target.closest('.join-room-button');
+        if (button) {
+            const roomId = button.dataset.roomId;
+            const hasPassword = button.dataset.hasPassword === 'true';
+
+            if (hasPassword) {
+                selectedRoomIdForPassword = roomId;
+                dom.pvpPasswordInput.value = '';
+                dom.pvpPasswordModal.classList.remove('hidden');
+            } else {
+                if (roomId) network.emitJoinRoom({ roomId });
+            }
+        }
+    });
+
+    dom.pvpPasswordSubmit.addEventListener('click', () => {
+        if (selectedRoomIdForPassword) {
+            const password = dom.pvpPasswordInput.value;
+            network.emitJoinRoom({ roomId: selectedRoomIdForPassword, password });
+            dom.pvpPasswordModal.classList.add('hidden');
+            selectedRoomIdForPassword = null;
+        }
+    });
+
+    dom.pvpPasswordCancel.addEventListener('click', () => {
+        dom.pvpPasswordModal.classList.add('hidden');
+        selectedRoomIdForPassword = null;
     });
 
     dom.pvpRoomListCloseButton.addEventListener('click', () => {

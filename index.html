@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="document.title">Reversus</title>
+    <title data-i18n="document.title">Reversus - 4 Jogadores</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -691,6 +691,29 @@
                     <input type="text" id="lobby-chat-input" data-i18n-placeholder="pvp.chat_placeholder">
                     <button id="lobby-chat-send-button" class="control-button" data-i18n="game.chat_send">Enviar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Friends Modal -->
+    <div id="invite-friends-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 data-i18n="pvp.invite_friends_title">Convidar Amigos</h2>
+            <div id="invite-friends-list" class="friends-list">
+                <p data-i18n="pvp.no_online_friends">Nenhum amigo online.</p>
+            </div>
+            <button id="invite-friends-close-button" class="control-button cancel" data-i18n="common.close">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Lobby Invite Notification Modal -->
+    <div id="lobby-invite-notification-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 data-i18n="pvp.invite_notification_title">Convite para Lobby</h2>
+            <p id="lobby-invite-notification-text"></p>
+            <div class="button-group">
+                <button id="lobby-invite-accept-button" class="control-button btn-p3-color" data-i18n="pvp.accept_invite">Aceitar</button>
+                <button id="lobby-invite-decline-button" class="control-button cancel" data-i18n="pvp.decline_invite">Recusar</button>
             </div>
         </div>
     </div>
