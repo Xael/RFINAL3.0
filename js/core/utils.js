@@ -56,23 +56,14 @@ export const updateLog = (logEntry) => {
             return; // If chat is muted, ignore player messages.
         }
 
-        // In PvP, we only add real-time chat messages from the 'chatMessage' event.
-        // Full log synchronization is handled by the 'gameStateUpdate' event,
-        // which calls renderAll(), which in turn calls this function without arguments.
-        if (gameState.isPvp) {
-            if (logEntry.type === 'dialogue') {
-                gameState.log.unshift(logEntry);
-            }
-        } else {
-            // In single-player, the client is the source of truth for the log.
-            const entry = typeof logEntry === 'string' ? { type: 'system', message: logEntry } : logEntry;
-            gameState.log.unshift(entry);
-        }
+        // Always add the entry to the log array
+        const entry = typeof logEntry === 'string' ? { type: 'system', message: logEntry } : logEntry;
+        gameState.log.push(entry);
     }
     
-    // Trim the log to a reasonable size
+    // Trim the log to a reasonable size, removing the oldest messages from the start.
     if (gameState.log.length > 50) {
-        gameState.log.pop();
+        gameState.log.shift();
     }
     
     const emojiMap = {
@@ -94,16 +85,30 @@ export const updateLog = (logEntry) => {
             const reportButton = !isMyMessage && m.googleId ? 
                 `<button class="report-button" title="Denunciar jogador por má conduta" data-google-id="${m.googleId}" data-username="${m.speaker}" data-message="${sanitizedMessage}">🚩</button>` 
                 : '';
-
-            const speakerClass = config.AI_CHAT_PERSONALITIES.hasOwnProperty(m.speaker) 
-                ? `speaker-${m.speaker}` 
-                : `speaker-player-1`;
+            
+            let speakerClass = '';
+            // Find the player by username to get their ID ('player-1', etc.)
+            const playerEntry = Object.values(gameState.players).find(p => p.name === m.speaker);
+            if (playerEntry) {
+                speakerClass = `speaker-${playerEntry.id}`; 
+            } else if (config.AI_CHAT_PERSONALITIES.hasOwnProperty(m.speaker)) {
+                speakerClass = `speaker-${m.speaker}`;
+            } else {
+                 // Fallback for human player if not found in players list (e.g., before game start)
+                speakerClass = 'speaker-player-1';
+            }
             
             const speakerName = `<strong>${m.speaker}:</strong> `;
             return `<div class="log-message dialogue ${speakerClass}">${speakerName}<span>${emojiMessage}</span>${reportButton}</div>`;
         }
         return `<div class="log-message system">${emojiMessage}</div>`;
     }).join('');
-
-    dom.logEl.scrollTop = 0;
+    
+    // Use a timeout to ensure the DOM has been updated before we try to scroll.
+    // This robustly fixes issues where scrolling happens before the new content is rendered.
+    setTimeout(() => {
+        if (dom.logEl) {
+            dom.logEl.scrollTop = dom.logEl.scrollHeight;
+        }
+    }, 0);
 };

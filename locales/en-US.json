@@ -569,7 +569,11 @@
         "xael_winning_1": "Can't catch me!",
         "xael_winning_2": "Too easy!",
         "xael_losing_1": "Hmm, interesting... but it won't be enough.",
-        "xael_losing_2": "You're learning fast."
+        "xael_losing_2": "You're learning fast.",
+        "detetive_winning_1": "The facts are clear. My victory is inevitable.",
+        "detetive_winning_2": "Your strategy is transparent. I anticipate your every move.",
+        "detetive_losing_1": "Interesting... an anomaly in the data. I must reassess.",
+        "detetive_losing_2": "You are a more cunning opponent than the evidence suggested."
     },
     "story_dialogue": {
         "start_necroverso_text": "Hello stranger... welcome! You are in the Inversus and I am the Necroverse. If you wish to return to your world, you must challenge the sovereigns of this place...",
@@ -697,7 +701,7 @@
         "june": "Can reuse an effect card from the discard pile once per match.",
         "july": "Has a chance to steal a random card from your hand.",
         "august": "Can swap places on the board with the opponent once per match.",
-        "september": "Can peek at a random card in your hand once per match.",
+        "september": "Once per round, can peek and swap a card from your hand with one of his own.",
         "october": "Once per match, can force everyone to discard the highest value card from their hands.",
         "november": "Once per round, can 'freeze' (ignore) an effect card played against it.",
         "december": "At the start of each round, if its 'Rest' card is in the discard pile, it 'revives' it to its hand."

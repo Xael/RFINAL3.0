@@ -966,12 +966,7 @@ export function initializeUiHandlers() {
         }
     };
     dom.chatSendButton.addEventListener('click', sendChatMessage);
-    dom.chatInput.addEventListener('keypress', (e) => { 
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            sendChatMessage();
-        }
-    });
+    dom.chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
 
     dom.lobbyChatSendButton.addEventListener('click', () => {
         const message = dom.lobbyChatInput.value.trim();
@@ -983,7 +978,6 @@ export function initializeUiHandlers() {
     
     dom.lobbyChatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault();
             const message = dom.lobbyChatInput.value.trim();
             if(message) {
                 network.emitLobbyChat(message);

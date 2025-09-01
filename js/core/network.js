@@ -1,10 +1,10 @@
 // js/core/network.js
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
-import { renderAll, showGameOver } from '../ui/ui-renderer.js';
+import { renderAll, showGameOver, showRoundSummaryModal } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel } from '../ui/profile-renderer.js';
-import { showSplashScreen } from '../ui/splash-screen.js';
+import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
@@ -211,6 +211,7 @@ export function connectToServer() {
         dom.matchmakingStatusModal.classList.add('hidden');
         dom.appContainerEl.classList.remove('hidden');
         sound.stopStoryMusic(); // Restore default playlist and enable next track button
+        dom.nextTrackButton.disabled = false; // Explicitly re-enable for PvP
         
         const state = getState();
         if (state.gameTimerInterval) clearInterval(state.gameTimerInterval);
@@ -261,11 +262,16 @@ export function connectToServer() {
         renderAll();
     });
 
+    socket.on('roundSummary', (summaryData) => {
+        showRoundSummaryModal(summaryData.winners, summaryData.finalScores);
+    });
+    
+    socket.on('matchCancelled', (message) => {
+        alert(message);
+        showSplashScreen();
+    });
+
     socket.on('gameOver', ({ message, winnerId }) => {
-        const { gameState } = getState();
-        if (gameState) {
-             emitGameFinished(winnerId, gameState.gameMode);
-        }
         showGameOver(message, "Fim de Jogo!", { action: 'menu' });
     });
 
@@ -295,12 +301,6 @@ export function emitGetProfile() { const { socket } = getState(); if (socket) so
 export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
 export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
 export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
-export function emitGameFinished(winnerId, mode) {
-    const { socket, currentRoomId } = getState();
-    if (socket && winnerId && currentRoomId) {
-        socket.emit('gameFinished', { winnerId, roomId: currentRoomId, mode });
-    }
-}
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
 export function emitCreateRoom({ name, password }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password }); }
 export function emitJoinRoom({ roomId, password }) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId, password }); }

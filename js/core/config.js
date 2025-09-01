@@ -133,6 +133,10 @@ export const AI_DIALOGUE = {
     'xael': {
         winning: ['ai_dialogue.xael_winning_1', 'ai_dialogue.xael_winning_2'],
         losing: ['ai_dialogue.xael_losing_1', 'ai_dialogue.xael_losing_2']
+    },
+    'detetivemisterioso': {
+        winning: ['ai_dialogue.detetive_winning_1', 'ai_dialogue.detetive_winning_2'],
+        losing: ['ai_dialogue.detetive_losing_1', 'ai_dialogue.detetive_losing_2']
     }
 };
 

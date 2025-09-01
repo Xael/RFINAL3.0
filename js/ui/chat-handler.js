@@ -40,6 +40,7 @@ export function openChatWindow(userId, username) {
 
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
+            e.preventDefault();
             const content = input.value.trim();
             if (content) {
                 network.emitSendPrivateMessage(parseInt(userId, 10), content);

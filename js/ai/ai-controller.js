@@ -26,6 +26,72 @@ export async function executeAiTurn(player) {
         if (player.isEventBoss) {
             const player1 = gameState.players['player-1'];
             switch(player.aiType) {
+                case 'detetivemisterioso': // September
+                    if (!gameState.eventBossAbilityUsedThisRound) {
+                        let swapMade = false;
+                        
+                        playSoundEffect('escolhido');
+                        announceEffect('Habilidade');
+                        updateLog({ type: 'dialogue', speaker: player.aiType, message: `Detetive Misterioso: "Hum... um movimento interessante. Vejamos suas cartas mais de perto."` });
+                        await new Promise(res => setTimeout(res, 500));
+
+                        const playerEffectCards = player1.hand.filter(c => c.type === 'effect');
+                        const aiEffectCards = player.hand.filter(c => c.type === 'effect');
+
+                        if (playerEffectCards.length > 0 && aiEffectCards.length > 0) {
+                            const priorityTake = ['Reversus Total', 'Reversus', 'Sobe'];
+                            let cardToTake = null;
+                            for (const cardName of priorityTake) {
+                                cardToTake = playerEffectCards.find(c => c.name === cardName);
+                                if (cardToTake) break;
+                            }
+
+                            if (cardToTake) {
+                                const priorityGive = ['Pula'];
+                                let cardToGive = aiEffectCards.find(c => priorityGive.includes(c.name)) || aiEffectCards[0];
+
+                                const p1_take_idx = player1.hand.findIndex(c => c.id === cardToTake.id);
+                                const ai_give_idx = player.hand.findIndex(c => c.id === cardToGive.id);
+                                
+                                if (p1_take_idx > -1 && ai_give_idx > -1) {
+                                    player1.hand.splice(p1_take_idx, 1, cardToGive);
+                                    player.hand.splice(ai_give_idx, 1, cardToTake);
+                                    updateLog({ type: 'dialogue', speaker: player.aiType, message: `Detetive Misterioso: "Elementar, meu caro jogador. Uma simples troca de... perspectivas. Eu fico com sua carta '${cardToTake.name}' e você com a minha '${cardToGive.name}'.` });
+                                    swapMade = true;
+                                }
+                            }
+                        }
+
+                        if (!swapMade) {
+                            const playerValueCards = player1.hand.filter(c => c.type === 'value').sort((a,b) => b.value - a.value);
+                            const aiValueCards = player.hand.filter(c => c.type === 'value').sort((a,b) => a.value - b.value);
+                            
+                            if (playerValueCards.length > 0 && aiValueCards.length > 0) {
+                                const cardToTake = playerValueCards[0];
+                                const cardToGive = aiValueCards[0];
+                                
+                                const p1_take_idx = player1.hand.findIndex(c => c.id === cardToTake.id);
+                                const ai_give_idx = player.hand.findIndex(c => c.id === cardToGive.id);
+
+                                if (p1_take_idx > -1 && ai_give_idx > -1) {
+                                    player1.hand.splice(p1_take_idx, 1, cardToGive);
+                                    player.hand.splice(ai_give_idx, 1, cardToTake);
+                                    updateLog({ type: 'dialogue', speaker: player.aiType, message: `Detetive Misterioso: "Observo que você valoriza esta carta de valor ${cardToTake.name}. Permita-me analisá-la em troca desta, de valor ${cardToGive.name}."` });
+                                    swapMade = true;
+                                }
+                            }
+                        }
+                        
+                        if (swapMade) {
+                            gameState.eventBossAbilityUsedThisRound = true;
+                            specialAbilityUsed = true;
+                            renderAll();
+                            await new Promise(res => setTimeout(res, 1500));
+                        } else {
+                            updateLog({ type: 'dialogue', speaker: player.aiType, message: `Detetive Misterioso: "Hmm, sua mão não apresenta nada de valor para minha investigação... por enquanto."` });
+                        }
+                    }
+                    break;
                 case 'astronomoperdido': // August
                     if (!player.eventAbilityUsedThisMatch && player.position < player1.position - 3) {
                         updateLog(`${player.name} usa 'Caos Cósmico' para trocar de lugar!`);

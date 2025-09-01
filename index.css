@@ -518,6 +518,8 @@ body.screen-shaking {
     overflow-y: auto;
     font-size: 0.9rem;
     line-height: 1.5;
+    display: flex;
+    flex-direction: column;
 }
 
 .chat-input-area {
@@ -583,6 +585,21 @@ body.screen-shaking {
 .log-message.speaker-player-1 {
     color: var(--accent-blue);
     text-shadow: 0 0 3px var(--accent-blue);
+    font-style: italic;
+}
+.log-message.speaker-player-2 {
+    color: var(--accent-red);
+    text-shadow: 0 0 3px var(--accent-red);
+    font-style: italic;
+}
+.log-message.speaker-player-3 {
+    color: var(--accent-green);
+    text-shadow: 0 0 3px var(--accent-green);
+    font-style: italic;
+}
+.log-message.speaker-player-4 {
+    color: var(--accent-yellow);
+    text-shadow: 0 0 3px var(--accent-yellow);
     font-style: italic;
 }
 .log-message.speaker-contravox { color: var(--accent-green); text-shadow: 0 0 3px var(--accent-green);}
@@ -2608,6 +2625,8 @@ body.screen-shaking {
 .lobby-chat-history {
     overflow-y: auto;
     padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
 }
 .lobby-chat-input-area {
     display: flex;
