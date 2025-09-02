@@ -4,6 +4,7 @@ import { t, getCurrentLanguage } from '../core/i18n.js';
 import * as network from '../core/network.js';
 import { getState } from '../core/state.js';
 import { openChatWindow } from './chat-handler.js';
+import { TITLE_CONFIG } from '../core/config.js';
 
 function xpForLevel(level) {
     if (level <= 1) return 0;
@@ -68,8 +69,27 @@ export function renderProfile(profileData) {
         selectedTitleText = profileData.selected_title_code;
     }
 
+    // Filter PvP titles to only show the best one achieved
+    let filteredTitles = profileData.titles || [];
+    if (isMyProfile) {
+        const pvpTitles = filteredTitles
+            .filter(t => t.line === 'Ranking PvP')
+            .sort((a, b) => {
+                const rankA = TITLE_CONFIG[a.code]?.rank || 999;
+                const rankB = TITLE_CONFIG[b.code]?.rank || 999;
+                return rankA - rankB; // Sort by rank number, ascending (1 is best)
+            });
+        
+        if (pvpTitles.length > 0) {
+            const bestPvpTitle = pvpTitles[0];
+            // Filter out all PvP titles, then add back only the best one.
+            filteredTitles = filteredTitles.filter(t => t.line !== 'Ranking PvP');
+            filteredTitles.push(bestPvpTitle);
+        }
+    }
 
-    const titlesHTML = isMyProfile ? (profileData.titles || []).reduce((acc, title) => {
+
+    const titlesHTML = isMyProfile ? (filteredTitles || []).reduce((acc, title) => {
         if (!acc[title.line]) acc[title.line] = '';
         let titleName = t(`titles.${title.code}`) || title.name;
         if (titleName.startsWith('titles.')) {

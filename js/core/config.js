@@ -107,6 +107,22 @@ export const ACHIEVEMENT_HINTS = {
     '120%_unlocked': 'achievement_hints.120%_unlocked'
 };
 
+export const TITLE_CONFIG = {
+    'pvp_rank_1': { rank: 1 },
+    'pvp_rank_2': { rank: 2 },
+    'pvp_rank_3': { rank: 3 },
+    'pvp_rank_4_10': { rank: 10 },
+    'pvp_rank_11_20': { rank: 20 },
+    'pvp_rank_21_30': { rank: 30 },
+    'pvp_rank_31_40': { rank: 40 },
+    'pvp_rank_41_50': { rank: 50 },
+    'pvp_rank_51_60': { rank: 60 },
+    'pvp_rank_61_70': { rank: 70 },
+    'pvp_rank_71_80': { rank: 80 },
+    'pvp_rank_81_90': { rank: 90 },
+    'pvp_rank_91_100': { rank: 100 }
+};
+
 export const AI_CHAT_PERSONALITIES = { 'contravox': {}, 'versatrix': {}, 'reversum': {}, 'necroverso_tutorial': {}, 'necroverso_king': {}, 'necroverso_final': {}, 'narrador': {}, 'xael': {}, 'inversus': {}, 'oprofetasombrio': {}, 'cupidodocaos': {}, 'goblindafortuna': {}, 'dragaodourado': {}, 'oespectro': {}, 'salamandra': {}, 'capitaobarbacurta': {}, 'astronomoperdido': {}, 'detetivemisterioso': {}, 'abruxadoresto': {}, 'yeti': {}, 'guardiaodaaurora': {} };
 
 export const AI_DIALOGUE = {

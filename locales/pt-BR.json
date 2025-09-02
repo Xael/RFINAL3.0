@@ -437,7 +437,7 @@
         "event_jun": "O Ardente",
         "event_jul": "Ladrão de Restos",
         "event_aug": "O Eterno",
-        "event_sep": "Caçador de Segredos",
+        "secret_hunter": "Caçador de Segredos",
         "event_oct": "Feiticeiro do Tabuleiro",
         "event_nov": "Congelador de Destinos",
         "event_dec": "Luz do Fim de Ano",
@@ -666,7 +666,7 @@
         "the_ardent": "O Ardente",
         "thief_of_rests": "Ladrão de Restos",
         "the_eternal": "O Eterno",
-        "caçador_de_segredos": "Caçador de Segredos",
+        "secret_hunter": "Caçador de Segredos",
         "board_sorcerer": "Feiticeiro do Tabuleiro",
         "freezer_of_fates": "Congelador de Destinos",
         "year_end_light": "Luz do Fim de Ano"
