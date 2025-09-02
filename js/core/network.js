@@ -1,7 +1,7 @@
 // js/core/network.js
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
-import { renderAll, showGameOver, showRoundSummaryModal } from '../ui/ui-renderer.js';
+import { renderAll, showGameOver, showRoundSummaryModal, showTurnIndicator } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from '../ui/profile-renderer.js';
 import { showSplashScreen } from './splash-screen.js';
@@ -182,7 +182,12 @@ export function connectToServer() {
             }
         }
         
+        // Hide other modals/screens that might be open
+        dom.splashScreenEl.classList.add('hidden');
         dom.pvpRoomListModal.classList.add('hidden');
+        dom.lobbyInviteNotificationModal.classList.add('hidden');
+        
+        // Show lobby
         dom.pvpLobbyModal.classList.remove('hidden');
         
         updateLobbyUi(roomData);
@@ -250,7 +255,9 @@ export function connectToServer() {
     });
 
     socket.on('gameStateUpdate', (gameState) => {
-        const { gameState: localGameState } = getState();
+        const { gameState: localGameState, playerId } = getState();
+        const oldCurrentPlayer = localGameState?.currentPlayer;
+
         const localUiState = localGameState ? {
             selectedCard: localGameState.selectedCard,
             reversusTarget: localGameState.reversusTarget,
@@ -260,6 +267,11 @@ export function connectToServer() {
         updateState('gameState', newGameState);
         setupPlayerPerspective();
         renderAll();
+
+        const newCurrentPlayer = newGameState.currentPlayer;
+        if (newCurrentPlayer === playerId && oldCurrentPlayer !== newCurrentPlayer && newGameState.gamePhase === 'playing') {
+            showTurnIndicator();
+        }
     });
 
     socket.on('roundSummary', (summaryData) => {
