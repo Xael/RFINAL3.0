@@ -1,5 +1,4 @@
 
-
 // This object holds the single source of truth for the application's state.
 const appState = {
     // Core game state object, holds all data about the current match.
@@ -43,8 +42,8 @@ const appState = {
     isAnnouncing: false,
     // Holds the options for the last story duel, for a safe restart.
     lastStoryGameOptions: null,
-    // Controls which messages are shown in the game log. Can be 'all', 'log', or 'chat'.
-    chatFilter: 'all',
+    // Flag to control general chat visibility.
+    isChatMuted: false,
 
     // --- PVP/Network State ---
     isConnectionAttempted: false, // Flag to ensure we only try to connect once.
@@ -58,8 +57,6 @@ const appState = {
     isLoggedIn: false, // Flag to indicate if the user is authenticated
     currentRoomId: null, // The ID of the room the player is currently in
     currentQueueMode: null, // The mode ('1v1', '1v4', '2v2') the player is queuing for
-    betAmount: 0, // The bet amount for the current PvP match
-    pot: 0, // The current pot for the PvP match
 };
 
 /**

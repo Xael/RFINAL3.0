@@ -21,12 +21,11 @@ export const renderRoomList = (rooms) => {
         const colorClass = `color-${(index % 4) + 1}`;
         const modeText = t(modeKeyMap[room.mode] || room.mode);
         const passwordIcon = room.hasPassword ? '<span class="password-icon" title="Sala com senha">🔒</span>' : '';
-        const betIcon = room.betAmount > 0 ? `<span class="bet-icon" title="Aposta: ${room.betAmount} CoinVersus">🪙 x${room.betAmount}</span>` : '';
         const playersHTML = room.players.map(p => `<span class="room-player-name clickable" data-google-id="${p.googleId}">${p.username}</span>`).join('') || `<span class="room-player-name">${t('pvp.empty_room')}</span>`;
 
         return `
             <div class="room-card ${colorClass}">
-                <h3>${room.name} ${passwordIcon} ${betIcon}</h3>
+                <h3>${room.name} ${passwordIcon}</h3>
                 <div class="room-card-players-list">
                     ${playersHTML}
                 </div>
