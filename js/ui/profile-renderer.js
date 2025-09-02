@@ -127,16 +127,10 @@ export function renderProfile(profileData) {
 
     // Adicionar botões de ação (amigo/silenciar) fora do grid principal de dados
     const actionButtonsContainer = document.getElementById('profile-action-buttons');
-    const settingsContainer = document.getElementById('profile-settings-container') || (() => {
-        const container = document.createElement('div');
-        container.id = 'profile-settings-container';
-        container.className = 'profile-action-buttons'; // Reutiliza o estilo
-        actionButtonsContainer.parentNode.insertBefore(container, actionButtonsContainer.nextSibling);
-        return container;
-    })();
+    const settingsContainer = document.getElementById('profile-settings-container');
 
-    settingsContainer.innerHTML = ''; // Limpa configurações anteriores
-    actionButtonsContainer.innerHTML = ''; // Limpa botões de amizade anteriores
+    if(settingsContainer) settingsContainer.innerHTML = ''; // Limpa configurações anteriores
+    if(actionButtonsContainer) actionButtonsContainer.innerHTML = ''; // Limpa botões de amizade anteriores
 
     if (!isMyProfile) {
         let buttonHTML = '';
@@ -151,15 +145,8 @@ export function renderProfile(profileData) {
                 buttonHTML = `<button class="control-button add-friend-btn" data-user-id="${profileData.id}">${t('profile.add_friend')}</button>`;
                 break;
         }
-        actionButtonsContainer.innerHTML = buttonHTML;
+        if(actionButtonsContainer) actionButtonsContainer.innerHTML = buttonHTML;
     } else {
-        const { isChatMuted } = getState();
-        settingsContainer.innerHTML = `
-            <button id="toggle-chat-mute-button" class="control-button secondary">
-                ${t(isChatMuted ? 'profile.unmute_chat' : 'profile.mute_chat')}
-            </button>
-        `;
-
         document.getElementById('title-selection-form')?.addEventListener('change', (e) => {
             if (e.target.name === 'selected-title') network.emitSetSelectedTitle(e.target.value);
         });
@@ -343,4 +330,36 @@ export function addPrivateChatMessage(message) {
     messageEl.textContent = message.content;
     messagesContainer.appendChild(messageEl);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+/**
+ * Renders the list of online, available friends into the invite modal.
+ * @param {Array<object>} friends - An array of friend objects.
+ */
+export function renderOnlineFriendsForInvite(friends) {
+    const container = dom.inviteFriendsList;
+    if (!container) return;
+
+    if (!friends || friends.length === 0) {
+        container.innerHTML = `<p>${t('pvp.no_online_friends')}</p>`;
+        return;
+    }
+
+    container.innerHTML = friends.map(friend => {
+        let titleText = friend.selected_title_code ? t(`titles.${friend.selected_title_code}`) : '';
+        if (titleText.startsWith('titles.')) titleText = friend.selected_title_code;
+
+        return `
+            <div class="friend-item">
+                <img src="${friend.avatar_url}" alt="Avatar" class="friend-avatar">
+                <div class="friend-info">
+                    <span class="friend-name">${friend.username}</span>
+                    <span class="friend-title">${titleText}</span>
+                </div>
+                <div class="friend-actions">
+                    <button class="control-button invite-friend-btn" data-user-id="${friend.id}" data-username="${friend.username}">${t('pvp.invite')}</button>
+                </div>
+            </div>
+        `;
+    }).join('');
 }

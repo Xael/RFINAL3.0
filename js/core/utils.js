@@ -47,22 +47,16 @@ export const shuffle = (array) => {
  * @param {string | object} [logEntry] - The message string or a log object with metadata.
  */
 export const updateLog = (logEntry) => {
-    const { gameState, isChatMuted, userProfile } = getState();
+    const { gameState, chatFilter, userProfile } = getState();
     if (!gameState) return;
 
     if (logEntry) {
-        const isPlayerChat = typeof logEntry === 'object' && logEntry.type === 'dialogue';
-        if (isChatMuted && isPlayerChat) {
-            return; // If chat is muted, ignore player messages.
-        }
-
-        // Always add the entry to the log array
         const entry = typeof logEntry === 'string' ? { type: 'system', message: logEntry } : logEntry;
         gameState.log.push(entry);
     }
     
     // Trim the log to a reasonable size, removing the oldest messages from the start.
-    if (gameState.log.length > 50) {
+    if (gameState.log.length > 100) { // Increased log size
         gameState.log.shift();
     }
     
@@ -74,7 +68,13 @@ export const updateLog = (logEntry) => {
         '<3': '❤️'
     };
 
-    dom.logEl.innerHTML = gameState.log.map(m => {
+    const filteredLog = gameState.log.filter(m => {
+        if (chatFilter === 'log') return m.type === 'system';
+        if (chatFilter === 'chat') return m.type === 'dialogue';
+        return true; // 'all'
+    });
+
+    dom.logEl.innerHTML = filteredLog.map(m => {
         const sanitizedMessage = String(m.message || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const emojiMessage = sanitizedMessage.replace(/:\)|:\(|;\(|s2|&lt;3|<3/gi, (match) => emojiMap[match.toLowerCase()] || match);
 
