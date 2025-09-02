@@ -1,5 +1,4 @@
-
-
+// js/ui/player-area-renderer.js
 import * as dom from '../core/dom.js';
 import * as config from '../core/config.js';
 import { getState } from '../core/state.js';
@@ -152,6 +151,10 @@ function renderPlayerHeader(player) {
         </div>
     ` : '';
 
+    const coinversusHTML = gameState.betAmount > 0 ? `
+        <span class="stat-item" title="${t('game.coinversus_header_title')}">🪙 <strong>${player.coinversus !== undefined ? player.coinversus : '...'}</strong></span>
+    ` : '';
+
     return `
         <div class="player-header">
             <div class="opponent-header-top">
@@ -165,6 +168,7 @@ function renderPlayerHeader(player) {
             </div>
             <div class="player-stats">
                  <span class="stat-item" title="${t('game.score_header_title')}">${t('game.score_header')}: <strong>${player.liveScore || 0}</strong></span>
+                 ${coinversusHTML}
                  <span class="stat-item" title="${t('game.resto_header_title')}">${t('game.resto_header')}: <strong>${restoValue}</strong></span>
                  <span class="stat-item" title="${t('game.path_header_title')}">${t('game.path_header')}: <strong>${pathDisplay}</strong></span>
                  <span class="stat-item" title="${t('game.house_header_title')}">${t('game.house_header')}: <strong>${player.position}</strong></span>

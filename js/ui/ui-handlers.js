@@ -3,7 +3,7 @@ import * as dom from '../core/dom.js';
 import { getState, updateState } from '../core/state.js';
 import { initializeGame, restartLastDuel } from '../game-controller.js';
 import { renderAchievementsModal } from './achievements-renderer.js';
-import { renderAll, showGameOver } from './ui-renderer.js';
+import { renderAll, showGameOver, updateChatControls } from './ui-renderer.js';
 import * as sound from '../core/sound.js';
 import { startStoryMode, renderStoryNode, playEndgameSequence } from '../story/story-controller.js';
 import * as saveLoad from '../core/save-load.js';
@@ -441,6 +441,7 @@ export function initializeUiHandlers() {
     });
     
     dom.inversusModeButton.addEventListener('click', () => {
+        sound.initializeMusic();
         initializeGame('inversus', {});
     });
 
@@ -965,13 +966,94 @@ export function initializeUiHandlers() {
             dom.chatInput.value = '';
         }
     };
-    dom.chatSendButton.addEventListener('click', sendChatMessage);
+    
+    // This button does not exist in the in-game chat, but is used in the lobby. No need to remove.
+    if(dom.chatSendButton) dom.chatSendButton.addEventListener('click', sendChatMessage);
+    
     dom.chatInput.addEventListener('keypress', (e) => { 
         if (e.key === 'Enter') {
             e.preventDefault();
             sendChatMessage();
         }
     });
+    
+    dom.chatToggleBtn.addEventListener('click', () => {
+        const state = getState();
+        updateState('isChatMuted', !state.isChatMuted);
+        updateChatControls();
+    });
+
+    dom.chatFilterBtn.addEventListener('click', () => {
+        const state = getState();
+        const currentFilter = state.chatFilter;
+        const filterCycle = {
+            'all': 'log',
+            'log': 'chat',
+            'chat': 'all'
+        };
+        const nextFilter = filterCycle[currentFilter] || 'all';
+        updateState('chatFilter', nextFilter);
+        updateLog(); // Re-render the log with the new filter
+        updateChatControls(); // Update button text
+    });
+
+
+    // --- Lobby and Invite Handlers ---
+    if (dom.pvpLobbyModal) {
+        dom.pvpLobbyModal.addEventListener('click', (e) => {
+            const inviteButton = e.target.closest('.invite-friend-slot-btn');
+            if (inviteButton) {
+                network.emitGetOnlineFriends(); // Server responds by opening the modal
+            }
+
+            const kickButton = e.target.closest('.kick-player-button');
+            if (kickButton) {
+                const kickId = kickButton.dataset.kickId;
+                const username = kickButton.title.match(/Expulsar (.*) da sala/)?.[1] || 'este jogador';
+                if (confirm(t('confirm.kick_player', { username }))) {
+                    network.emitKickPlayer(kickId);
+                }
+            }
+        });
+    }
+    
+    if (dom.inviteFriendsModal) {
+        dom.inviteFriendsModal.addEventListener('click', (e) => {
+            const inviteButton = e.target.closest('.invite-friend-btn');
+            if (inviteButton) {
+                const targetUserId = inviteButton.dataset.userId;
+                network.emitInviteFriendToLobby(parseInt(targetUserId, 10));
+                inviteButton.textContent = t('pvp.invite_sent_button') || 'Sent';
+                inviteButton.disabled = true;
+            }
+        });
+    }
+
+    if (dom.inviteFriendsCloseButton) {
+        dom.inviteFriendsCloseButton.addEventListener('click', () => {
+            dom.inviteFriendsModal.classList.add('hidden');
+        });
+    }
+
+    if (dom.lobbyInviteAcceptButton) {
+        dom.lobbyInviteAcceptButton.addEventListener('click', (e) => {
+            const roomId = e.target.dataset.roomId;
+            if (roomId) {
+                network.emitAcceptInvite(roomId);
+            }
+            dom.lobbyInviteNotificationModal.classList.add('hidden');
+        });
+    }
+
+    if (dom.lobbyInviteDeclineButton) {
+        dom.lobbyInviteDeclineButton.addEventListener('click', (e) => {
+            const roomId = dom.lobbyInviteAcceptButton.dataset.roomId; // Get room from accept button
+            if (roomId) {
+                 network.emitDeclineInvite(roomId);
+            }
+            dom.lobbyInviteNotificationModal.classList.add('hidden');
+        });
+    }
 
     dom.lobbyChatSendButton.addEventListener('click', () => {
         const message = dom.lobbyChatInput.value.trim();
@@ -1003,16 +1085,22 @@ export function initializeUiHandlers() {
     dom.pvpCreateRoomConfirmButton.addEventListener('click', () => {
         const name = dom.roomNameInput.value.trim();
         const password = dom.roomPasswordInput.value.trim();
+        const betAmountRadio = document.querySelector('input[name="bet-amount"]:checked');
+        const betAmount = betAmountRadio ? parseInt(betAmountRadio.value, 10) : 0;
 
         if (!name) {
             alert(t('pvp.room_name_required'));
             return;
         }
 
-        network.emitCreateRoom({ name, password });
+        network.emitCreateRoom({ name, password, betAmount });
         dom.pvpCreateRoomModal.classList.add('hidden');
         dom.roomNameInput.value = '';
         dom.roomPasswordInput.value = '';
+        const defaultBetRadio = document.querySelector('input[name="bet-amount"][value="0"]');
+        if (defaultBetRadio) {
+            defaultBetRadio.checked = true;
+        }
     });
     
     let selectedRoomIdForPassword = null;

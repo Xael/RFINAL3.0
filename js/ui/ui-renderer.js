@@ -10,6 +10,36 @@ import { updateLog } from '../core/utils.js';
 import { t } from '../core/i18n.js';
 
 /**
+ * Updates the UI for the chat filter and mute/unmute buttons.
+ */
+export function updateChatControls() {
+    const { isChatMuted, chatFilter } = getState();
+
+    if (!dom.chatContainerEl || !dom.chatToggleBtn || !dom.chatFilterBtn || !dom.chatInput) {
+        return;
+    }
+
+    // Toggle Mute Button and Area
+    dom.chatContainerEl.classList.toggle('chat-muted', isChatMuted);
+    dom.chatToggleBtn.classList.toggle('active', isChatMuted);
+    // When muted (off), button shows "ON" as the action to perform. When unmuted (on), it shows "OFF".
+    dom.chatToggleBtn.textContent = t(isChatMuted ? 'chat.toggle_on' : 'chat.toggle_off');
+
+    dom.chatInput.disabled = isChatMuted;
+    dom.chatInput.placeholder = t(isChatMuted ? 'chat.chat_muted_message' : 'game.chat_placeholder');
+
+    // Filter Button Text - shows the current state
+    const filterKeyMap = {
+        all: 'chat.filter_all',
+        log: 'chat.filter_log',
+        chat: 'chat.filter_chat'
+    };
+    const currentFilterTextKey = filterKeyMap[chatFilter] || 'chat.filter_all';
+    dom.chatFilterBtn.textContent = t(currentFilterTextKey);
+}
+
+
+/**
  * Updates the UI for Xael's Star Power ability.
  */
 export const updateXaelStarPowerUI = () => {
@@ -41,7 +71,7 @@ function renderPvpPot() {
     const potEl = dom.pvpPotContainer;
     if (!potEl) return;
 
-    if (gameState.isPvp && gameState.pot !== undefined) {
+    if (gameState.isPvp && gameState.pot !== undefined && gameState.betAmount > 0) {
         potEl.classList.remove('hidden');
         potEl.innerHTML = `🏆 <span>${t('game.pot')}: ${gameState.pot}</span>`;
     } else {
@@ -102,6 +132,9 @@ export const renderAll = () => {
     if (gameState.isStoryMode) {
         updateXaelStarPowerUI();
     }
+
+    // Update Chat Controls
+    updateChatControls();
 };
 
 /**
@@ -138,17 +171,28 @@ export async function showTurnIndicator() {
 
 /**
  * Shows the round summary modal with scores and winner information.
+ * @param {object} summaryData - The data for the summary, including winners, scores, and pot won.
  */
-export async function showRoundSummaryModal(winners, finalScores) {
+export async function showRoundSummaryModal(summaryData) {
     const { gameState } = getState();
+    const { winners, finalScores, potWon } = summaryData;
 
-    dom.roundSummaryTitle.textContent = `Fim da Rodada ${gameState.turn}`;
+    dom.roundSummaryTitle.textContent = t('round_summary.title', { turn: gameState.turn });
     
     const winnerNames = winners.map(id => gameState.players[id].name).join(' e ');
-    dom.roundSummaryWinnerText.textContent = winners.length > 0 ? `Vencedor(es): ${winnerNames}` : "A rodada empatou!";
+    dom.roundSummaryWinnerText.textContent = winners.length > 0 ? t('round_summary.winner_text', { winnerNames }) : t('round_summary.tie_text');
     
+    const potTextEl = document.getElementById('round-summary-pot-text');
+    if (potTextEl && potWon > 0) {
+        potTextEl.textContent = t('round_summary.pot_winnings', { potWon });
+        potTextEl.classList.remove('hidden');
+    } else if (potTextEl) {
+        potTextEl.classList.add('hidden');
+    }
+
     dom.roundSummaryScoresEl.innerHTML = gameState.playerIdsInGame.map(id => {
         const player = gameState.players[id];
+        if (!player) return '';
         return `
             <div class="summary-player-score ${winners.includes(id) ? 'is-winner' : ''}">
                 <span class="summary-player-name">${player.name}</span>
@@ -180,41 +224,20 @@ export async function showRoundSummaryModal(winners, finalScores) {
  * @param {string} [buttonOptions.action='restart'] - The action for the button ('restart' or 'menu').
  */
 export const showGameOver = (message, title = "Fim de Jogo!", buttonOptions = {}) => {
-    const { text = 'Jogar Novamente', action = 'restart' } = buttonOptions;
-
+    const { text = t('game_over.play_again'), action = 'restart' } = buttonOptions;
+    
     dom.gameOverTitle.textContent = title;
     dom.gameOverMessage.textContent = message;
-    
     dom.restartButton.textContent = text;
-    dom.restartButton.dataset.action = action; // Set data attribute for handler
-
+    dom.restartButton.dataset.action = action;
     dom.gameOverModal.classList.remove('hidden');
-    
-    const { gameState, gameTimerInterval } = getState();
-    if(gameTimerInterval) clearInterval(gameTimerInterval);
-    updateState('gameTimerInterval', null);
 
-    // Grant achievements on game over
-    if (gameState && action === 'restart') {
-        // FIX: Correctly identify the local player in PvP for achievement checks.
-        const localPlayer = gameState.isPvp
-            ? gameState.players[getState().playerId]
-            : gameState.players['player-1'];
-            
-        const player1Won = message.includes(localPlayer?.name || '---');
-
-        // Grant Speed Run achievement (works in story and regular mode)
-        if (player1Won && gameState.elapsedSeconds < 300) {
-            grantAchievement('speed_run');
-        }
-
-        // Grant other achievements for non-story modes
-        if (!gameState.isStoryMode) {
-            grantAchievement(player1Won ? 'first_win' : 'first_defeat');
-            // Grant "Quick Duel Win" achievement
-            if (player1Won && gameState.gameMode === 'solo' && gameState.playerIdsInGame.length === 2) {
-                grantAchievement('quick_duel_win');
-            }
-        }
+    const { gameState } = getState();
+    if (gameState && gameState.isStoryMode && !message.toLowerCase().includes('derrotado')) {
+        // Only grant achievement on non-story defeats
+    } else if (gameState && !gameState.isStoryMode && !message.toLowerCase().includes('derrotado')) {
+        grantAchievement('first_win');
+    } else {
+        grantAchievement('first_defeat');
     }
 };

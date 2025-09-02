@@ -3,7 +3,7 @@ import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver, showRoundSummaryModal } from '../ui/ui-renderer.js';
 import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
-import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel } from '../ui/profile-renderer.js';
+import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from '../ui/profile-renderer.js';
 import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer } from '../game-controller.js';
@@ -263,7 +263,7 @@ export function connectToServer() {
     });
 
     socket.on('roundSummary', (summaryData) => {
-        showRoundSummaryModal(summaryData.winners, summaryData.finalScores);
+        showRoundSummaryModal(summaryData);
     });
     
     socket.on('matchCancelled', (message) => {
@@ -293,6 +293,43 @@ export function connectToServer() {
         dom.pvpMatchmakingModal.classList.remove('hidden');
         alert(t('matchmaking.cancel_success'));
     });
+    
+    // --- New Invite Listeners ---
+    socket.on('onlineFriendsList', (friends) => {
+        renderOnlineFriendsForInvite(friends);
+        dom.inviteFriendsModal.classList.remove('hidden');
+    });
+
+    socket.on('lobbyInvite', ({ inviterUsername, roomName, roomId }) => {
+        dom.lobbyInviteNotificationText.textContent = t('pvp.invite_notification_text', { username: inviterUsername, roomName });
+        dom.lobbyInviteAcceptButton.dataset.roomId = roomId;
+        dom.lobbyInviteDeclineButton.dataset.inviterId = inviterUsername; // Not strictly needed but good practice
+        dom.lobbyInviteNotificationModal.classList.remove('hidden');
+    });
+
+    socket.on('inviteResponse', ({ status, username }) => {
+        let message = '';
+        switch (status) {
+            case 'sent':
+                message = t('pvp.invite_sent', { username });
+                break;
+            case 'declined':
+                message = t('pvp.invite_declined', { username });
+                break;
+            case 'offline':
+                message = t('pvp.invite_failed_offline', { username });
+                break;
+            case 'in_game':
+                 message = t('pvp.invite_failed_ingame', { username });
+                 break;
+            case 'already_in_lobby':
+                message = t('pvp.already_in_lobby');
+                break;
+        }
+        if (message) {
+            alert(message);
+        }
+    });
 }
 
 // --- EMITTERS ---
@@ -302,7 +339,7 @@ export function emitViewProfile(googleId) { const { socket } = getState(); if (s
 export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
 export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
-export function emitCreateRoom({ name, password }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password }); }
+export function emitCreateRoom({ name, password, betAmount }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password, betAmount }); }
 export function emitJoinRoom({ roomId, password }) { const { socket } = getState(); if (socket) socket.emit('joinRoom', { roomId, password }); }
 export function emitLobbyChat(message) { const { socket } = getState(); if(socket) socket.emit('lobbyChatMessage', message); }
 export function emitChatMessage(message) { const { socket } = getState(); if (socket) socket.emit('chatMessage', message); }
@@ -339,6 +376,30 @@ export function emitCancelMatchmaking() {
     if (socket) {
         socket.emit('cancelMatchmaking');
     }
+}
+
+// --- Invite Emitters ---
+export function emitGetOnlineFriends() {
+    const { socket } = getState();
+    if (socket) socket.emit('getOnlineFriends');
+}
+export function emitInviteFriendToLobby(targetUserId) {
+    const { socket, currentRoomId } = getState();
+    if (socket && currentRoomId) {
+        socket.emit('inviteFriendToLobby', { targetUserId, roomId: currentRoomId });
+    }
+}
+export function emitAcceptInvite(roomId) {
+    const { socket } = getState();
+    if (socket) socket.emit('acceptInvite', { roomId });
+}
+export function emitDeclineInvite(roomId) {
+    const { socket } = getState();
+    if (socket) socket.emit('declineInvite', { roomId });
+}
+export function emitKickPlayer(targetClientId) { 
+    const { socket, currentRoomId } = getState(); 
+    if (socket && currentRoomId) socket.emit('kickPlayer', { targetClientId, roomId: currentRoomId }); 
 }
 
 

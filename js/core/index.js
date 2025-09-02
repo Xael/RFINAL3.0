@@ -28,12 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Checks if a saved game exists to enable the 'Continue' button.
     checkForSavedGame();
     
-    // Load chat mute preference from local storage
-    const savedMutePref = localStorage.getItem('reversus-chat-muted');
-    if (savedMutePref) {
-        updateState('isChatMuted', JSON.parse(savedMutePref));
-    }
-    
     // Displays the initial splash screen.
     showSplashScreen();
 

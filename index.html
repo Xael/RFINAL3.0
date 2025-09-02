@@ -353,11 +353,16 @@
             </div>
             <div id="game-timer-container">00:00</div>
             <div class="chat-container">
-                <h2 data-i18n="game.log_title">Histórico do Jogo</h2>
+                <div class="chat-header">
+                    <h2 data-i18n="game.log_title">Histórico do Jogo</h2>
+                    <div id="chat-control-buttons" class="chat-filter-buttons">
+                        <button id="chat-filter-btn" class="filter-btn"></button>
+                        <button id="chat-toggle-btn" class="filter-btn"></button>
+                    </div>
+                </div>
                 <div id="game-log" class="game-log"></div>
                 <div id="chat-input-area" class="chat-input-area">
                     <input type="text" id="chat-input" data-i18n-placeholder="game.chat_placeholder">
-                    <button id="chat-send-button" class="control-button" data-i18n="game.chat_send">Enviar</button>
                 </div>
             </div>
         </div>
@@ -555,6 +560,7 @@
         <div class="modal-content">
             <h2 id="round-summary-title">Fim da Rodada 1</h2>
             <p id="round-summary-winner-text">Vencedor: Jogador X</p>
+            <p id="round-summary-pot-text" class="round-summary-pot"></p>
             <div id="round-summary-scores"></div>
             <button id="next-round-button" class="control-button" data-i18n="round_summary.next_round">Próxima Rodada</button>
         </div>
@@ -645,6 +651,15 @@
             <div class="form-item">
                 <label for="room-password-input" data-i18n="pvp.room_password">Senha (opcional):</label>
                 <input type="password" id="room-password-input" maxlength="20">
+            </div>
+            <div class="form-item">
+                <label data-i18n="pvp.bet_amount">Valor da Aposta:</label>
+                <div class="bet-options-group">
+                    <label><input type="radio" name="bet-amount" value="0" checked> <span data-i18n="pvp.no_bet">Sem Aposta</span></label>
+                    <label><input type="radio" name="bet-amount" value="1"> 🪙 x1</label>
+                    <label><input type="radio" name="bet-amount" value="10"> 🪙 x10</label>
+                    <label><input type="radio" name="bet-amount" value="100"> 🪙 x100</label>
+                </div>
             </div>
             <div class="button-group">
                 <button id="pvp-create-room-confirm-button" class="control-button" data-i18n="pvp.create_room">Criar</button>

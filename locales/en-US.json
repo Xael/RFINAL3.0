@@ -160,7 +160,15 @@
         "field_effect_indicator": "Field",
         "field_effect_indicator_title": "Active field effect: {effectName}",
         "pot": "Pot",
-        "chat_muted_message": "Chat is muted."
+        "coinversus_header_title": "Player's CoinVersus"
+    },
+    "chat": {
+        "filter_all": "ALL",
+        "filter_log": "LOG",
+        "filter_chat": "CHAT",
+        "toggle_on": "ON",
+        "toggle_off": "OFF",
+        "chat_muted_message": "Chat muted."
     },
     "setup": {
         "title": "Game Mode",
@@ -229,7 +237,8 @@
         "title": "End of Round {turn}",
         "winner_text": "Winner(s): {winnerNames}",
         "tie_text": "The round was a tie!",
-        "next_round": "Next Round"
+        "next_round": "Next Round",
+        "pot_winnings": "Round Pot: {potWon} 🪙"
     },
     "field_effect": {
         "title": "Field Effect Activated!",
@@ -280,10 +289,14 @@
         "invite_failed_ingame": "Failed to invite: {username} is already in a room or match.",
         "invite_declined": "{username} declined your invitation.",
         "already_in_lobby": "Already in lobby",
+        "invite_sent_button": "Sent",
         "create_room_title": "Create New Room",
         "room_name": "Room Name:",
         "room_password": "Password (optional):",
-        "room_name_required": "Room name is required."
+        "room_name_required": "Room name is required.",
+        "bet_amount": "Bet Amount:",
+        "no_bet": "No Bet",
+        "bet_title": "Bet: {betAmount} CoinVersus"
     },
     "menu": {
         "title": "Match Menu",
@@ -303,7 +316,8 @@
         "remove_friend": "Are you sure you want to remove {username} from your friends list?",
         "report_player": "Are you sure you want to report {username} for misconduct in chat?",
         "ban_player": "Are you sure you want to ban {username}? This action is permanent.",
-        "unban_player": "Are you sure you want to unban {username}?"
+        "unban_player": "Are you sure you want to unban {username}?",
+        "kick_player": "Are you sure you want to kick {username} from the room?"
     },
     "achievements": {
         "title": "Achievements",
@@ -379,8 +393,7 @@
         "dismiss_report": "Dismiss"
     },
     "chat": {
-        "placeholder": "Type a message...",
-        "chat_muted_message": "Chat is muted."
+        "placeholder": "Type a message..."
     },
     "event": {
         "title": "Monthly Event",
@@ -693,17 +706,17 @@
         "year_end_light": "Year-End Light"
     },
     "event_abilities": {
-        "january": "Predicts the next field effect that will be activated.",
-        "february": "Swaps 'Rest' cards with the opponent at the start of the match.",
-        "march": "At the start of its turn, draws 2 value cards and discards 1.",
-        "april": "Once per round, can ignore a negative effect played against it.",
-        "may": "Plays its effect cards face down, revealing them only at the end of the round.",
-        "june": "Can reuse an effect card from the discard pile once per match.",
-        "july": "Has a chance to steal a random card from your hand.",
-        "august": "Can swap places on the board with the opponent once per match.",
-        "september": "Once per round, can peek and swap a card from your hand with one of his own.",
-        "october": "Once per match, can force everyone to discard the highest value card from their hands.",
-        "november": "Once per round, can 'freeze' (ignore) an effect card played against it.",
-        "december": "At the start of each round, if its 'Rest' card is in the discard pile, it 'revives' it to its hand."
+        "january_new": "May cause a red path to appear in front of him at the start of each round (50% chance).",
+        "february_new": "Swaps 'Rest' cards with the opponent at the start of each round if favorable.",
+        "march_new": "At the start of his turn, draws 2 value cards and discards 2, prioritizing keeping the highest value cards.",
+        "april_new": "Once per turn, can ignore a negative effect played against him.",
+        "may_new": "Plays his value and effect cards face down, revealing them only at the end of the round.",
+        "june_new": "Can reuse an effect card that was used this round, once per round.",
+        "july_new": "Has a chance (50%) to steal a random card from your hand per round.",
+        "august_new": "Can swap places on the board with the opponent once per match.",
+        "september_new": "Once per round, can peek and swap a card from your hand with one of his.",
+        "october_new": "Once per round (50% chance), can force all players to discard their highest value card.",
+        "november_new": "Once per round, can 'freeze' an opponent's effect card, preventing it from being played this round.",
+        "december_new": "At the start of each round, he may swap hands with you (50% chance)."
     }
 }

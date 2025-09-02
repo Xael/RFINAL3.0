@@ -141,16 +141,16 @@ export const AI_DIALOGUE = {
 };
 
 export const MONTHLY_EVENTS = [
-    { month: 0, nameKey: 'event_names.january', characterNameKey: 'event_chars.dark_prophet', ai: 'oprofetasombrio', image: 'oprofetasombrio.png', rewardTitleKey: 'event_rewards.visionary', abilityKey: 'event_abilities.january' },
-    { month: 1, nameKey: 'event_names.february', characterNameKey: 'event_chars.chaos_cupid', ai: 'cupidodocaos', image: 'cupidodocaos.png', rewardTitleKey: 'event_rewards.uniter_of_rests', abilityKey: 'event_abilities.february' },
-    { month: 2, nameKey: 'event_names.march', characterNameKey: 'event_chars.fortune_goblin', ai: 'goblindafortuna', image: 'goblindafortuna.png', rewardTitleKey: 'event_rewards.blessed_by_rest', abilityKey: 'event_abilities.march' },
-    { month: 3, nameKey: 'event_names.april', characterNameKey: 'event_chars.golden_dragon', ai: 'dragaodourado', image: 'dragaodourado.png', rewardTitleKey: 'event_rewards.guardian_of_runes', abilityKey: 'event_abilities.april' },
-    { month: 4, nameKey: 'event_names.may', characterNameKey: 'event_chars.the_specter', ai: 'oespectro', image: 'oespectro.png', rewardTitleKey: 'event_rewards.shadows_on_board', abilityKey: 'event_abilities.may' },
-    { month: 5, nameKey: 'event_names.june', characterNameKey: 'event_chars.salamander', ai: 'salamandra', image: 'salamandra.png', rewardTitleKey: 'event_rewards.the_ardent', abilityKey: 'event_abilities.june' },
-    { month: 6, nameKey: 'event_names.july', characterNameKey: 'event_chars.captain_shortbeard', ai: 'capitaobarbacurta', image: 'capitaobarbacurta.png', rewardTitleKey: 'event_rewards.thief_of_rests', abilityKey: 'event_abilities.july' },
-    { month: 7, nameKey: 'event_names.august', characterNameKey: 'event_chars.lost_astronomer', ai: 'astronomoperdido', image: 'astronomoperdido.png', rewardTitleKey: 'event_rewards.the_eternal', abilityKey: 'event_abilities.august' },
-    { month: 8, nameKey: 'event_names.september', characterNameKey: 'event_chars.mysterious_detective', ai: 'detetivemisterioso', image: 'detetivemisterioso.png', rewardTitleKey: 'event_rewards.secret_hunter', abilityKey: 'event_abilities.september' },
-    { month: 9, nameKey: 'event_names.october', characterNameKey: 'event_chars.witch_of_rest', ai: 'abruxadoresto', image: 'abruxadoresto.png', rewardTitleKey: 'event_rewards.board_sorcerer', abilityKey: 'event_abilities.october' },
-    { month: 10, nameKey: 'event_names.november', characterNameKey: 'event_chars.yeti', ai: 'yeti', image: 'yeti.png', rewardTitleKey: 'event_rewards.freezer_of_fates', abilityKey: 'event_abilities.november' },
-    { month: 11, nameKey: 'event_names.december', characterNameKey: 'event_chars.guardian_of_dawn', ai: 'guardiaodaaurora', image: 'guardiaodaaurora.png', rewardTitleKey: 'event_rewards.year_end_light', abilityKey: 'event_abilities.december' }
+    { month: 0, nameKey: 'event_names.january', characterNameKey: 'event_chars.dark_prophet', ai: 'oprofetasombrio', image: 'oprofetasombrio.png', rewardTitleKey: 'event_rewards.visionary', abilityKey: 'event_abilities.january_new' },
+    { month: 1, nameKey: 'event_names.february', characterNameKey: 'event_chars.chaos_cupid', ai: 'cupidodocaos', image: 'cupidodocaos.png', rewardTitleKey: 'event_rewards.uniter_of_rests', abilityKey: 'event_abilities.february_new' },
+    { month: 2, nameKey: 'event_names.march', characterNameKey: 'event_chars.fortune_goblin', ai: 'goblindafortuna', image: 'goblindafortuna.png', rewardTitleKey: 'event_rewards.blessed_by_rest', abilityKey: 'event_abilities.march_new' },
+    { month: 3, nameKey: 'event_names.april', characterNameKey: 'event_chars.golden_dragon', ai: 'dragaodourado', image: 'dragaodourado.png', rewardTitleKey: 'event_rewards.guardian_of_runes', abilityKey: 'event_abilities.april_new' },
+    { month: 4, nameKey: 'event_names.may', characterNameKey: 'event_chars.the_specter', ai: 'oespectro', image: 'oespectro.png', rewardTitleKey: 'event_rewards.shadows_on_board', abilityKey: 'event_abilities.may_new' },
+    { month: 5, nameKey: 'event_names.june', characterNameKey: 'event_chars.salamander', ai: 'salamandra', image: 'salamandra.png', rewardTitleKey: 'event_rewards.the_ardent', abilityKey: 'event_abilities.june_new' },
+    { month: 6, nameKey: 'event_names.july', characterNameKey: 'event_chars.captain_shortbeard', ai: 'capitaobarbacurta', image: 'capitaobarbacurta.png', rewardTitleKey: 'event_rewards.thief_of_rests', abilityKey: 'event_abilities.july_new' },
+    { month: 7, nameKey: 'event_names.august', characterNameKey: 'event_chars.lost_astronomer', ai: 'astronomoperdido', image: 'astronomoperdido.png', rewardTitleKey: 'event_rewards.the_eternal', abilityKey: 'event_abilities.august_new' },
+    { month: 8, nameKey: 'event_names.september', characterNameKey: 'event_chars.mysterious_detective', ai: 'detetivemisterioso', image: 'detetivemisterioso.png', rewardTitleKey: 'event_rewards.secret_hunter', abilityKey: 'event_abilities.september_new' },
+    { month: 9, nameKey: 'event_names.october', characterNameKey: 'event_chars.witch_of_rest', ai: 'abruxadoresto', image: 'abruxadoresto.png', rewardTitleKey: 'event_rewards.board_sorcerer', abilityKey: 'event_abilities.october_new' },
+    { month: 10, nameKey: 'event_names.november', characterNameKey: 'event_chars.yeti', ai: 'yeti', image: 'yeti.png', rewardTitleKey: 'event_rewards.freezer_of_fates', abilityKey: 'event_abilities.november_new' },
+    { month: 11, nameKey: 'event_names.december', characterNameKey: 'event_chars.guardian_of_dawn', ai: 'guardiaodaaurora', image: 'guardiaodaaurora.png', rewardTitleKey: 'event_rewards.year_end_light', abilityKey: 'event_abilities.december_new' }
 ];

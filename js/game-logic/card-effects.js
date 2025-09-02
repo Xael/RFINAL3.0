@@ -20,19 +20,11 @@ export async function applyEffect(card, targetId, casterName, effectTypeToRevers
     }
 
     // --- Habilidades de Evento Passivas ---
-    if (target.isEventBoss && !gameState.eventBossAbilityUsedThisRound) {
-        // Habilidade do Dragão Dourado
-        if (target.aiType === 'dragaodourado' && ['Menos', 'Desce', 'Pula'].includes(effectName)) {
-            updateLog(`Dragão Dourado usou sua habilidade e ignorou o efeito de ${effectName}!`);
-            gameState.eventBossAbilityUsedThisRound = true;
-            return; // Efeito é ignorado
-        }
-        // Habilidade do Yeti
-        if (target.aiType === 'yeti' && ['Mais', 'Menos', 'Sobe', 'Desce', 'Pula'].includes(effectName)) {
-             updateLog(`Yeti usou sua habilidade e congelou o efeito de ${effectName}!`);
-             gameState.eventBossAbilityUsedThisRound = true;
-             return; // Efeito é ignorado
-        }
+    // Habilidade do Dragão Dourado: Ignora 1 efeito negativo por turno.
+    if (target.isEventBoss && target.aiType === 'dragaodourado' && !target.eventAbilityUsedThisTurn && ['Menos', 'Desce', 'Pula'].includes(effectName)) {
+        updateLog(`Dragão Dourado usou sua habilidade e ignorou o efeito de ${effectName}!`);
+        target.eventAbilityUsedThisTurn = true;
+        return; // Efeito é ignorado
     }
 
 

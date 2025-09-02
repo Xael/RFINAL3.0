@@ -196,9 +196,13 @@ export const xaelPowerConfirmNo = document.getElementById('xael-power-confirm-no
 
 
 // Chat
+export const chatContainerEl = document.querySelector('.chat-container');
 export const chatInputArea = document.getElementById('chat-input-area');
 export const chatInput = document.getElementById('chat-input');
 export const chatSendButton = document.getElementById('chat-send-button');
+export const chatFilterBtn = document.getElementById('chat-filter-btn');
+export const chatToggleBtn = document.getElementById('chat-toggle-btn');
+
 
 // PVP / Auth
 export const rankingButton = document.getElementById('ranking-button');

@@ -30,29 +30,29 @@ export const getCardImageUrl = (card, isHidden) => {
 export const renderCard = (card, context, playerId) => {
     const { gameState, playerId: myPlayerId } = getState();
     const classList = ['card', card.type];
+    const player = gameState.players[playerId];
 
     let isHidden;
     if (context === 'play-zone' || context === 'modal') {
-        // Cards in the play zone or a modal are ALWAYS face up for everyone.
         isHidden = false;
     } else if (gameState.isPvp) {
-        // In PvP, visibility is determined by the session's player ID and server data.
         const isMyCard = playerId === myPlayerId;
         isHidden = !isMyCard && !(gameState.revealedHands || []).includes(playerId);
     } else {
-        // In single-player, visibility depends on the `isHuman` flag.
-        const player = gameState.players[playerId];
         const isHumanPlayer = player ? player.isHuman : false;
         isHidden = !isHumanPlayer && !(gameState.revealedHands || []).includes(playerId);
     }
+    
+    // Specter's ability: Hide cards in play zone during the 'playing' phase.
+    if (player && player.aiType === 'oespectro' && context === 'play-zone' && gameState.gamePhase === 'playing') {
+        isHidden = true;
+    }
 
-    // Logic to obscure cards (Contravox ability) - also needs to be robust
     const isMyTurnToSeeObscured = gameState.isPvp ? (playerId === myPlayerId) : (gameState.players[playerId]?.isHuman);
     const isCardObscuredByContravox = isMyTurnToSeeObscured && context === 'player-hand' && gameState.player1CardsObscured;
 
-    let isCardDisabled = card.isBlocked || false;
+    let isCardDisabled = card.isBlocked || card.isFrozen || false;
     if (isMyTurnToSeeObscured && context === 'player-hand') {
-        const player = gameState.players[playerId];
         const valueCardsInHandCount = player.hand.filter(c => c.type === 'value').length;
         
         if (card.type === 'value' && (valueCardsInHandCount <= 1 || player.playedValueCardThisTurn)) {
@@ -88,6 +88,9 @@ export const renderCard = (card, context, playerId) => {
     }
     if (card.name === 'NECRO_X_CURSE') {
         cardTitle = 'title="Esta carta está amaldiçoada e não pode ser jogada."';
+    }
+    if (card.isFrozen) {
+        cardTitle = 'title="Esta carta está congelada e não pode ser jogada nesta rodada."';
     }
 
 
