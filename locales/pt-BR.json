@@ -33,7 +33,7 @@
         "continue": "CONTINUAR",
         "pvp_online": "PVP Online",
         "event": "Evento",
-        "ranking": "Ranking",
+        "ranking": "RANK DO PVP",
         "profile": "Perfil",
         "achievements": "Conquistas",
         "friends": "Amigos",
@@ -306,7 +306,7 @@
         "unlocked_toast": "{name}: {description}"
     },
     "ranking": {
-        "title": "🏆 Ranking 🏆",
+        "title": "🏆 Ranking PVP 🏆",
         "loading": "Carregando ranking...",
         "error": "Não foi possível carregar o ranking.",
         "empty": "O ranking ainda está vazio. Seja o primeiro a vencer!",

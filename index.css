@@ -513,28 +513,6 @@ body.screen-shaking {
     font-size: 1.2rem;
     color: var(--text-secondary);
 }
-.chat-filter-buttons {
-    display: flex;
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 5px;
-}
-.filter-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out;
-}
-.filter-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-#chat-toggle-btn.active {
-    background-color: var(--accent-red);
-    color: var(--text-primary);
-}
 
 .game-log {
     flex-grow: 1;
@@ -549,16 +527,12 @@ body.screen-shaking {
     flex-direction: column;
 }
 
-.chat-input-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+.chat-input-wrapper {
     margin-top: 0.5rem;
     flex-shrink: 0;
 }
 
-.chat-container.chat-muted #chat-input-area {
+.chat-container.chat-muted .chat-input-wrapper {
     display: none;
 }
 
@@ -572,9 +546,47 @@ body.screen-shaking {
     font-size: 0.9rem;
 }
 
+.chat-controls-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border-top: 1px solid rgba(168, 218, 220, 0.2);
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#chat-filter-btn,
+#chat-toggle-btn {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--text-secondary);
+    font-family: var(--font-family);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background: var(--bg-main);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+#chat-filter-btn:hover,
+#chat-toggle-btn:hover {
+    background: var(--bg-panel);
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+#chat-toggle-btn.active {
+    background-color: var(--accent-red);
+    border-color: var(--accent-red);
+    color: var(--text-primary);
+}
+
 .log-message {
     display: flex;
-    align-items: flex-start; /* Alinha no topo para texto com múltiplas linhas */
+    align-items: flex-start;
     gap: 0.5rem;
     line-height: 1.5;
 }
@@ -583,18 +595,15 @@ body.screen-shaking {
     opacity: 1;
 }
 
-/* Estilos para o conteúdo da mensagem para garantir quebra de linha */
 .log-message .message-content {
     flex-grow: 1;
-    word-break: break-word; /* Quebra palavras longas para evitar overflow */
-    min-width: 0; /* Essencial para que o flexbox permita a quebra de linha */
+    word-break: break-word;
+    min-width: 0;
 }
 
-/* Garante que o nome do locutor não seja comprimido */
 .log-message strong {
     flex-shrink: 0;
 }
-
 
 .report-button {
     background: none;
@@ -611,7 +620,6 @@ body.screen-shaking {
 .report-button:hover {
     transform: scale(1.2);
 }
-
 
 .log-message.dialogue {
     font-size: 1.1rem;
@@ -658,7 +666,7 @@ body.screen-shaking {
     min-height: 40px; /* Give it a minimum height to avoid layout shifts */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     gap: 0.5rem;
 }
@@ -684,6 +692,8 @@ body.screen-shaking {
     color: var(--accent-yellow);
     text-shadow: 0 0 5px var(--accent-yellow), 0 0 10px var(--accent-yellow);
     animation: golden-text-glow 2.5s infinite ease-in-out;
+    text-align: left;
+    padding-left: 1rem;
 }
 .pvp-pot-container span {
     vertical-align: middle;
@@ -748,6 +758,7 @@ body.screen-shaking {
     font-weight: 600;
     text-transform: uppercase;
     animation: pulse-red 1.5s infinite;
+    align-self: center;
 }
 
 #player-1-area-container {
@@ -3010,7 +3021,7 @@ body.screen-shaking {
 /* --- RANKING & PROFILE MODALS --- */
 .ranking-modal-content,
 .profile-modal-content {
-    width: 800px;
+    width: 900px;
     max-width: 95vw;
 }
 
@@ -3022,6 +3033,7 @@ body.screen-shaking {
 .ranking-title {
     color: var(--text-primary);
     animation: golden-text-glow 2.5s infinite ease-in-out;
+    text-align: center;
 }
 
 #ranking-container table {
