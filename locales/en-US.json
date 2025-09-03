@@ -32,6 +32,7 @@
         "story_mode": "Story Mode",
         "continue": "CONTINUE",
         "pvp_online": "PVP Online",
+        "shop": "Shop",
         "event": "Event",
         "ranking": "PVP RANK",
         "profile": "Profile",
@@ -39,6 +40,27 @@
         "friends": "Friends",
         "inversus": "INVERSUS",
         "version": "Version 3.0"
+    },
+    "shop": {
+        "avatar_tab": "Avatar",
+        "select_avatar_desc": "Select an avatar to purchase. It will appear next to your name in rooms and on the ranking.",
+        "buy": "Buy",
+        "owned": "Owned",
+        "buying": "Buying...",
+        "confirm_purchase": "Do you want to buy the '{avatarName}' avatar?",
+        "purchase_success": "Avatar purchased successfully!",
+        "purchase_error": "Purchase failed: {error}",
+        "login_required": "Please log in to access the shop."
+    },
+    "avatars": {
+        "default_1": "Default Avatar 1",
+        "default_2": "Default Avatar 2",
+        "default_3": "Default Avatar 3",
+        "default_4": "Default Avatar 4",
+        "necroverso": "Necroverso Avatar",
+        "contravox": "Contravox Avatar",
+        "versatrix": "Versatrix Avatar",
+        "reversum": "King Reversum Avatar"
     },
     "quick_start": {
         "title": "Quick Start",

@@ -19,6 +19,7 @@ import { setLanguage, t } from '../core/i18n.js';
 import { showSplashScreen } from './splash-screen.js';
 import { renderProfile } from './profile-renderer.js';
 import { openChatWindow, initializeChatHandlers } from './chat-handler.js';
+import { renderShopAvatars } from './shop-renderer.js';
 
 let currentEventData = null;
 
@@ -1256,4 +1257,31 @@ export function initializeUiHandlers() {
             }
         });
     }
+
+    // --- Shop Handlers ---
+    dom.shopButton.addEventListener('click', () => {
+        const { isLoggedIn } = getState();
+        if (!isLoggedIn) {
+            alert(t('common.login_required', { feature: t('splash.shop') }));
+            return;
+        }
+        dom.shopModal.classList.remove('hidden');
+        renderShopAvatars(); // Initial render
+    });
+
+    dom.closeShopButton.addEventListener('click', () => {
+        dom.shopModal.classList.add('hidden');
+    });
+
+    dom.shopAvatarsGrid.addEventListener('click', (e) => {
+        const button = e.target.closest('.buy-avatar-btn');
+        if (button) {
+            const avatarCode = button.dataset.avatarCode;
+            if (confirm(t('shop.confirm_purchase', { avatarName: t(`avatars.${avatarCode}`) }))) {
+                button.disabled = true;
+                button.textContent = t('shop.buying');
+                network.emitBuyAvatar(avatarCode);
+            }
+        }
+    });
 }

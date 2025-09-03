@@ -170,3 +170,14 @@ export const MONTHLY_EVENTS = [
     { month: 10, nameKey: 'event_names.november', characterNameKey: 'event_chars.yeti', ai: 'yeti', image: 'yeti.png', rewardTitleKey: 'event_rewards.freezer_of_fates', abilityKey: 'event_abilities.november_new' },
     { month: 11, nameKey: 'event_names.december', characterNameKey: 'event_chars.guardian_of_dawn', ai: 'guardiaodaaurora', image: 'guardiaodaaurora.png', rewardTitleKey: 'event_rewards.year_end_light', abilityKey: 'event_abilities.december_new' }
 ];
+
+export const AVATAR_CATALOG = {
+    'default_1': { nameKey: 'avatars.default_1', image_url: 'aleatorio1.png', cost: 1000, unlock_achievement_code: null },
+    'default_2': { nameKey: 'avatars.default_2', image_url: 'aleatorio2.png', cost: 1000, unlock_achievement_code: null },
+    'default_3': { nameKey: 'avatars.default_3', image_url: 'aleatorio3.png', cost: 1000, unlock_achievement_code: null },
+    'default_4': { nameKey: 'avatars.default_4', image_url: 'aleatorio4.png', cost: 1000, unlock_achievement_code: null },
+    'necroverso': { nameKey: 'avatars.necroverso', image_url: 'necroverso.png', cost: 15000, unlock_achievement_code: 'tutorial_win' },
+    'contravox': { nameKey: 'avatars.contravox', image_url: 'contravox.png', cost: 20000, unlock_achievement_code: 'contravox_win' },
+    'versatrix': { nameKey: 'avatars.versatrix', image_url: 'versatrix.png', cost: 25000, unlock_achievement_code: 'versatrix_win' },
+    'reversum': { nameKey: 'avatars.reversum', image_url: 'reversum.png', cost: 30000, unlock_achievement_code: 'reversum_win' }
+};

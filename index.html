@@ -64,6 +64,7 @@
         <img id="user-avatar" src="" alt="User Avatar">
         <div class="user-info">
              <span id="user-name"></span>
+             <span id="user-coin-balance-header">🪙 0</span>
              <div class="xp-bar-container">
                  <div id="xp-bar-fill"></div>
                  <span id="xp-bar-text"></span>
@@ -86,6 +87,7 @@
                     <button id="quick-start-button" class="control-button btn-p1-color" data-i18n="splash.quick_start">Início Rápido</button>
                     <button id="story-mode-button" class="control-button btn-p3-color" data-i18n="splash.story_mode">Modo História</button>
                     <button id="pvp-mode-button" class="control-button btn-p2-color" data-i18n="splash.pvp_online">PVP Online</button>
+                    <button id="shop-button" class="control-button btn-p4-color" data-i18n="splash.shop">Loja</button>
                     <button id="event-button" class="control-button btn-neutral-color hidden" data-i18n="splash.event">Evento</button>
                     <button id="ranking-button" class="control-button btn-inversus-color" data-i18n="splash.ranking">Ranking</button>
                     <button id="inversus-mode-button" class="control-button btn-inversus-color hidden" data-i18n="splash.inversus">INVERSUS</button>
@@ -173,6 +175,9 @@
             <div id="profile-main-tab-content" class="info-tab-content active">
                 <div id="profile-data-container">
                     <p data-i18n="profile.loading">Carregando perfil...</p>
+                </div>
+                <div id="profile-avatar-selection-container" class="profile-section hidden">
+                    <!-- Avatar selection will be rendered here by JS -->
                 </div>
                  <div id="profile-action-buttons" class="profile-action-buttons">
                     <!-- Add/Remove Friend buttons will be injected here -->
@@ -820,6 +825,22 @@
         <div id="credits-animation-container"></div>
         <div id="credits-content">
             <!-- Credits will be populated here -->
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div id="shop-modal" class="modal-overlay hidden">
+        <div class="modal-content shop-modal-content">
+            <div class="info-tabs">
+                <button class="info-tab-button active" data-tab="shop-avatar" data-i18n="shop.buy_avatars_tab">Comprar Avatares</button>
+            </div>
+            <div id="shop-avatar-tab-content" class="info-tab-content active">
+                <p data-i18n="shop.select_avatar_desc">Selecione um avatar para comprar. Ele aparecerá ao lado do seu nome nas salas e no ranking.</p>
+                <div id="shop-avatars-grid" class="shop-avatars-grid">
+                    <!-- Avatars will be rendered here by JS -->
+                </div>
+            </div>
+            <button id="close-shop-button" class="control-button" data-i18n="common.close">Fechar</button>
         </div>
     </div>
 

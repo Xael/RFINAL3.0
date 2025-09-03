@@ -1328,7 +1328,30 @@ body.screen-shaking {
 }
 
 
-/* Story Battle Character Portrait */
+/* Story Battle Character Portrait & Equipped Avatar */
+.player-equipped-avatar {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    z-index: 1; /* Below cards */
+    opacity: 0.6;
+    pointer-events: none;
+    filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.5));
+}
+
+.player-area.p1-bg .player-equipped-avatar { filter: drop-shadow(0 0 8px var(--player-1-color)); }
+.player-area.p2-bg .player-equipped-avatar { filter: drop-shadow(0 0 8px var(--player-2-color)); }
+.player-area.p3-bg .player-equipped-avatar { filter: drop-shadow(0 0 8px var(--player-3-color)); }
+.player-area.p4-bg .player-equipped-avatar { filter: drop-shadow(0 0 8px var(--player-4-color)); }
+
+.player-area.has-avatar .play-zone,
+.player-area.has-avatar .player-hand {
+    padding-left: 130px;
+}
+
 .player-area-character-portrait {
     position: relative;
     order: 2;
@@ -2972,6 +2995,11 @@ body.screen-shaking {
     padding: 0 10px 0 5px;
 }
 #user-name { font-weight: 600; }
+#user-coin-balance-header {
+    font-weight: 600;
+    color: var(--accent-yellow);
+    text-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
 #user-avatar { width: 40px; height: 40px; border-radius: 50%; }
 
 .xp-bar-container {
@@ -3020,7 +3048,8 @@ body.screen-shaking {
 
 /* --- RANKING & PROFILE MODALS --- */
 .ranking-modal-content,
-.profile-modal-content {
+.profile-modal-content,
+.shop-modal-content {
     width: 900px;
     max-width: 95vw;
 }
@@ -3133,6 +3162,7 @@ body.screen-shaking {
     height: 150px;
     border-radius: 50%;
     border: 4px solid var(--text-secondary);
+    object-fit: cover;
 }
 .profile-username { font-size: 1.5rem; font-weight: 700; }
 .profile-title-display {
@@ -3167,6 +3197,10 @@ body.screen-shaking {
     margin-bottom: 0.5rem;
 }
 .profile-stat-item p { font-size: 1.8rem; font-weight: 600; }
+
+.profile-section {
+    margin-top: 1rem;
+}
 
 .profile-section h3 {
     color: var(--accent-yellow);
@@ -3459,4 +3493,72 @@ body.screen-shaking {
 .admin-actions .control-button {
     padding: 5px 10px;
     font-size: 0.8rem;
+}
+
+/* --- SHOP & AVATAR SELECTION --- */
+#profile-my-avatars-grid,
+.shop-avatars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.avatar-item {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.avatar-image-wrapper {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--text-secondary);
+    background-color: var(--bg-main);
+}
+
+.avatar-item.owned .avatar-image-wrapper {
+    border-color: var(--accent-yellow);
+    box-shadow: 0 0 10px var(--accent-yellow);
+}
+
+.avatar-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-name {
+    font-weight: 600;
+    font-size: 1rem;
+    min-height: 2.2em;
+}
+
+.avatar-price {
+    font-weight: 700;
+    color: var(--accent-yellow);
+}
+
+.avatar-item .control-button {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+.avatar-item.equipped {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 15px var(--accent-green);
 }

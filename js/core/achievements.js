@@ -93,7 +93,7 @@ function checkAllAchievementsUnlocked() {
  * @param {string} id - The ID of the achievement to grant.
  */
 export function grantAchievement(id) {
-    const { achievements, gameState } = getState();
+    const { achievements, gameState, isLoggedIn } = getState();
 
     // Prevent 'Speed Run' achievement during the tutorial match.
     if (id === 'speed_run' && gameState?.currentStoryBattle === 'tutorial_necroverso') {
@@ -108,12 +108,18 @@ export function grantAchievement(id) {
         playSoundEffect('conquista');
         showAchievementNotification(achievementData);
         
+        if (isLoggedIn) {
+            network.emitGrantAchievement(id);
+        }
+
         // Concede CoinVersus para desafios especiais de história
         if (['xael_win', 'inversus_win', '120%_unlocked'].includes(id)) {
             let amount = 1000;
             if (id === 'inversus_win') amount = 2500;
             if (id === '120%_unlocked') amount = 5000;
-            network.emitClaimChallengeReward({ challengeId: id, amount: amount });
+            if (isLoggedIn) {
+                network.emitClaimChallengeReward({ challengeId: id, amount: amount });
+            }
         }
 
         saveAchievements();

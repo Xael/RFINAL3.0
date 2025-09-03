@@ -5,6 +5,7 @@ import * as network from '../core/network.js';
 import { getState } from '../core/state.js';
 import { openChatWindow } from './chat-handler.js';
 import { TITLE_CONFIG } from '../core/config.js';
+import { updateCoinVersusDisplay } from './shop-renderer.js';
 
 function xpForLevel(level) {
     if (level <= 1) return 0;
@@ -51,6 +52,7 @@ export function renderProfile(profileData) {
         dom.userAvatar.src = profileData.avatar_url || '';
         dom.userName.textContent = profileData.username || t('game.you');
         dom.userLevel.textContent = profileData.level || 1;
+        updateCoinVersusDisplay(profileData.coinversus);
         const currentLevelXp = xpForLevel(profileData.level);
         const nextLevelXp = xpForLevel(profileData.level + 1);
         const xpIntoLevel = profileData.xp - currentLevelXp;
@@ -266,40 +268,65 @@ export function renderFriendsList(friends) {
         container.innerHTML = `<p>${t('friends.no_friends')}</p>`;
         return;
     }
+
     container.innerHTML = friends.map(friend => {
+        const statusClass = friend.isOnline ? 'online' : 'offline';
+        const statusText = friend.isOnline ? t('friends.status_online') : t('friends.status_offline');
         let titleText = friend.selected_title_code ? t(`titles.${friend.selected_title_code}`) : '';
         if (titleText.startsWith('titles.')) {
             titleText = friend.selected_title_code;
         }
+
         return `
-            <div class="friend-item" id="friend-item-${friend.id}">
+            <div class="friend-item">
                 <img src="${friend.avatar_url}" alt="Avatar" class="friend-avatar">
                 <div class="friend-info">
                     <span class="friend-name">
-                        <div class="friend-status ${friend.isOnline ? 'online' : 'offline'}" id="friend-status-${friend.id}" title="${t(friend.isOnline ? 'friends.status_online' : 'friends.status_offline')}"></div>
+                        <div class="friend-status ${statusClass}" title="${statusText}"></div>
                         ${friend.username}
                     </span>
                     <span class="friend-title">${titleText}</span>
                 </div>
                 <div class="friend-actions">
-                    <button class="control-button view-profile-btn" data-google-id="${friend.google_id}">${t('friends.view_profile')}</button>
-                    <button class="control-button send-message-btn" data-user-id="${friend.id}" data-username="${friend.username}" ${!friend.isOnline ? 'disabled' : ''}>${t('friends.send_message')}</button>
-                    <button class="control-button cancel remove-friend-btn" data-user-id="${friend.id}">${t('friends.remove')}</button>
+                    <button class="control-button view-profile-btn" data-google-id="${friend.google_id}" title="${t('friends.view_profile')}">👤</button>
+                    ${friend.isOnline ? `<button class="control-button send-message-btn" data-user-id="${friend.id}" data-username="${friend.username}" title="${t('friends.send_message')}">💬</button>` : ''}
+                    <button class="control-button cancel remove-friend-btn" data-user-id="${friend.id}" title="${t('friends.remove')}">✖</button>
                 </div>
             </div>
-        `}).join('');
+        `;
+    }).join('');
+}
+
+export function renderOnlineFriendsForInvite(friends) {
+    if (!dom.inviteFriendsList) return;
+
+    if (friends.length === 0) {
+        dom.inviteFriendsList.innerHTML = `<p>${t('pvp.no_online_friends')}</p>`;
+        return;
+    }
+    
+    dom.inviteFriendsList.innerHTML = friends.map(friend => `
+        <div class="friend-item">
+            <img src="${friend.avatar_url}" alt="Avatar" class="friend-avatar">
+            <div class="friend-info">
+                <span class="friend-name">${friend.username}</span>
+            </div>
+            <div class="friend-actions">
+                <button class="control-button invite-friend-btn" data-user-id="${friend.id}">${t('pvp.invite')}</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 export function renderFriendRequests(requests) {
-    const container = dom.friendRequestsListContainer;
-    if (!container) return;
-    if (!requests || requests.length === 0) {
-        container.innerHTML = `<p>${t('friends.no_requests')}</p>`;
+    if (!dom.friendRequestsListContainer) return;
+    if (requests.length === 0) {
+        dom.friendRequestsListContainer.innerHTML = `<p>${t('friends.no_requests')}</p>`;
         return;
     }
-    container.innerHTML = requests.map(req => `
-        <div class="friend-item friend-request-item" id="friend-request-${req.id}">
-            <img src="${req.avatar_url}" alt="Avatar" class="friend-avatar">
+    dom.friendRequestsListContainer.innerHTML = requests.map(req => `
+        <div class="friend-item friend-request-item">
+             <img src="${req.avatar_url}" alt="Avatar" class="friend-avatar">
             <div class="friend-info">
                 <span class="friend-name">${req.username}</span>
             </div>
@@ -311,75 +338,30 @@ export function renderFriendRequests(requests) {
     `).join('');
 }
 
-export function updateFriendStatusIndicator(userId, isOnline) {
-    const statusEl = document.getElementById(`friend-status-${userId}`);
-    const messageBtn = document.querySelector(`.send-message-btn[data-user-id="${userId}"]`);
-    if (statusEl) {
-        statusEl.className = `friend-status ${isOnline ? 'online' : 'offline'}`;
-        statusEl.title = t(isOnline ? 'friends.status_online' : 'friends.status_offline');
-    }
-    if (messageBtn) {
-        messageBtn.disabled = !isOnline;
-    }
-}
-
-export function addPrivateChatMessage(message) {
+export function addPrivateChatMessage({ senderId, senderUsername, content, recipientId }) {
     const { userProfile } = getState();
-    if (!userProfile) return;
+    const isSent = senderId === userProfile.id;
+    const targetUserId = isSent ? recipientId : senderId;
+    const targetUsername = isSent ? '???' : senderUsername; // We need a way to get recipient username
 
-    const isSentByMe = message.senderId === userProfile.id;
-    const chatPartnerId = isSentByMe ? message.recipientId : message.senderId;
-    const chatPartnerUsername = isSentByMe ? null : message.senderUsername;
-
-    let chatWindow = document.getElementById(`chat-window-${chatPartnerId}`);
-    // If window doesn't exist and the message is for me, open it.
-    if (!chatWindow && !isSentByMe) {
-        openChatWindow(chatPartnerId, chatPartnerUsername);
-        chatWindow = document.getElementById(`chat-window-${chatPartnerId}`);
-    }
-
+    // Open window if it doesn't exist
+    const chatWindow = document.getElementById(`chat-window-${targetUserId}`);
     if (!chatWindow) {
-        console.log("Chat window not found for message:", message);
-        return;
+        openChatWindow(targetUserId, targetUsername);
     }
     
-    const messagesContainer = chatWindow.querySelector('.chat-window-messages');
-    const messageEl = document.createElement('div');
-    messageEl.className = `chat-message ${isSentByMe ? 'sent' : 'received'}`;
-    // Sanitize message content before inserting
-    messageEl.textContent = message.content;
-    messagesContainer.appendChild(messageEl);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    const messagesContainer = document.querySelector(`#chat-window-${targetUserId} .chat-window-messages`);
+    if (messagesContainer) {
+        const messageEl = document.createElement('div');
+        messageEl.className = `chat-message ${isSent ? 'sent' : 'received'}`;
+        messageEl.textContent = content;
+        messagesContainer.appendChild(messageEl);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 }
 
-/**
- * Renders the list of online, available friends into the invite modal.
- * @param {Array<object>} friends - An array of friend objects.
- */
-export function renderOnlineFriendsForInvite(friends) {
-    const container = dom.inviteFriendsList;
-    if (!container) return;
-
-    if (!friends || friends.length === 0) {
-        container.innerHTML = `<p>${t('pvp.no_online_friends')}</p>`;
-        return;
-    }
-
-    container.innerHTML = friends.map(friend => {
-        let titleText = friend.selected_title_code ? t(`titles.${friend.selected_title_code}`) : '';
-        if (titleText.startsWith('titles.')) titleText = friend.selected_title_code;
-
-        return `
-            <div class="friend-item">
-                <img src="${friend.avatar_url}" alt="Avatar" class="friend-avatar">
-                <div class="friend-info">
-                    <span class="friend-name">${friend.username}</span>
-                    <span class="friend-title">${titleText}</span>
-                </div>
-                <div class="friend-actions">
-                    <button class="control-button invite-friend-btn" data-user-id="${friend.id}" data-username="${friend.username}">${t('pvp.invite')}</button>
-                </div>
-            </div>
-        `;
-    }).join('');
+export function updateFriendStatusIndicator(userId, isOnline) {
+    // This is less efficient than a targeted update, but safer for now.
+    // A better implementation would find the specific friend item and toggle its class.
+    network.emitGetFriendsList();
 }

@@ -13,6 +13,7 @@ import { animateCardPlay } from '../ui/animations.js';
 import { showCoinRewardNotification } from '../ui/toast-renderer.js';
 import { playSoundEffect, announceEffect } from '../core/sound.js';
 import * as sound from './sound.js';
+import { renderShopAvatars, updateCoinVersusDisplay } from '../ui/shop-renderer.js';
 
 /**
  * Sets up the player areas in the UI so the local player is always at the bottom.
@@ -346,6 +347,22 @@ export function connectToServer() {
             alert(message);
         }
     });
+
+    // --- Shop Listeners ---
+    socket.on('avatarPurchaseSuccess', ({ updatedProfile }) => {
+        const { userProfile } = getState();
+        if (userProfile.google_id === updatedProfile.google_id) {
+            updateState('userProfile', updatedProfile);
+            renderShopAvatars();
+            updateCoinVersusDisplay(updatedProfile.coinversus);
+            showCoinRewardNotification(t('shop.purchase_success'));
+        }
+    });
+
+    socket.on('avatarPurchaseError', ({ message }) => {
+        alert(t('shop.purchase_error', { error: message }));
+        renderShopAvatars(); // Re-render to re-enable button
+    });
 }
 
 // --- EMITTERS ---
@@ -379,6 +396,8 @@ export function emitSendPrivateMessage(recipientId, content) { const { socket } 
 export function emitReportPlayer(reportedGoogleId, message) { const { socket } = getState(); if (socket) socket.emit('reportPlayer', { reportedGoogleId, message }); }
 export function emitClaimDailyLoginReward() { const { socket } = getState(); if(socket) socket.emit('claimDailyLoginReward'); }
 export function emitClaimChallengeReward(data) { const { socket } = getState(); if(socket) socket.emit('claimChallengeReward', data); }
+export function emitGrantAchievement(achievementId) { const { socket } = getState(); if (socket) socket.emit('grantAchievement', { achievementId }); }
+export function emitBuyAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('buyAvatar', { avatarCode }); }
 
 // --- Matchmaking Emitters ---
 export function emitJoinMatchmaking(mode) {

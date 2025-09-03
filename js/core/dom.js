@@ -229,6 +229,7 @@ export const pvpCreateRoomConfirmButton = document.getElementById('pvp-create-ro
 export const pvpCreateRoomCancelButton = document.getElementById('pvp-create-room-cancel-button');
 export const pvpPotContainer = document.getElementById('pvp-pot-container');
 export const turnCountdownTimer = document.getElementById('turn-countdown-timer');
+export const userCoinBalanceHeader = document.getElementById('user-coin-balance-header');
 
 // Event Modal
 export const eventButton = document.getElementById('event-button');
@@ -265,3 +266,9 @@ export const lobbyInviteDeclineButton = document.getElementById('lobby-invite-de
 
 // Chat
 export const privateChatPanel = document.getElementById('private-chat-panel');
+
+// Shop
+export const shopButton = document.getElementById('shop-button');
+export const shopModal = document.getElementById('shop-modal');
+export const shopAvatarsGrid = document.getElementById('shop-avatars-grid');
+export const closeShopButton = document.getElementById('close-shop-button');
