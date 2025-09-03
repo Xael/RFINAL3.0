@@ -21,11 +21,11 @@ export const showAchievementNotification = (achievementData, overrideDescription
 };
 
 /**
- * Shows a toast notification for a daily login reward.
- * @param {number} amount - The amount of CoinVersus received.
+ * Shows a toast notification for a coin reward.
+ * @param {string} message - The message to display in the toast.
  */
-export const showDailyRewardNotification = (amount) => {
-    dom.rewardToastText.textContent = t('rewards.daily_login_toast', { amount });
+export const showCoinRewardNotification = (message) => {
+    dom.rewardToastText.textContent = message;
     dom.dailyRewardToast.classList.remove('hidden');
 
     setTimeout(() => {

@@ -858,6 +858,12 @@ export function initializeUiHandlers() {
                 if (wins >= 3) {
                     const rewardName = eventConfig ? t(eventConfig.rewardTitleKey) : "";
                     message = t('event.victory_completed_message', { rewardName });
+                    
+                    // Concede a recompensa de moedas pela primeira vez
+                    const year = new Date().getFullYear();
+                    const challengeId = `event_${currentMonth}_${year}`;
+                    network.emitClaimChallengeReward({ challengeId, amount: 1000 });
+
                 } else {
                     message = t('event.victory_progress_message', { wins });
                 }

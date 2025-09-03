@@ -394,7 +394,8 @@
         "defeat_message": "Você foi derrotado. Volte amanhã para uma nova tentativa."
     },
     "rewards": {
-        "daily_login_toast": "Recompensa Diária! Você ganhou +{amount} CoinVersus."
+        "daily_login_toast": "Recompensa Diária! Você ganhou +{amount} CoinVersus.",
+        "challenge_complete_toast": "Desafio Concluído! Você ganhou +{amount} CoinVersus!"
     },
     "log": {
         "welcome": "Bem-vindo ao Reversus! Modo: {modeText}.",

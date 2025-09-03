@@ -10,7 +10,7 @@ import { updateGameTimer } from '../game-controller.js';
 import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
 import { t } from './i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
-import { showDailyRewardNotification } from '../ui/toast-renderer.js';
+import { showCoinRewardNotification } from '../ui/toast-renderer.js';
 import { playSoundEffect, announceEffect } from '../core/sound.js';
 import * as sound from './sound.js';
 
@@ -72,7 +72,11 @@ export function connectToServer() {
     });
 
     socket.on('dailyRewardSuccess', ({ amount }) => {
-        showDailyRewardNotification(amount);
+        showCoinRewardNotification(t('rewards.daily_login_toast', { amount }));
+    });
+    
+    socket.on('challengeRewardSuccess', ({ amount }) => {
+        showCoinRewardNotification(t('rewards.challenge_complete_toast', { amount }));
     });
 
     socket.on('loginError', (message) => {
@@ -374,6 +378,7 @@ export function emitGetFriendsList() { const { socket } = getState(); if (socket
 export function emitSendPrivateMessage(recipientId, content) { const { socket } = getState(); if (socket) socket.emit('sendPrivateMessage', { recipientId, content }); }
 export function emitReportPlayer(reportedGoogleId, message) { const { socket } = getState(); if (socket) socket.emit('reportPlayer', { reportedGoogleId, message }); }
 export function emitClaimDailyLoginReward() { const { socket } = getState(); if(socket) socket.emit('claimDailyLoginReward'); }
+export function emitClaimChallengeReward(data) { const { socket } = getState(); if(socket) socket.emit('claimChallengeReward', data); }
 
 // --- Matchmaking Emitters ---
 export function emitJoinMatchmaking(mode) {
