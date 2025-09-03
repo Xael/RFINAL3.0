@@ -7,6 +7,7 @@ import * as config from './config.js';
 import { getState, updateState } from './state.js';
 import { playSoundEffect } from './sound.js';
 import { showAchievementNotification } from '../ui/toast-renderer.js';
+import * as network from '../core/network.js';
 
 const ACHIEVEMENTS_KEY = 'reversus-achievements';
 
@@ -107,6 +108,14 @@ export function grantAchievement(id) {
         playSoundEffect('conquista');
         showAchievementNotification(achievementData);
         
+        // Concede CoinVersus para desafios especiais de história
+        if (['xael_win', 'inversus_win', '120%_unlocked'].includes(id)) {
+            let amount = 1000;
+            if (id === 'inversus_win') amount = 2500;
+            if (id === '120%_unlocked') amount = 5000;
+            network.emitClaimChallengeReward({ challengeId: id, amount: amount });
+        }
+
         saveAchievements();
         checkAndShowSpecialFeatures(); // Check features after every new achievement
     }

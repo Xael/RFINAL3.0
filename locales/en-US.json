@@ -305,6 +305,23 @@
         "title": "Achievements",
         "unlocked_toast": "{name}: {description}"
     },
+    "achievement_hints": {
+        "first_win": "Win your first match in the game.",
+        "first_defeat": "The first defeat is just the beginning of the journey.",
+        "versatrix_loss": "Being defeated by her might open new paths...",
+        "speed_run": "Speed is the key. Finish a duel quickly.",
+        "contravox_win": "Defeat the master of inverted words.",
+        "versatrix_win": "The golden queen has been overcome. What did she leave behind?",
+        "versatrix_card_collected": "A special gift from the queen can be found on the splash screen after beating her.",
+        "reversum_win": "The mighty king has fallen before you.",
+        "tutorial_win": "Show Necroverso that you've learned the lesson.",
+        "xael_win": "Find and defeat the creator at his own game.",
+        "quick_duel_win": "A victory may be quick, but it's still a victory.",
+        "true_end_beta": "You've defeated the three kings, but the story doesn't end here.",
+        "true_end_final": "Face the true threat with the help of an unexpected ally.",
+        "inversus_win": "Defeat the dark reflection of Reversus to achieve mastery.",
+        "120%_unlocked": "The final secret awaits the one who has unraveled all others."
+    },
     "ranking": {
         "title": "🏆 PVP Ranking 🏆",
         "loading": "Loading ranking...",

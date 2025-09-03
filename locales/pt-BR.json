@@ -305,6 +305,23 @@
         "title": "Conquistas",
         "unlocked_toast": "{name}: {description}"
     },
+    "achievement_hints": {
+        "first_win": "Vença sua primeira partida no jogo.",
+        "first_defeat": "A primeira derrota é apenas o começo da jornada.",
+        "versatrix_loss": "Ser derrotado por ela pode abrir novos caminhos...",
+        "speed_run": "A velocidade é a chave. Termine um duelo rapidamente.",
+        "contravox_win": "Derrote o mestre das palavras invertidas.",
+        "versatrix_win": "A rainha dourada foi superada. O que ela deixou para trás?",
+        "versatrix_card_collected": "Um presente especial da rainha pode ser encontrado na tela inicial após vencê-la.",
+        "reversum_win": "O poderoso rei caiu diante de você.",
+        "tutorial_win": "Mostre ao Necroverso que você aprendeu a lição.",
+        "xael_win": "Encontre e derrote o criador em seu próprio jogo.",
+        "quick_duel_win": "A vitória pode ser rápida, mas ainda é uma vitória.",
+        "true_end_beta": "Você derrotou os três reis, mas a história não acaba aqui.",
+        "true_end_final": "Enfrente a verdadeira ameaça com a ajuda de um aliado inesperado.",
+        "inversus_win": "Derrote o reflexo sombrio do Reversus para alcançar a maestria.",
+        "120%_unlocked": "O segredo final aguarda aquele que desvendou todos os outros."
+    },
     "ranking": {
         "title": "🏆 Ranking PVP 🏆",
         "loading": "Carregando ranking...",
@@ -673,17 +690,17 @@
         "year_end_light": "Luz do Fim de Ano"
     },
     "event_abilities": {
-        "january_new": "Pode fazer aparecer um caminho vermelho a sua frente no inicio de cada rodada (50% chance).",
-        "february_new": "Troca as cartas de 'Resto' com o oponente no início de cada rodada se for favorável.",
-        "march_new": "No início do seu turno, compra 2 cartas de valor e descarta 2, priorizando ficar com as de maior valor.",
-        "april_new": "Uma vez por turno, pode ignorar um efeito negativo jogado contra ele.",
-        "may_new": "Joga suas cartas de valor e efeito viradas para baixo, revelando-as apenas no final da rodada.",
-        "june_new": "Pode reutilizar uma carta de efeito que foi utilizada nesta rodada uma vez por rodada.",
-        "july_new": "Tem uma chance (50%) de roubar uma carta aleatória da sua mão por rodada.",
-        "august_new": "Pode trocar de lugar no tabuleiro com o oponente uma vez por partida.",
-        "september_new": "Uma vez por rodada, pode espiar e trocar uma carta da sua mão com uma dele.",
-        "october_new": "Uma vez por rodada (50% de chance), pode forçar todos a descartarem a carta de maior valor de suas mãos.",
-        "november_new": "Uma vez por rodada, pode 'congelar' uma carta de efeito do oponente, impedindo que ela seja jogada nesta rodada.",
-        "december_new": "No início de cada rodada, ele poderá trocar de mão com você (chance de 50%)."
+        "january_new": "Can make a red path appear in front of him at the start of each round (50% chance).",
+        "february_new": "Swaps 'Rest' cards with the opponent at the start of each round if it's favorable.",
+        "march_new": "At the start of his turn, draws 2 value cards and discards 2, prioritizing keeping the highest values.",
+        "april_new": "Once per turn, can ignore a negative effect played against him.",
+        "may_new": "Plays his value and effect cards face down, revealing them only at the end of the round.",
+        "june_new": "Can reuse an effect card that was used this round once per round.",
+        "july_new": "Has a chance (50%) to steal a random card from your hand per round.",
+        "august_new": "Can swap places on the board with the opponent once per match.",
+        "september_new": "Once per round, can peek at and swap a card from your hand with one of his.",
+        "october_new": "Once per round (50% chance), can force everyone to discard the highest value card from their hands.",
+        "november_new": "Once per round, can 'freeze' an opponent's effect card, preventing it from being played this round.",
+        "december_new": "At the start of each round, he may swap hands with you (50% chance)."
     }
 }
