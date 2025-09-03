@@ -172,7 +172,8 @@
         "filter_chat": "CHAT",
         "toggle_on": "ON",
         "toggle_off": "OFF",
-        "chat_muted_message": "Chat silenciado."
+        "chat_muted_message": "Chat silenciado.",
+        "filter_button_label": "FILTRO"
     },
     "setup": {
         "title": "Modo de Jogo",

@@ -98,8 +98,7 @@ export const updateLog = (logEntry) => {
                 speakerClass = 'speaker-player-1';
             }
             
-            const speakerName = `<strong>${m.speaker}:</strong> `;
-            return `<div class="log-message dialogue ${speakerClass}">${speakerName}<span class="message-content">${emojiMessage}</span>${reportButton}</div>`;
+            return `<div class="log-message dialogue ${speakerClass}"><span class="message-content"><strong>${m.speaker}:</strong> ${emojiMessage}</span>${reportButton}</div>`;
         }
         return `<div class="log-message system"><span class="message-content">${emojiMessage}</span></div>`;
     }).join('');

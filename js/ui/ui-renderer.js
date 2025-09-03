@@ -22,20 +22,14 @@ export function updateChatControls() {
     // Toggle Mute Button and Area
     dom.chatContainerEl.classList.toggle('chat-muted', isChatMuted);
     dom.chatToggleBtn.classList.toggle('active', isChatMuted);
-    // When muted (off), button shows "ON" as the action to perform. When unmuted (on), it shows "OFF".
-    dom.chatToggleBtn.textContent = t(isChatMuted ? 'chat.toggle_on' : 'chat.toggle_off');
+    // Toggle button now shows the current state (OFF when muted, ON when not muted)
+    dom.chatToggleBtn.textContent = t(isChatMuted ? 'chat.toggle_off' : 'chat.toggle_on');
 
     dom.chatInput.disabled = isChatMuted;
     dom.chatInput.placeholder = t(isChatMuted ? 'chat.chat_muted_message' : 'game.chat_placeholder');
 
-    // Filter Button Text - shows the current state
-    const filterKeyMap = {
-        all: 'chat.filter_all',
-        log: 'chat.filter_log',
-        chat: 'chat.filter_chat'
-    };
-    const currentFilterTextKey = filterKeyMap[chatFilter] || 'chat.filter_all';
-    dom.chatFilterBtn.textContent = t(currentFilterTextKey);
+    // Filter Button Text - now static as requested
+    dom.chatFilterBtn.textContent = t('chat.filter_button_label');
 }
 
 
