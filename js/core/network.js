@@ -96,6 +96,8 @@ export function connectToServer() {
 
     socket.on('profileData', (profile) => {
         const { userProfile } = getState();
+        // This check ensures we only update the main user's profile if it matches,
+        // but it still allows viewing other profiles.
         if (userProfile && profile.google_id === userProfile.google_id) {
             updateState('userProfile', profile);
         }
@@ -114,6 +116,11 @@ export function connectToServer() {
     // --- Admin Listeners ---
     socket.on('adminData', (data) => {
         renderAdminPanel(data);
+    });
+
+    socket.on('adminActionSuccess', () => {
+        // This event signals that an admin action was successful and the panel should be refreshed
+        emitAdminGetData();
     });
 
     socket.on('newReport', () => {
@@ -478,6 +485,16 @@ export function emitAdminBanUser(userId) {
 export function emitAdminUnbanUser(userId) {
     const { socket } = getState();
     if (socket) socket.emit('admin:unbanUser', { userId });
+}
+
+export function emitAdminRollbackUser(userId) {
+    const { socket } = getState();
+    if (socket) socket.emit('admin:rollbackUser', { userId });
+}
+
+export function emitAdminAddCoins(amount) {
+    const { socket } = getState();
+    if (socket) socket.emit('admin:addCoins', { amount });
 }
 
 export function emitAdminResolveReport(reportId) {

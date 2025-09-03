@@ -205,7 +205,8 @@ export function renderAdminPanel({ online, banned, pendingReports }) {
                     <span class="friend-title">ID: ${user.id}</span>
                 </div>
             </div>
-            <div class="admin-actions">
+            <div class="admin-actions" style="flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+                <button class="control-button cancel admin-rollback-btn" data-user-id="${user.id}" data-username="${user.username}" title="${t('admin.rollback_button')}">${t('admin.rollback_button')}</button>
                 <button class="control-button cancel admin-ban-btn" data-user-id="${user.id}" data-username="${user.username}">${t('admin.ban_button')}</button>
             </div>
         </div>
@@ -220,13 +221,24 @@ export function renderAdminPanel({ online, banned, pendingReports }) {
                      <span class="friend-title">ID: ${user.id}</span>
                 </div>
             </div>
-            <div class="admin-actions">
+            <div class="admin-actions" style="flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+                 <button class="control-button cancel admin-rollback-btn" data-user-id="${user.id}" data-username="${user.username}" title="${t('admin.rollback_button')}">${t('admin.rollback_button')}</button>
                 <button class="control-button btn-p3-color admin-unban-btn" data-user-id="${user.id}" data-username="${user.username}">${t('admin.unban_button')}</button>
             </div>
         </div>
     `).join('') : `<p>${t('admin.no_banned_users')}</p>`;
 
     adminTabContent.innerHTML = `
+        <div class="admin-section">
+            <h3 style="color: var(--accent-yellow); border-bottom-color: var(--accent-yellow);">${t('admin.self_actions')}</h3>
+             <div class="admin-self-actions">
+                <label for="admin-add-coins-input">${t('admin.add_coins_label')}</label>
+                <div class="friends-search-container" style="margin-top: 0.5rem;">
+                    <input type="number" id="admin-add-coins-input" class="friends-search-input" placeholder="1000">
+                    <button id="admin-add-coins-btn" class="control-button">${t('admin.add_coins_button')}</button>
+                </div>
+            </div>
+        </div>
         <div class="admin-section">
             <h3 style="color: var(--accent-yellow); border-bottom-color: var(--accent-yellow);">${t('admin.player_reports')}</h3>
             <div class="admin-user-list">${reportsHTML}</div>

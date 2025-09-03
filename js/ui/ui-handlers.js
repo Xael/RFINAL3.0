@@ -238,27 +238,6 @@ export function initializeUiHandlers() {
                 network.emitReportPlayer(googleId, message);
             }
         }
-        if (e.target.matches('.admin-ban-btn')) {
-            const button = e.target;
-            const userId = button.dataset.userId;
-            const username = button.dataset.username;
-            if (confirm(t('confirm.ban_player', { username }))) {
-                network.emitAdminBanUser(userId);
-            }
-        }
-        if (e.target.matches('.admin-unban-btn')) {
-            const button = e.target;
-            const userId = button.dataset.userId;
-            const username = button.dataset.username;
-            if (confirm(t('confirm.unban_player', { username }))) {
-                network.emitAdminUnbanUser(userId);
-            }
-        }
-        if (e.target.matches('.admin-dismiss-report-btn')) {
-            const button = e.target;
-            const reportId = button.dataset.reportId;
-            network.emitAdminResolveReport(reportId);
-        }
     });
 
     dom.playButton.addEventListener('click', handlePlayButtonClick);
@@ -1257,6 +1236,47 @@ export function initializeUiHandlers() {
             }
         });
     }
+
+    // Delegated event listener for all admin actions
+    if (dom.profileAdminTabContent) {
+        dom.profileAdminTabContent.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (!button) return;
+    
+            if (button.matches('.admin-ban-btn')) {
+                const userId = button.dataset.userId;
+                const username = button.dataset.username;
+                if (confirm(t('confirm.ban_player', { username }))) {
+                    network.emitAdminBanUser(userId);
+                }
+            } else if (button.matches('.admin-unban-btn')) {
+                const userId = button.dataset.userId;
+                const username = button.dataset.username;
+                if (confirm(t('confirm.unban_player', { username }))) {
+                    network.emitAdminUnbanUser(userId);
+                }
+            } else if (button.matches('.admin-rollback-btn')) {
+                const userId = button.dataset.userId;
+                const username = button.dataset.username;
+                if (confirm(t('confirm.rollback_player', { username }))) {
+                    network.emitAdminRollbackUser(userId);
+                }
+            } else if (button.matches('.admin-dismiss-report-btn')) {
+                const reportId = button.dataset.reportId;
+                network.emitAdminResolveReport(reportId);
+            } else if (button.matches('#admin-add-coins-btn')) {
+                const input = document.getElementById('admin-add-coins-input');
+                const amount = parseInt(input.value, 10);
+                if (amount && amount > 0) {
+                    network.emitAdminAddCoins(amount);
+                    input.value = '';
+                } else {
+                    alert('Por favor, insira um número positivo.');
+                }
+            }
+        });
+    }
+
 
     // --- Shop Handlers ---
     dom.shopButton.addEventListener('click', () => {

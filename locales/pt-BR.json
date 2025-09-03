@@ -42,7 +42,7 @@
         "version": "Versão 3.0"
     },
     "shop": {
-        "avatar_tab": "Avatar",
+        "buy_avatars_tab": "Comprar Avatares",
         "select_avatar_desc": "Selecione um avatar para comprar. Ele aparecerá ao lado do seu nome nas salas e no ranking.",
         "buy": "Comprar",
         "owned": "Adquirido",
@@ -57,6 +57,12 @@
         "default_2": "Avatar Padrão 2",
         "default_3": "Avatar Padrão 3",
         "default_4": "Avatar Padrão 4",
+        "graxa": "Avatar Graxa",
+        "jujuba": "Avatar Jujuba",
+        "frank": "Avatar Frank",
+        "lele": "Avatar Lelê",
+        "vini": "Avatar Vini",
+        "rodrigo": "Avatar Rodrigo",
         "necroverso": "Avatar Necroverso",
         "contravox": "Avatar Contravox",
         "versatrix": "Avatar Versatrix",
@@ -322,7 +328,8 @@
         "report_player": "Tem certeza de que deseja denunciar {username} por má conduta no chat?",
         "ban_player": "Tem certeza que deseja banir {username}? Esta ação é permanente.",
         "unban_player": "Tem certeza que deseja desbanir {username}?",
-        "kick_player": "Tem certeza que deseja expulsar {username} da sala?"
+        "kick_player": "Tem certeza que deseja expulsar {username} da sala?",
+        "rollback_player": "Tem certeza que deseja resetar completamente a conta de {username}? Todo o progresso, moedas, títulos e conquistas serão apagados. Esta ação é irreversível."
     },
     "achievements": {
         "title": "Conquistas",
@@ -412,7 +419,11 @@
         "player_reports": "Denúncias de Jogadores",
         "no_reports": "Nenhuma denúncia pendente.",
         "report_from": "Denunciado por: {username}",
-        "dismiss_report": "Dispensar"
+        "dismiss_report": "Dispensar",
+        "rollback_button": "Resetar Conta",
+        "self_actions": "Ações Pessoais de Admin",
+        "add_coins_label": "Adicionar CoinVersus (para si mesmo):",
+        "add_coins_button": "Adicionar"
     },
     "chat": {
         "placeholder": "Digite uma mensagem...",
@@ -725,5 +736,23 @@
         "october_new": "Once per round (50% chance), can force everyone to discard the highest value card from their hands.",
         "november_new": "Once per round, can 'freeze' an opponent's effect card, preventing it from being played this round.",
         "december_new": "At the start of each round, he may swap hands with you (50% chance)."
+    },
+    "credits": {
+        "title": "Credits",
+        "category_script": "Script & Game Design",
+        "category_music": "Music",
+        "category_sound": "Sound Effects",
+        "category_art": "Art",
+        "category_programming": "Programming",
+        "category_beta_testers": "Beta Testers",
+        "beta_testers_names": "Aline, Ana, Andressa, Bruna, Caio, Camila, Danilo, Diego, Elis, Ester, Fabio, Felipe, Fernanda, Gisele, Gustavo, Ingrid, Isabella, Jenifer, Johnny, Julia, Kaique, Karine, Leonardo, Livia, Luciano, Marcio, Marcos, Mariana, Matheus, Mayara, Nádia, Paola, Patricia, Paulo, Pedro, Renan, Ricardo, Sthefany, Talita, Thais, Thiago, Vanessa, Vinicius, Vitor, Wagner, William, Zé",
+        "beta_testers_thanks": "THANK YOU!",
+        "category_special_thanks": "Special Thanks",
+        "special_thanks_1": "To God, for the strength and creativity.",
+        "special_thanks_2": "To my fiancée Aline, the inspiration for this project.",
+        "special_thanks_3": "To my parents, for their unconditional support.",
+        "special_thanks_4": "And to you, player, for being part of this story.",
+        "final_thanks": "Thank you for playing!",
+        "the_end": "The End?"
     }
 }

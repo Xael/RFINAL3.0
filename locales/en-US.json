@@ -57,6 +57,12 @@
         "default_2": "Default Avatar 2",
         "default_3": "Default Avatar 3",
         "default_4": "Default Avatar 4",
+        "graxa": "Graxa Avatar",
+        "jujuba": "Jujuba Avatar",
+        "frank": "Frank Avatar",
+        "lele": "Lelê Avatar",
+        "vini": "Vini Avatar",
+        "rodrigo": "Rodrigo Avatar",
         "necroverso": "Necroverso Avatar",
         "contravox": "Contravox Avatar",
         "versatrix": "Versatrix Avatar",
@@ -322,7 +328,8 @@
         "report_player": "Are you sure you want to report {username} for chat misconduct?",
         "ban_player": "Are you sure you want to ban {username}? This action is permanent.",
         "unban_player": "Are you sure you want to unban {username}?",
-        "kick_player": "Are you sure you want to kick {username} from the room?"
+        "kick_player": "Are you sure you want to kick {username} from the room?",
+        "rollback_player": "Are you sure you want to completely reset {username}'s account? All progress, coins, titles, and achievements will be erased. This action is irreversible."
     },
     "achievements": {
         "title": "Achievements",
@@ -412,7 +419,15 @@
         "player_reports": "Player Reports",
         "no_reports": "No pending reports.",
         "report_from": "Reported by: {username}",
-        "dismiss_report": "Dismiss"
+        "dismiss_report": "Dismiss",
+        "rollback_button": "Reset Account",
+        "self_actions": "Admin Self Actions",
+        "add_coins_label": "Add CoinVersus (for self):",
+        "add_coins_button": "Add"
+    },
+    "chat": {
+        "placeholder": "Type a message...",
+        "chat_muted_message": "Chat is muted."
     },
     "event": {
         "title": "Monthly Event",
