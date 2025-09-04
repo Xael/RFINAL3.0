@@ -24,6 +24,18 @@ import { renderShopAvatars } from './shop-renderer.js';
 let currentEventData = null;
 
 /**
+ * Hides the game UI, shows the story modal, and renders the next story node.
+ * @param {string} nodeId - The ID of the story node to render.
+ */
+function continueStory(nodeId) {
+    setTimeout(() => {
+        dom.appContainerEl.classList.add('hidden');
+        dom.storyModeModalEl.classList.remove('hidden');
+        renderStoryNode(nodeId);
+    }, 1000);
+}
+
+/**
  * Gets the ID of the local human player.
  * @returns {string | null} The player ID or null if not found.
  */
@@ -814,7 +826,6 @@ export function initializeUiHandlers() {
         const { battle, won, reason } = e.detail;
         const { gameState } = getState();
         
-        // Ensure game options are saved for a potential restart
         if(gameState) {
              updateState('lastStoryGameOptions', { mode: gameState.gameMode, options: gameState.gameOptions });
         }
@@ -839,7 +850,6 @@ export function initializeUiHandlers() {
                     const rewardName = eventConfig ? t(eventConfig.rewardTitleKey) : "";
                     message = t('event.victory_completed_message', { rewardName });
                     
-                    // Concede a recompensa de moedas pela primeira vez
                     const year = new Date().getFullYear();
                     const challengeId = `event_${currentMonth}_${year}`;
                     network.emitClaimChallengeReward({ challengeId, amount: 1000 });
@@ -860,14 +870,80 @@ export function initializeUiHandlers() {
         let buttonAction = 'restart';
 
         switch (battle) {
-            case 'tutorial_necroverso': if (won) { achievements.grantAchievement('tutorial_win'); setTimeout(() => renderStoryNode('post_tutorial'), 1000); return; } else { message = "Você foi derrotado, mas aprendeu o básico. Vamos tentar de novo."; } break;
-            case 'contravox': if (won) { achievements.grantAchievement('contravox_win'); setTimeout(() => renderStoryNode('post_contravox_victory'), 1000); return; } else { message = "O Contravox te venceu. Quer tentar de novo?"; } break;
-            case 'versatrix': if (won) { achievements.grantAchievement('versatrix_win'); setTimeout(() => renderStoryNode('post_versatrix_victory'), 1000); } else { const { storyState } = getState(); storyState.lostToVersatrix = true; achievements.grantAchievement('versatrix_loss'); setTimeout(() => renderStoryNode('post_versatrix_defeat'), 1000); } return;
-            case 'reversum': if (won) { achievements.grantAchievement('reversum_win'); setTimeout(() => renderStoryNode('post_reversum_victory'), 1000); } else { message = "O Rei Reversum é muito poderoso. Tentar novamente?"; } break;
-            case 'necroverso_king': if (won) { achievements.grantAchievement('true_end_beta'); setTimeout(() => renderStoryNode('post_necroverso_king_victory'), 1000); } else { message = "O poder combinado dos reis é demais. Deseja tentar novamente?"; } break;
-            case 'necroverso_final': if (won) { achievements.grantAchievement('true_end_final'); playEndgameSequence(); } else { message = reason === 'time' ? "O tempo acabou! O Inversus foi consumido..." : "O Necroverso venceu. A escuridão consome tudo. Tentar novamente?"; } break;
-            case 'xael_challenge': if (won) { achievements.grantAchievement('xael_win'); message = "Você venceu o criador! Habilidade 'Revelação Estelar' desbloqueada no Modo História."; buttonAction = 'menu'; } else { message = "O criador conhece todos os truques. Tentar novamente?"; } break;
-            case 'narrador': if (won) { achievements.grantAchievement('120%_unlocked'); message = "Você derrotou o Narrador! O que acontece agora...?"; buttonAction = 'menu'; } else { message = "O Narrador reescreveu a história para te derrotar. Tentar de novo?"; } break;
+            case 'tutorial_necroverso':
+                if (won) {
+                    achievements.grantAchievement('tutorial_win');
+                    continueStory('post_tutorial');
+                    return;
+                } else {
+                    message = "Você foi derrotado, mas aprendeu o básico. Vamos tentar de novo.";
+                }
+                break;
+            case 'contravox':
+                if (won) {
+                    achievements.grantAchievement('contravox_win');
+                    continueStory('post_contravox_victory');
+                    return;
+                } else {
+                    message = "O Contravox te venceu. Quer tentar de novo?";
+                }
+                break;
+            case 'versatrix':
+                if (won) {
+                    achievements.grantAchievement('versatrix_win');
+                    continueStory('post_versatrix_victory');
+                } else {
+                    const { storyState } = getState();
+                    storyState.lostToVersatrix = true;
+                    achievements.grantAchievement('versatrix_loss');
+                    continueStory('post_versatrix_defeat');
+                }
+                return;
+            case 'reversum':
+                if (won) {
+                    achievements.grantAchievement('reversum_win');
+                    continueStory('post_reversum_victory');
+                    return;
+                } else {
+                    message = "O Rei Reversum é muito poderoso. Tentar novamente?";
+                }
+                break;
+            case 'necroverso_king':
+                if (won) {
+                    achievements.grantAchievement('true_end_beta');
+                    continueStory('post_necroverso_king_victory');
+                    return;
+                } else {
+                    message = "O poder combinado dos reis é demais. Deseja tentar novamente?";
+                }
+                break;
+            case 'necroverso_final':
+                if (won) {
+                    achievements.grantAchievement('true_end_final');
+                    playEndgameSequence();
+                    return;
+                } else {
+                    message = reason === 'time' ? "O tempo acabou! O Inversus foi consumido..." : "O Necroverso venceu. A escuridão consome tudo. Tentar novamente?";
+                }
+                break;
+            case 'xael_challenge':
+                if (won) {
+                    achievements.grantAchievement('xael_win');
+                    message = "Você venceu o criador! Habilidade 'Revelação Estelar' desbloqueada no Modo História.";
+                    buttonAction = 'menu';
+                } else {
+                    message = "O criador conhece todos os truques. Tentar novamente?";
+                }
+                break;
+            case 'narrador':
+                if (won) {
+                    achievements.grantAchievement('120%_unlocked');
+                    message = "Você derrotou o Narrador! O que acontece agora...?";
+                    buttonAction = 'menu';
+                } else {
+                    message = "O Narrador reescreveu a história para te derrotar. Tentar de novo?";
+                }
+                break;
             case 'inversus':
                 if (won) {
                     achievements.grantAchievement('inversus_win');
@@ -877,7 +953,8 @@ export function initializeUiHandlers() {
                     message = "O reflexo sombrio do Reversus te derrotou. Tentar novamente?";
                 }
                 break;
-            default: message = won ? 'Você venceu o duelo!' : 'Você foi derrotado.';
+            default:
+                message = won ? 'Você venceu o duelo!' : 'Você foi derrotado.';
         }
         showGameOver(message, title, { action: buttonAction });
     });
