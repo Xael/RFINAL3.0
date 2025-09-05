@@ -1,3 +1,6 @@
+import { getState } from './state.js';
+import { renderAll } from '../ui/ui-renderer.js';
+
 let currentLanguage = 'pt-BR';
 let translations = {};
 
@@ -67,6 +70,12 @@ export async function setLanguage(lang) {
     await loadTranslations(lang);
     translateElements();
     document.documentElement.lang = lang.split('-')[0];
+
+    // Re-render dynamic components if a game is active, to update their text.
+    const { gameState } = getState();
+    if (gameState) {
+        renderAll();
+    }
 
     // Update active state on buttons
     document.querySelectorAll('.lang-button').forEach(btn => {

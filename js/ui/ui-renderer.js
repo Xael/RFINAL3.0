@@ -28,8 +28,7 @@ export function updateChatControls() {
     dom.chatInput.disabled = isChatMuted;
     dom.chatInput.placeholder = t(isChatMuted ? 'chat.chat_muted_message' : 'game.chat_placeholder');
 
-    // Filter Button Text - now static as requested
-    dom.chatFilterBtn.textContent = t('chat.filter_button_label');
+    // Filter Button Text is now handled by the data-i18n attribute in the HTML.
 }
 
 
