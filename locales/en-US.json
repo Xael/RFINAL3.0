@@ -34,7 +34,7 @@
         "pvp_online": "PVP Online",
         "shop": "Shop",
         "event": "Event",
-        "ranking": "PVP RANK",
+        "ranking": "Ranking",
         "profile": "Profile",
         "achievements": "Achievements",
         "friends": "Friends",
@@ -151,6 +151,24 @@
         "privacy_item3_text": "The player can request the deletion of their personal data at any time, aware that this may result in the permanent closure of the account.",
         "privacy_item4_title": "Consent",
         "privacy_item4_text": "By creating an account and continuing to use the game, the user fully agrees with these rules and privacy policies."
+    },
+    "credits": {
+        "title": "Credits",
+        "category_script": "Story/Game Design",
+        "category_music": "Music",
+        "category_sound": "Sound Designer",
+        "category_art": "Art",
+        "category_programming": "Programming",
+        "category_beta_testers": "Beta Testers",
+        "beta_testers_names": "Vinicius, Ricardo, and Rodrigo",
+        "beta_testers_thanks": "thank you so much for the feedback <3!",
+        "category_special_thanks": "Special Thanks",
+        "special_thanks_1": "My family, my eternal Gemini Versatrix Karol <3",
+        "special_thanks_2": "My friends and family who supported the creation of the Reversus game in some way",
+        "special_thanks_3": "Everyone who supported my wedding and bought the physical version of the board and card game!",
+        "special_thanks_4": "To my mother-in-law Vilma who financed the entire printing production to make the game a reality.",
+        "final_thanks": "Thank you very much!",
+        "the_end": "The End."
     },
     "game": {
         "log_title": "Game History",
@@ -340,23 +358,6 @@
         "title": "Achievements",
         "unlocked_toast": "{name}: {description}"
     },
-    "achievement_hints": {
-        "first_win": "Win your first match in the game.",
-        "first_defeat": "The first defeat is just the beginning of the journey.",
-        "versatrix_loss": "Being defeated by her might open new paths...",
-        "speed_run": "Speed is the key. Finish a duel quickly.",
-        "contravox_win": "Defeat the master of inverted words.",
-        "versatrix_win": "The golden queen has been overcome. What did she leave behind?",
-        "versatrix_card_collected": "A special gift from the queen can be found on the splash screen after beating her.",
-        "reversum_win": "The mighty king has fallen before you.",
-        "tutorial_win": "Show Necroverso that you've learned the lesson.",
-        "xael_win": "Find and defeat the creator at his own game.",
-        "quick_duel_win": "A victory may be quick, but it's still a victory.",
-        "true_end_beta": "You've defeated the three kings, but the story doesn't end here.",
-        "true_end_final": "Face the true threat with the help of an unexpected ally.",
-        "inversus_win": "Defeat the dark reflection of Reversus to achieve mastery.",
-        "120%_unlocked": "The final secret awaits the one who has unraveled all others."
-    },
     "ranking": {
         "title": "🏆 PVP Ranking 🏆",
         "loading": "Loading ranking...",
@@ -429,25 +430,6 @@
         "self_actions": "Admin Self Actions",
         "add_coins_label": "Add CoinVersus (for self):",
         "add_coins_button": "Add"
-    },
-    "chat": {
-        "placeholder": "Type a message...",
-        "chat_muted_message": "Chat is muted."
-    },
-    "event": {
-        "title": "Monthly Event",
-        "challenge_title": "Challenge of the Month",
-        "description": "Defeat the event opponent 3 times to earn an exclusive reward. You can only try once a day!",
-        "ability_title": "Special Ability",
-        "progress_title": "Progress",
-        "reward_title": "Exclusive Reward",
-        "reward_text_placeholder": "Title: \"{rewardName}\"",
-        "challenge_button": "Challenge!",
-        "status_wait": "You've already attempted the challenge today. Come back tomorrow!",
-        "status_completed": "Challenge complete! Play again whenever you like this month.",
-        "victory_progress_message": "You won! Event progress: {wins}/3. Come back tomorrow to continue.",
-        "victory_completed_message": "Challenge complete! You've unlocked the title: \"{rewardName}\"!",
-        "defeat_message": "You were defeated. Come back tomorrow for another attempt."
     },
     "rewards": {
         "daily_login_toast": "Daily Reward! You earned +{amount} CoinVersus.",
@@ -568,7 +550,7 @@
         "first_defeat": "Life is full of defeats... don't give up or the game is over.",
         "versatrix_loss": "Did Versatrix really want to beat you?",
         "speed_run": "Win a match in less than 5 minutes.",
-        "contravox_win": "Don't waste time reading this text as there is nothing interesting in it.",
+        "contravox_win": ".ti ni gnitseretni gnihton si ereht sa txet siht gnidaer emit etsaw t'noD",
         "versatrix_win": "You defeated Versatrix... Maybe she left something for you.",
         "versatrix_card_collected": "You found and collected Versatrix's special card!",
         "reversum_win": "He thought he was the most powerful, but there is another King now.",
@@ -579,6 +561,23 @@
         "true_end_final": "Congratulations, tell me how you managed to win later.",
         "inversus_win": "You defeated the dark reflection of Reversus. The secret is in the game's logo.",
         "120%_unlocked": "The secret of the secret, the password is \"Final\""
+    },
+    "achievement_hints": {
+        "first_win": "The first step to glory is simply... to win.",
+        "first_defeat": "Sometimes, to learn how to win, one must first... lose.",
+        "versatrix_loss": "Is a defeat to the golden queen truly a defeat?",
+        "speed_run": "Time is also an opponent. Be faster than it.",
+        "contravox_win": ".evitaler si gnidnatsrednU .efil ot ecnartne na si tnemhsilpmoccA",
+        "versatrix_win": "A victory against Versatrix might reveal more than just the way forward.",
+        "versatrix_card_collected": "The golden queen sometimes hides in plain sight, even before the game begins.",
+        "reversum_win": "Dethrone the tyrant to prove who really rules.",
+        "tutorial_win": "Even the first lesson can be a decisive victory.",
+        "xael_win": "They say the Creator only appears when the chaos is... Total.",
+        "quick_duel_win": "Prove your worth in a quick and direct match.",
+        "true_end_beta": "You've defeated a king... but not the master behind the shadows.",
+        "true_end_final": "To face the final darkness, you will need an unexpected alliance.",
+        "inversus_win": "The dark reflection of Reversus awaits. The final victory reveals this path.",
+        "120%_unlocked": "When the narrator tires of telling the story, he enters it. A victory over the reflection opens this door."
     },
     "ai_dialogue": {
         "necroverso_tutorial_winning_1": "You still have much to learn...",
@@ -601,7 +600,7 @@
         "narrador_winning_2": "I have already made all the calculations to defeat you in less than 10 moves.",
         "narrador_winning_3": "Your chances are... statistically insignificant.",
         "narrador_losing_1": "Interesting... an unexpected variation.",
-        "narrador_losing_2": "You were a good opponent...",
+        "narrador_losing_2": "You were a good opponent.",
         "xael_winning_1": "You can't catch me!",
         "xael_winning_2": "Too easy!",
         "xael_losing_1": "Hmm, interesting... but it won't be enough.",
@@ -734,30 +733,12 @@
         "march_new": "At the start of his turn, draws 2 value cards and discards 2, prioritizing keeping the highest values.",
         "april_new": "Once per turn, can ignore a negative effect played against him.",
         "may_new": "Plays his value and effect cards face down, revealing them only at the end of the round.",
-        "june_new": "Can reuse an effect card that was used this round once per round.",
+        "june_new": "Can reuse an effect card that was used this round, once per round.",
         "july_new": "Has a chance (50%) to steal a random card from your hand per round.",
         "august_new": "Can swap places on the board with the opponent once per match.",
         "september_new": "Once per round, can peek at and swap a card from your hand with one of his.",
         "october_new": "Once per round (50% chance), can force everyone to discard the highest value card from their hands.",
         "november_new": "Once per round, can 'freeze' an opponent's effect card, preventing it from being played this round.",
         "december_new": "At the start of each round, he may swap hands with you (50% chance)."
-    },
-    "credits": {
-        "title": "Credits",
-        "category_script": "Script & Game Design",
-        "category_music": "Music",
-        "category_sound": "Sound Effects",
-        "category_art": "Art",
-        "category_programming": "Programming",
-        "category_beta_testers": "Beta Testers",
-        "beta_testers_names": "Aline, Ana, Andressa, Bruna, Caio, Camila, Danilo, Diego, Elis, Ester, Fabio, Felipe, Fernanda, Gisele, Gustavo, Ingrid, Isabella, Jenifer, Johnny, Julia, Kaique, Karine, Leonardo, Livia, Luciano, Marcio, Marcos, Mariana, Matheus, Mayara, Nádia, Paola, Patricia, Paulo, Pedro, Renan, Ricardo, Sthefany, Talita, Thais, Thiago, Vanessa, Vinicius, Vitor, Wagner, William, Zé",
-        "beta_testers_thanks": "THANK YOU!",
-        "category_special_thanks": "Special Thanks",
-        "special_thanks_1": "To God, for the strength and creativity.",
-        "special_thanks_2": "To my fiancée Aline, the inspiration for this project.",
-        "special_thanks_3": "To my parents, for their unconditional support.",
-        "special_thanks_4": "And to you, player, for being part of this story.",
-        "final_thanks": "Thank you for playing!",
-        "the_end": "The End?"
     }
 }

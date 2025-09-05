@@ -74,8 +74,9 @@ export const renderPlayerArea = (player) => {
         ${handHTML}
     `;
 
-    // Add character portrait for Story Mode OR equipped avatar for any other mode
-    if (player.aiType && !player.isHuman) { // Story mode AI portraits take precedence
+    const hasStoryPortrait = player.aiType && !player.isHuman && config.AI_CHAT_PERSONALITIES.hasOwnProperty(player.aiType);
+
+    if (hasStoryPortrait) {
         const portraitMap = {
             'necroverso_tutorial': { src: './necroverso.png', class: 'player-area-character-portrait necro-tutorial-portrait' },
             'contravox': { src: './contravox.png', class: 'player-area-character-portrait contravox-portrait' },
@@ -100,7 +101,7 @@ export const renderPlayerArea = (player) => {
             if (portraitInfo.id) portraitImg.id = portraitInfo.id;
             playerEl.appendChild(portraitImg);
         }
-    } else if (player.avatar_url) { // Render equipped avatar for human players and non-story AI
+    } else if (player.avatar_url && !player.avatar_url.includes('googleusercontent.com')) {
         playerEl.classList.add('has-avatar');
         const avatarImg = document.createElement('img');
         avatarImg.src = player.avatar_url;

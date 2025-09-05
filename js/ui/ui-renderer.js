@@ -22,13 +22,13 @@ export function updateChatControls() {
     // Toggle Mute Button and Area
     dom.chatContainerEl.classList.toggle('chat-muted', isChatMuted);
     dom.chatToggleBtn.classList.toggle('active', isChatMuted);
-    // Toggle button now shows the current state (OFF when muted, ON when not muted)
+    
+    // Explicitly set text for both buttons to ensure translation is applied
     dom.chatToggleBtn.textContent = t(isChatMuted ? 'chat.toggle_off' : 'chat.toggle_on');
+    dom.chatFilterBtn.textContent = t('chat.filter_button_label');
 
     dom.chatInput.disabled = isChatMuted;
     dom.chatInput.placeholder = t(isChatMuted ? 'chat.chat_muted_message' : 'game.chat_placeholder');
-
-    // Filter Button Text is now handled by the data-i18n attribute in the HTML.
 }
 
 
