@@ -74,8 +74,8 @@ export const renderPlayerArea = (player) => {
         ${handHTML}
     `;
 
-    // Add character portrait if applicable AFTER innerHTML is set
-    if (!player.isHuman) {
+    // Add character portrait for Story Mode OR equipped avatar for any other mode
+    if (player.aiType && !player.isHuman) { // Story mode AI portraits take precedence
         const portraitMap = {
             'necroverso_tutorial': { src: './necroverso.png', class: 'player-area-character-portrait necro-tutorial-portrait' },
             'contravox': { src: './contravox.png', class: 'player-area-character-portrait contravox-portrait' },
@@ -88,22 +88,24 @@ export const renderPlayerArea = (player) => {
             'inversus': { src: './INVERSUM1.png', class: 'inversus-character-portrait', id: 'inversus-character-portrait' }
         };
         
-        // Dynamically add event boss portraits
         config.MONTHLY_EVENTS.forEach(event => {
             portraitMap[event.ai] = { src: `./${event.image}`, class: 'player-area-character-portrait' };
         });
 
         const portraitInfo = portraitMap[player.aiType];
-
         if (portraitInfo) {
             const portraitImg = document.createElement('img');
             portraitImg.src = portraitInfo.src;
             portraitImg.className = portraitInfo.class;
-            if (portraitInfo.id) {
-                portraitImg.id = portraitInfo.id;
-            }
+            if (portraitInfo.id) portraitImg.id = portraitInfo.id;
             playerEl.appendChild(portraitImg);
         }
+    } else if (player.avatar_url) { // Render equipped avatar for human players and non-story AI
+        playerEl.classList.add('has-avatar');
+        const avatarImg = document.createElement('img');
+        avatarImg.src = player.avatar_url;
+        avatarImg.className = 'player-equipped-avatar';
+        playerEl.appendChild(avatarImg);
     }
 };
 

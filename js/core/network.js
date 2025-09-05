@@ -377,6 +377,7 @@ export function emitGetRanking(page = 1) { const { socket } = getState(); if (so
 export function emitGetProfile() { const { socket } = getState(); if (socket) socket.emit('getProfile'); }
 export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
 export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
+export function emitSetSelectedAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedAvatar', { avatarCode }); }
 export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
 export function emitCreateRoom({ name, password, betAmount }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password, betAmount }); }

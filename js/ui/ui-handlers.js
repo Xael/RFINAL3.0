@@ -10,6 +10,7 @@ import * as saveLoad from '../core/save-load.js';
 import * as achievements from '../core/achievements.js';
 import { updateLog } from '../core/utils.js';
 import * as config from '../core/config.js';
+import { AVATAR_CATALOG } from '../core/config.js';
 import * as network from '../core/network.js';
 import { shatterImage } from './animations.js';
 import { announceEffect } from '../core/sound.js';
@@ -17,7 +18,7 @@ import { playCard } from '../game-logic/player-actions.js';
 import { advanceToNextPlayer } from '../game-logic/turn-manager.js';
 import { setLanguage, t } from '../core/i18n.js';
 import { showSplashScreen } from './splash-screen.js';
-import { renderProfile } from './profile-renderer.js';
+import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from './profile-renderer.js';
 import { openChatWindow, initializeChatHandlers } from './chat-handler.js';
 import { renderShopAvatars } from './shop-renderer.js';
 
@@ -515,7 +516,7 @@ export function initializeUiHandlers() {
         dom.oneVOneSetupModal.classList.add('hidden');
         dom.randomOpponentSpinnerModal.classList.remove('hidden');
 
-        const opponents = [
+        const storyOpponents = [
             { name: 'Contravox', aiType: 'contravox', image: './contravox.png' },
             { name: 'Versatrix', aiType: 'versatrix', image: './versatrix.png' },
             { name: 'Rei Reversum', aiType: 'reversum', image: './reversum.png' },
@@ -524,6 +525,21 @@ export function initializeUiHandlers() {
             { name: 'Narrador', aiType: 'narrador', image: './narrador.png' },
             { name: 'Necroverso Final', aiType: 'necroverso_final', image: './necroverso2.png' }
         ];
+
+        const excludedAvatarKeys = new Set([
+            'default_1', 'default_2', 'default_3', 'default_4',
+            'necroverso', 'contravox', 'versatrix', 'reversum'
+        ]);
+
+        const avatarOpponents = Object.entries(AVATAR_CATALOG)
+            .filter(([key]) => !excludedAvatarKeys.has(key))
+            .map(([key, avatar]) => ({
+                name: t(avatar.nameKey),
+                aiType: 'default',
+                image: `./${avatar.image_url}`
+            }));
+
+        const opponents = [...storyOpponents, ...avatarOpponents];
 
         let spinnerInterval;
         let selectedOpponent;
@@ -1286,7 +1302,7 @@ export function initializeUiHandlers() {
 
     if (dom.profileModal) {
         dom.profileModal.addEventListener('click', (e) => {
-             const actionButton = e.target.closest('button.add-friend-btn, button.remove-friend-btn, button#toggle-chat-mute-button');
+             const actionButton = e.target.closest('button.add-friend-btn, button.remove-friend-btn, button#toggle-chat-mute-button, button.equip-avatar-btn');
              if (!actionButton) return;
 
              if (actionButton.matches('.add-friend-btn')) {
@@ -1310,6 +1326,9 @@ export function initializeUiHandlers() {
                 localStorage.setItem('reversus-chat-muted', JSON.stringify(newMuteState));
                 
                 actionButton.textContent = t(newMuteState ? 'profile.unmute_chat' : 'profile.mute_chat');
+            } else if (actionButton.matches('.equip-avatar-btn')) {
+                const avatarCode = actionButton.dataset.avatarCode;
+                network.emitSetSelectedAvatar(avatarCode);
             }
         });
     }
