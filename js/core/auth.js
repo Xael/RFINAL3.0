@@ -35,23 +35,11 @@ export function initializeGoogleSignIn() {
                 callback: handleCredentialResponse
             });
             
-            // Explicitly check login state to set visibility
+            // Explicitly check login state to set visibility of login button vs profile display
             const { isLoggedIn } = getState();
-            dom.googleSignInContainer.classList.toggle('hidden', isLoggedIn);
+            dom.loginButton.classList.toggle('hidden', isLoggedIn);
             dom.userProfileDisplay.classList.toggle('hidden', !isLoggedIn);
 
-            // Only render the button if the user is NOT logged in.
-            if (!isLoggedIn) {
-                const signInButton = document.getElementById('google-signin-button');
-                if (signInButton) {
-                    google.accounts.id.renderButton(
-                        signInButton,
-                        { theme: "outline", size: "large", type: "standard" } 
-                    );
-                } else {
-                    console.error("Google Sign-In button container not found.");
-                }
-            }
         } else {
             attempts++;
             if (attempts < maxAttempts) {
@@ -59,8 +47,9 @@ export function initializeGoogleSignIn() {
                 setTimeout(init, 100);
             } else {
                 console.error("Google Sign-In library failed to load in time. Login will not be available.");
-                if (dom.googleSignInContainer) {
-                    dom.googleSignInContainer.innerHTML = '<p style="color: white; text-align: center;">Erro ao carregar o login.</p>';
+                if (dom.loginButton) {
+                    dom.loginButton.textContent = 'Erro de Login';
+                    dom.loginButton.disabled = true;
                 }
             }
         }

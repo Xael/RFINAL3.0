@@ -2961,12 +2961,11 @@ body.screen-shaking {
 }
 
 /* --- GOOGLE SIGN IN & USER PROFILE --- */
-#google-signin-container,
 #user-profile-display {
     position: fixed;
     top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 60px; /* Positioned next to the 40px fullscreen button */
+    transform: none;
     z-index: 2001;
 }
 

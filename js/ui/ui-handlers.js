@@ -257,7 +257,17 @@ export function initializeUiHandlers() {
     dom.endTurnButton.addEventListener('click', handleEndTurnButtonClick);
     dom.cardViewerCloseButton.addEventListener('click', () => dom.cardViewerModalEl.classList.add('hidden'));
     
-    // --- NEW QUICK START FLOW ---
+    // --- NEW LOGIN & QUICK START FLOW ---
+    dom.loginButton.addEventListener('click', () => {
+        sound.initializeMusic();
+        if (typeof google !== 'undefined' && google.accounts) {
+            google.accounts.id.prompt();
+        } else {
+            console.error("Google Auth not ready.");
+            alert("Serviço de login não está pronto. Tente novamente em um momento.");
+        }
+    });
+
     dom.quickStartButton.addEventListener('click', () => {
         sound.initializeMusic();
         dom.splashScreenEl.classList.add('hidden');
@@ -289,7 +299,7 @@ export function initializeUiHandlers() {
         if (!button) return;
 
         const mode = button.dataset.mode;
-        network.emitJoinMatchmaking(mode);
+        network.emitJoinMatchmaking({ mode });
         dom.pvpMatchmakingModal.classList.add('hidden');
         dom.matchmakingStatusModal.classList.remove('hidden');
         dom.matchmakingStatusText.textContent = t('matchmaking.searching_text');
@@ -308,7 +318,7 @@ export function initializeUiHandlers() {
     
     dom.storyModeButton.addEventListener('click', () => {
         sound.initializeMusic();
-        const hasSave = localStorage.getItem('reversus-story-save');
+        const hasSave = saveLoad.checkForSavedGame();
         dom.storyContinueGameButton.disabled = !hasSave;
         dom.storyStartOptionsModal.classList.remove('hidden');
     });
@@ -316,7 +326,7 @@ export function initializeUiHandlers() {
     dom.pvpModeButton.addEventListener('click', () => {
         const { isLoggedIn } = getState();
         if (!isLoggedIn) {
-            alert("É necessário fazer login com o Google para jogar no modo PVP.");
+            alert(t('common.login_required', { feature: 'PVP Online' }));
             return;
         }
         network.emitListRooms();
@@ -401,7 +411,7 @@ export function initializeUiHandlers() {
             if (target) {
                 const googleId = target.dataset.googleId;
                 if (googleId) {
-                    network.emitViewProfile(googleId);
+                    network.emitViewProfile({ googleId });
                 }
             }
         });
@@ -413,7 +423,7 @@ export function initializeUiHandlers() {
             if(target) {
                 const googleId = target.dataset.googleId;
                 if (googleId) {
-                    network.emitViewProfile(googleId);
+                    network.emitViewProfile({ googleId });
                 }
             }
         });
@@ -1260,7 +1270,7 @@ export function initializeUiHandlers() {
                 const userId = button.dataset.userId;
                 const username = button.closest('.friend-item')?.querySelector('.friend-name')?.textContent.trim() || 'este amigo';
                 if (confirm(t('confirm.remove_friend', { username }))) {
-                     network.emitRemoveFriend(userId);
+                     network.emitRemoveFriend({ targetUserId: userId });
                 }
                 return;
             }
@@ -1268,7 +1278,7 @@ export function initializeUiHandlers() {
             if (button.matches('.view-profile-btn')) {
                 const googleId = button.dataset.googleId;
                 if (googleId) {
-                    network.emitViewProfile(googleId);
+                    network.emitViewProfile({ googleId });
                 }
                 return;
             }
@@ -1318,7 +1328,7 @@ export function initializeUiHandlers() {
                 });
             } else if (actionButton.matches('.remove-friend-btn')) {
                 const userId = actionButton.dataset.userId;
-                network.emitRemoveFriend(userId);
+                network.emitRemoveFriend({ targetUserId: userId });
             } else if (actionButton.matches('#toggle-chat-mute-button')) {
                 const state = getState();
                 const newMuteState = !state.isChatMuted;
@@ -1328,7 +1338,7 @@ export function initializeUiHandlers() {
                 actionButton.textContent = t(newMuteState ? 'profile.unmute_chat' : 'profile.mute_chat');
             } else if (actionButton.matches('.equip-avatar-btn')) {
                 const avatarCode = actionButton.dataset.avatarCode;
-                network.emitSetSelectedAvatar(avatarCode);
+                network.emitSetSelectedAvatar({ avatarCode });
             }
         });
     }
@@ -1343,28 +1353,28 @@ export function initializeUiHandlers() {
                 const userId = button.dataset.userId;
                 const username = button.dataset.username;
                 if (confirm(t('confirm.ban_player', { username }))) {
-                    network.emitAdminBanUser(userId);
+                    network.emitAdminBanUser({ userId });
                 }
             } else if (button.matches('.admin-unban-btn')) {
                 const userId = button.dataset.userId;
                 const username = button.dataset.username;
                 if (confirm(t('confirm.unban_player', { username }))) {
-                    network.emitAdminUnbanUser(userId);
+                    network.emitAdminUnbanUser({ userId });
                 }
             } else if (button.matches('.admin-rollback-btn')) {
                 const userId = button.dataset.userId;
                 const username = button.dataset.username;
                 if (confirm(t('confirm.rollback_player', { username }))) {
-                    network.emitAdminRollbackUser(userId);
+                    network.emitAdminRollbackUser({ userId });
                 }
             } else if (button.matches('.admin-dismiss-report-btn')) {
                 const reportId = button.dataset.reportId;
-                network.emitAdminResolveReport(reportId);
+                network.emitAdminResolveReport({ reportId });
             } else if (button.matches('#admin-add-coins-btn')) {
                 const input = document.getElementById('admin-add-coins-input');
                 const amount = parseInt(input.value, 10);
                 if (amount && amount > 0) {
-                    network.emitAdminAddCoins(amount);
+                    network.emitAdminAddCoins({ amount });
                     input.value = '';
                 } else {
                     alert('Por favor, insira um número positivo.');
@@ -1396,7 +1406,7 @@ export function initializeUiHandlers() {
             if (confirm(t('shop.confirm_purchase', { avatarName: t(`avatars.${avatarCode}`) }))) {
                 button.disabled = true;
                 button.textContent = t('shop.buying');
-                network.emitBuyAvatar(avatarCode);
+                network.emitBuyAvatar({ avatarCode });
             }
         }
     });

@@ -206,6 +206,7 @@ export const chatToggleBtn = document.getElementById('chat-toggle-btn');
 
 // PVP / Auth
 export const rankingButton = document.getElementById('ranking-button');
+export const loginButton = document.getElementById('login-button');
 export const profileModal = document.getElementById('profile-modal');
 export const closeProfileButton = document.getElementById('close-profile-button');
 export const profileDataContainer = document.getElementById('profile-data-container');
@@ -213,7 +214,6 @@ export const achievementsGrid = document.getElementById('achievements-grid');
 export const rankingModal = document.getElementById('ranking-modal');
 export const closeRankingButton = document.getElementById('close-ranking-button');
 export const rankingContainer = document.getElementById('ranking-container');
-export const googleSignInContainer = document.getElementById('google-signin-container');
 export const userProfileDisplay = document.getElementById('user-profile-display');
 export const userAvatar = document.getElementById('user-avatar');
 export const userName = document.getElementById('user-name');
