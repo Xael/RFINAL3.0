@@ -390,7 +390,11 @@
         "request_sent": "Request Sent",
         "friends": "Friends",
         "mute_chat": "Mute Chat",
-        "unmute_chat": "Unmute Chat"
+        "unmute_chat": "Unmute Chat",
+        "my_avatars": "My Avatars",
+        "equip": "Equip",
+        "equipped": "Equipped",
+        "remove_avatar": "Remove Avatar"
     },
     "friends": {
         "add_title": "Add Friend",
@@ -667,6 +671,7 @@
         "necroverso_king_battle_intro_text": "Hahaha! Thanks to you, I have full control over the kings you defeated! And they will fight for me! But, to be fair, I'll explain the rules: in this combat, whoever has the lowest score in the round loses a heart. Lose them all... and you will be eliminated forever!",
         "necroverso_king_battle_intro_option_1": "That doesn't seem fair!",
         "post_necroverso_king_victory_text": "You... defeated me? Impossible! For now, you are free. But know that this is not the end. I will be back...",
+        "return_to_menu_from_kings": "Finalizar",
         "versatrix_warning_1_text": "Wait! Before you face him, know this, he can't be beaten just by reaching the center of the board first... and don't let his darkness touch you...",
         "versatrix_warning_1_option_1": "Darkness...",
         "versatrix_warning_1_option_2": "I don't know what to do...",
@@ -675,7 +680,9 @@
         "pre_final_battle_text": "Two tips for you... your time is up and there's no escape!",
         "pre_final_battle_option_1": "That didn't seem like a tip...",
         "pre_final_battle_option_2": "Oh, I get it!",
+        "final_battle_final": "Finalizar",
         "xael_challenge_intro_text": "So you accept my challenge! The rules here are different. The goal is to reach space 10 with MORE stars than me. Collect them on the board and use their effects wisely. Ready?",
+        "start_xael_challenge": "Começar",
         "endgame_dialogue_1": "We did it! You defeated him!",
         "endgame_dialogue_2": "...",
         "endgame_dialogue_3": "Even if you defeat me... the Inversus... will never cease to exist.",
@@ -740,5 +747,20 @@
         "october_new": "Once per round (50% chance), can force everyone to discard the highest value card from their hands.",
         "november_new": "Once per round, can 'freeze' an opponent's effect card, preventing it from being played this round.",
         "december_new": "At the start of each round, he may swap hands with you (50% chance)."
+    },
+    "event": {
+        "title": "Monthly Event",
+        "challenge_title": "Challenge of the Month",
+        "description": "Defeat the event opponent 3 times to earn an exclusive reward. You can only try once per day!",
+        "ability_title": "Special Ability",
+        "progress_title": "Progress",
+        "reward_title": "Exclusive Reward",
+        "reward_text_placeholder": "Title: \"{rewardName}\"",
+        "challenge_button": "Challenge!",
+        "status_wait": "You've already attempted the challenge today. Come back tomorrow!",
+        "status_completed": "Challenge complete! You can play again for fun this month.",
+        "victory_progress_message": "You won! Event progress: {wins}/3. Come back tomorrow to continue.",
+        "victory_completed_message": "Challenge complete! You've unlocked the title: \"{rewardName}\"!",
+        "defeat_message": "You were defeated. Come back tomorrow for a new attempt."
     }
 }

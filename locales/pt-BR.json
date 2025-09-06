@@ -396,7 +396,8 @@
         "unmute_chat": "Reativar Chat",
         "my_avatars": "Meus Avatares",
         "equip": "Equipar",
-        "equipped": "Equipado"
+        "equipped": "Equipado",
+        "remove_avatar": "Remover Avatar"
     },
     "friends": {
         "add_title": "Adicionar Amigo",
@@ -751,18 +752,18 @@
         "december_new": "No início de cada rodada, ele poderá trocar de mão com você (chance de 50%)."
     },
     "event": {
-        "title": "Evento Mensal",
-        "challenge_title": "Desafio do Mês",
-        "description": "Vença o oponente do evento 3 vezes para ganhar uma recompensa exclusiva. Você só pode tentar uma vez por dia!",
-        "ability_title": "Habilidade Especial",
-        "progress_title": "Progresso",
-        "reward_title": "Recompensa Exclusiva",
-        "reward_text_placeholder": "Título: \"{rewardName}\"",
-        "challenge_button": "Desafiar!",
-        "status_wait": "Você já tentou o desafio hoje. Volte amanhã!",
-        "status_completed": "Desafio completo! Jogue novamente quando quiser este mês.",
-        "victory_progress_message": "Você venceu! Progresso do evento: {wins}/3. Volte amanhã para continuar.",
-        "victory_completed_message": "Desafio completo! Você desbloqueou o título: \"{rewardName}\"!",
-        "defeat_message": "Você foi derrotado. Volte amanhã para uma nova tentativa."
+        "title": "Monthly Event",
+        "challenge_title": "Challenge of the Month",
+        "description": "Defeat the event opponent 3 times to earn an exclusive reward. You can only try once per day!",
+        "ability_title": "Special Ability",
+        "progress_title": "Progress",
+        "reward_title": "Exclusive Reward",
+        "reward_text_placeholder": "Title: \"{rewardName}\"",
+        "challenge_button": "Challenge!",
+        "status_wait": "You've already attempted the challenge today. Come back tomorrow!",
+        "status_completed": "Challenge complete! You can play again for fun this month.",
+        "victory_progress_message": "You won! Event progress: {wins}/3. Come back tomorrow to continue.",
+        "victory_completed_message": "Challenge complete! You've unlocked the title: \"{rewardName}\"!",
+        "defeat_message": "You were defeated. Come back tomorrow for a new attempt."
     }
 }

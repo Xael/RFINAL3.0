@@ -22,37 +22,51 @@ function renderMyAvatars(profileData) {
     if (!grid || !container) return;
 
     const ownedAvatars = profileData.owned_avatars || [];
+    container.classList.remove('hidden');
 
-    if (ownedAvatars.length > 0) {
-        container.classList.remove('hidden');
-        grid.innerHTML = ownedAvatars.map(code => {
-            const avatar = AVATAR_CATALOG[code];
-            // Handle case where an avatar code might exist in the DB but not in the client config
-            if (!avatar) {
-                console.warn(`Avatar with code "${code}" not found in local catalog.`);
-                return '';
+    const isDefaultEquipped = !profileData.equipped_avatar_code;
+
+    const defaultAvatarHTML = `
+        <div class="avatar-item ${isDefaultEquipped ? 'equipped' : ''}">
+            <div class="avatar-image-wrapper">
+                <svg viewBox="0 0 100 100" fill="#888" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 50.31a19 19 0 100-38 19 19 0 000 38zm0 5.69c-12.71 0-38 6.35-38 19v9.48h76v-9.48c0-12.65-25.29-19-38-19z"/>
+                </svg>
+            </div>
+            <span class="avatar-name">${t('profile.remove_avatar')}</span>
+            ${isDefaultEquipped 
+                ? `<button class="control-button" disabled>${t('profile.equipped')}</button>` 
+                : `<button class="control-button equip-avatar-btn" data-avatar-code="default">${t('profile.equip')}</button>`
             }
+        </div>
+    `;
 
-            const isEquipped = profileData.equipped_avatar_code === code;
-            const avatarName = t(avatar.nameKey);
+    const ownedAvatarsHTML = ownedAvatars.map(code => {
+        const avatar = AVATAR_CATALOG[code];
+        if (!avatar) {
+            console.warn(`Avatar with code "${code}" not found in local catalog.`);
+            return '';
+        }
 
-            const buttonHTML = isEquipped
-                ? `<button class="control-button" disabled>${t('profile.equipped')}</button>`
-                : `<button class="control-button equip-avatar-btn" data-avatar-code="${code}">${t('profile.equip')}</button>`;
+        const isEquipped = profileData.equipped_avatar_code === code;
+        const avatarName = t(avatar.nameKey);
 
-            return `
-                <div class="avatar-item ${isEquipped ? 'equipped' : ''}">
-                    <div class="avatar-image-wrapper">
-                        <img src="./${avatar.image_url}" alt="${avatarName}">
-                    </div>
-                    <span class="avatar-name">${avatarName}</span>
-                    ${buttonHTML}
+        const buttonHTML = isEquipped
+            ? `<button class="control-button" disabled>${t('profile.equipped')}</button>`
+            : `<button class="control-button equip-avatar-btn" data-avatar-code="${code}">${t('profile.equip')}</button>`;
+
+        return `
+            <div class="avatar-item ${isEquipped ? 'equipped' : ''}">
+                <div class="avatar-image-wrapper">
+                    <img src="./${avatar.image_url}" alt="${avatarName}">
                 </div>
-            `;
-        }).join('');
-    } else {
-        container.classList.add('hidden');
-    }
+                <span class="avatar-name">${avatarName}</span>
+                ${buttonHTML}
+            </div>
+        `;
+    }).join('');
+
+    grid.innerHTML = defaultAvatarHTML + ownedAvatarsHTML;
 }
 
 
