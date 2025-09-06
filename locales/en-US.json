@@ -39,7 +39,8 @@
         "achievements": "Achievements",
         "friends": "Friends",
         "inversus": "INVERSUS",
-        "version": "Version 3.0"
+        "version": "Version 3.0",
+        "login": "LOGIN"
     },
     "shop": {
         "buy_avatars_tab": "Buy Avatars",

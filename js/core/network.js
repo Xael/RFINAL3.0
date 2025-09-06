@@ -62,7 +62,7 @@ export function connectToServer() {
         updateState('isLoggedIn', true);
         updateState('userProfile', userProfile);
         
-        dom.googleSignInContainer.classList.add('hidden');
+        dom.loginButton.classList.add('hidden');
         dom.userProfileDisplay.classList.remove('hidden');
         renderProfile(userProfile);
         dom.rankingButton.classList.remove('hidden'); 
