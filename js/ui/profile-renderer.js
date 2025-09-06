@@ -4,13 +4,57 @@ import { t, getCurrentLanguage } from '../core/i18n.js';
 import * as network from '../core/network.js';
 import { getState } from '../core/state.js';
 import { openChatWindow } from './chat-handler.js';
-import { TITLE_CONFIG } from '../core/config.js';
+import { TITLE_CONFIG, AVATAR_CATALOG } from '../core/config.js';
 import { updateCoinVersusDisplay } from './shop-renderer.js';
 
 function xpForLevel(level) {
     if (level <= 1) return 0;
     return (level - 1) * (level - 1) * 100;
 }
+
+/**
+ * Renders the "My Avatars" section within the profile modal.
+ * @param {object} profileData - The profile data for the user.
+ */
+function renderMyAvatars(profileData) {
+    const grid = document.getElementById('profile-my-avatars-grid');
+    const container = document.getElementById('profile-avatar-selection-container');
+    if (!grid || !container) return;
+
+    const ownedAvatars = profileData.owned_avatars || [];
+
+    if (ownedAvatars.length > 0) {
+        container.classList.remove('hidden');
+        grid.innerHTML = ownedAvatars.map(code => {
+            const avatar = AVATAR_CATALOG[code];
+            // Handle case where an avatar code might exist in the DB but not in the client config
+            if (!avatar) {
+                console.warn(`Avatar with code "${code}" not found in local catalog.`);
+                return '';
+            }
+
+            const isEquipped = profileData.equipped_avatar_code === code;
+            const avatarName = t(avatar.nameKey);
+
+            const buttonHTML = isEquipped
+                ? `<button class="control-button" disabled>${t('profile.equipped')}</button>`
+                : `<button class="control-button equip-avatar-btn" data-avatar-code="${code}">${t('profile.equip')}</button>`;
+
+            return `
+                <div class="avatar-item ${isEquipped ? 'equipped' : ''}">
+                    <div class="avatar-image-wrapper">
+                        <img src="./${avatar.image_url}" alt="${avatarName}">
+                    </div>
+                    <span class="avatar-name">${avatarName}</span>
+                    ${buttonHTML}
+                </div>
+            `;
+        }).join('');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
 
 export function renderProfile(profileData) {
     if (!profileData) return;
@@ -146,6 +190,14 @@ export function renderProfile(profileData) {
         </div>`;
     
     dom.profileDataContainer.innerHTML = finalHTML;
+
+    // --- 3. Renderizar Meus Avatares (se for meu perfil) ---
+    if (isMyProfile) {
+        renderMyAvatars(profileData);
+    } else {
+        const container = document.getElementById('profile-avatar-selection-container');
+        if (container) container.classList.add('hidden');
+    }
 
     // Adicionar botões de ação (amigo/silenciar) fora do grid principal de dados
     const actionButtonsContainer = document.getElementById('profile-action-buttons');
