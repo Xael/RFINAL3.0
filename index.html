@@ -18,7 +18,8 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    
+    <script type="module" src="js/core/index.js"></script>
+    <script type="module" src="js/core/shortcuts.js"></script>
 <script type="importmap">
 {
   "imports": {
@@ -848,21 +849,6 @@
     </div>
 
 </div>
-<script>
-    // Cache Busting: Force the browser to load the latest version of the script.
-    // A static version number is used to avoid server fetch errors.
-    const version = "1722464198000"; // This timestamp is updated on each deployment.
-
-    const indexScript = document.createElement('script');
-    indexScript.type = 'module';
-    indexScript.src = `js/core/index.js?v=${version}`;
-    document.body.appendChild(indexScript);
-
-    const shortcutsScript = document.createElement('script');
-    shortcutsScript.type = 'module';
-    shortcutsScript.src = `js/core/shortcuts.js?v=${version}`;
-    document.body.appendChild(shortcutsScript);
-</script>
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>

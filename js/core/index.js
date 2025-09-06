@@ -1,6 +1,6 @@
-
 import { initializeUiHandlers } from '../ui/ui-handlers.js';
 import { showSplashScreen } from '../ui/splash-screen.js';
+import { setupPvpRooms } from '../game-controller.js';
 import { checkForSavedGame } from './save-load.js';
 import { loadAchievements } from './achievements.js';
 import { initializeGoogleSignIn } from './auth.js';
@@ -10,12 +10,6 @@ import { updateState } from './state.js';
 
 // This is the main entry point of the application.
 document.addEventListener('DOMContentLoaded', async () => {
-    // Guard to ensure the init logic runs only once.
-    if (window.gameHasInitialized) {
-        return;
-    }
-    window.gameHasInitialized = true;
-
     // Initialize internationalization first
     await initI18n();
 
@@ -24,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Sets up all the button clicks and other user interactions.
     initializeUiHandlers();
+
+    // Initializes the PvP rooms data structure.
+    setupPvpRooms();
 
     // Load any existing achievements from local storage.
     loadAchievements();

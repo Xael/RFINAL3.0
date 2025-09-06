@@ -241,33 +241,9 @@ export function renderProfile(profileData) {
     }
 }
 
-export function renderAdminPanel({ online, banned, pendingReports, totalConnections, dailyStats }) {
+export function renderAdminPanel({ online, banned, pendingReports }) {
     const adminTabContent = document.getElementById('profile-admin-tab-content');
     if (!adminTabContent) return;
-
-    const lang = getCurrentLanguage().replace('_', '-');
-
-    const dailyStatsHTML = dailyStats && dailyStats.length > 0 ? `
-        <div class="admin-user-list" style="max-height: 200px;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Jogadores Únicos</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${dailyStats.map(stat => `
-                        <tr>
-                            <td>${new Date(stat.access_date).toLocaleDateString(lang)}</td>
-                            <td>${stat.unique_users}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    ` : `<p>Nenhum dado de acesso diário registrado.</p>`;
-
 
     const reportsHTML = pendingReports && pendingReports.length > 0 ? pendingReports.map(report => `
         <div class="admin-user-item">
@@ -319,13 +295,6 @@ export function renderAdminPanel({ online, banned, pendingReports, totalConnecti
     `).join('') : `<p>${t('admin.no_banned_users')}</p>`;
 
     adminTabContent.innerHTML = `
-        <div class="admin-section">
-            <h3>${t('admin.server_status')}</h3>
-            <p><strong>Conexões Ativas no Servidor:</strong> ${totalConnections || 0}</p>
-            <br>
-            <h4>Acessos Diários (Últimos 30 Dias)</h4>
-            ${dailyStatsHTML}
-        </div>
         <div class="admin-section">
             <h3 style="color: var(--accent-yellow); border-bottom-color: var(--accent-yellow);">${t('admin.self_actions')}</h3>
              <div class="admin-self-actions">

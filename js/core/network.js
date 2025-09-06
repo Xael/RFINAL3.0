@@ -2,15 +2,16 @@
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver, showRoundSummaryModal, showTurnIndicator } from '../ui/ui-renderer.js';
-import { renderRoomList, updateLobbyUi, addLobbyChatMessage } from '../ui/lobby-renderer.js';
+import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from '../ui/profile-renderer.js';
-import { showSplashScreen } from '../ui/splash-screen.js';
+import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
-import { updateGameTimer, initializeGame } from '../game-controller.js';
-import { showPvpDrawSequence, advanceToNextPlayer } from '../game-logic/turn-manager.js';
+import { updateGameTimer } from '../game-controller.js';
+import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
 import { t } from './i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
 import { showCoinRewardNotification } from '../ui/toast-renderer.js';
+import { playSoundEffect, announceEffect } from '../core/sound.js';
 import * as sound from './sound.js';
 import { renderShopAvatars, updateCoinVersusDisplay } from '../ui/shop-renderer.js';
 
@@ -117,9 +118,9 @@ export function connectToServer() {
         renderAdminPanel(data);
     });
 
-    socket.on('adminActionSuccess', (message) => {
-        alert(message);
-        emitAdminGetData(); // Refresh panel
+    socket.on('adminActionSuccess', () => {
+        // This event signals that an admin action was successful and the panel should be refreshed
+        emitAdminGetData();
     });
 
     socket.on('newReport', () => {
@@ -376,7 +377,7 @@ export function emitGetRanking(page = 1) { const { socket } = getState(); if (so
 export function emitGetProfile() { const { socket } = getState(); if (socket) socket.emit('getProfile'); }
 export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
 export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
-export function emitSetSelectedAvatar(data) { const { socket } = getState(); if (socket) socket.emit('setSelectedAvatar', data); }
+export function emitSetSelectedAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedAvatar', { avatarCode }); }
 export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
 export function emitCreateRoom({ name, password, betAmount }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password, betAmount }); }
@@ -494,7 +495,7 @@ export function emitAdminRollbackUser(userId) {
 
 export function emitAdminAddCoins(amount) {
     const { socket } = getState();
-    if (socket) socket.emit('admin:addCoins', { amount });
+    if (socket) socket.emit('admin:addCoins', amount);
 }
 
 export function emitAdminResolveReport(reportId) {
