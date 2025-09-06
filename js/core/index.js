@@ -1,3 +1,4 @@
+
 import { initializeUiHandlers } from '../ui/ui-handlers.js';
 import { showSplashScreen } from '../ui/splash-screen.js';
 import { checkForSavedGame } from './save-load.js';
@@ -9,6 +10,12 @@ import { updateState } from './state.js';
 
 // This is the main entry point of the application.
 document.addEventListener('DOMContentLoaded', async () => {
+    // Guard to ensure the init logic runs only once.
+    if (window.gameHasInitialized) {
+        return;
+    }
+    window.gameHasInitialized = true;
+
     // Initialize internationalization first
     await initI18n();
 
