@@ -95,10 +95,10 @@ export function connectToServer() {
     });
 
     socket.on('profileData', (profile) => {
-        const { userProfile } = getState();
+        const { userProfile: myProfile } = getState();
         // This check ensures we only update the main user's profile if it matches,
         // but it still allows viewing other profiles.
-        if (userProfile && profile.google_id === userProfile.google_id) {
+        if (myProfile && profile.google_id === myProfile.google_id) {
             updateState('userProfile', profile);
         }
         renderProfile(profile);
@@ -377,7 +377,7 @@ export function emitGetRanking(page = 1) { const { socket } = getState(); if (so
 export function emitGetProfile() { const { socket } = getState(); if (socket) socket.emit('getProfile'); }
 export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
 export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
-export function emitSetSelectedAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedAvatar', avatarCode); }
+export function emitSetSelectedAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedAvatar', { avatarCode }); }
 export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
 export function emitCreateRoom({ name, password, betAmount }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password, betAmount }); }
@@ -405,14 +405,14 @@ export function emitReportPlayer(reportedGoogleId, message) { const { socket } =
 export function emitClaimDailyLoginReward() { const { socket } = getState(); if(socket) socket.emit('claimDailyLoginReward'); }
 export function emitClaimChallengeReward(data) { const { socket } = getState(); if(socket) socket.emit('claimChallengeReward', data); }
 export function emitGrantAchievement(achievementId) { const { socket } = getState(); if (socket) socket.emit('grantAchievement', { achievementId }); }
-export function emitBuyAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('buyAvatar', { avatarCode }); }
+export function emitBuyAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('buyAvatar', avatarCode); }
 
 // --- Matchmaking Emitters ---
 export function emitJoinMatchmaking(mode) {
     const { socket } = getState();
     if (socket) {
         updateState('currentQueueMode', mode);
-        socket.emit('joinMatchmaking', { mode });
+        socket.emit('joinMatchmaking', mode);
     }
 }
 export function emitCancelMatchmaking() {
@@ -480,25 +480,25 @@ export function emitAdminGetData() {
 
 export function emitAdminBanUser(userId) {
     const { socket } = getState();
-    if (socket) socket.emit('admin:banUser', { userId });
+    if (socket) socket.emit('admin:banUser', userId);
 }
 
 export function emitAdminUnbanUser(userId) {
     const { socket } = getState();
-    if (socket) socket.emit('admin:unbanUser', { userId });
+    if (socket) socket.emit('admin:unbanUser', userId);
 }
 
 export function emitAdminRollbackUser(userId) {
     const { socket } = getState();
-    if (socket) socket.emit('admin:rollbackUser', { userId });
+    if (socket) socket.emit('admin:rollbackUser', userId);
 }
 
 export function emitAdminAddCoins(amount) {
     const { socket } = getState();
-    if (socket) socket.emit('admin:addCoins', { amount });
+    if (socket) socket.emit('admin:addCoins', amount);
 }
 
 export function emitAdminResolveReport(reportId) {
     const { socket } = getState();
-    if (socket) socket.emit('admin:resolveReport', { reportId });
+    if (socket) socket.emit('admin:resolveReport', reportId);
 }
