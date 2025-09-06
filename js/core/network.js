@@ -2,16 +2,15 @@
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver, showRoundSummaryModal, showTurnIndicator } from '../ui/ui-renderer.js';
-import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
+import { renderRoomList, updateLobbyUi, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from '../ui/profile-renderer.js';
 import { showSplashScreen } from '../ui/splash-screen.js';
 import { updateLog } from './utils.js';
-import { updateGameTimer } from '../game-controller.js';
-import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
+import { updateGameTimer, initializeGame } from '../game-controller.js';
+import { showPvpDrawSequence, advanceToNextPlayer } from '../game-logic/turn-manager.js';
 import { t } from './i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
 import { showCoinRewardNotification } from '../ui/toast-renderer.js';
-import { playSoundEffect, announceEffect } from '../core/sound.js';
 import * as sound from './sound.js';
 import { renderShopAvatars, updateCoinVersusDisplay } from '../ui/shop-renderer.js';
 
