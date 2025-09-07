@@ -241,9 +241,33 @@ export function renderProfile(profileData) {
     }
 }
 
-export function renderAdminPanel({ online, banned, pendingReports }) {
+export function renderAdminPanel({ online, banned, pendingReports, totalConnections, dailyStats }) {
     const adminTabContent = document.getElementById('profile-admin-tab-content');
     if (!adminTabContent) return;
+
+    const lang = getCurrentLanguage().replace('_', '-');
+
+    const dailyStatsHTML = dailyStats && dailyStats.length > 0 ? `
+        <div class="admin-user-list" style="max-height: 200px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>${t('admin.date_header')}</th>
+                        <th>${t('admin.unique_users_header')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${dailyStats.map(stat => `
+                        <tr>
+                            <td>${new Date(stat.access_date).toLocaleDateString(lang)}</td>
+                            <td>${stat.unique_users}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    ` : `<p>${t('admin.no_daily_stats')}</p>`;
+
 
     const reportsHTML = pendingReports && pendingReports.length > 0 ? pendingReports.map(report => `
         <div class="admin-user-item">
@@ -296,14 +320,11 @@ export function renderAdminPanel({ online, banned, pendingReports }) {
 
     adminTabContent.innerHTML = `
         <div class="admin-section">
-            <h3 style="color: var(--accent-yellow); border-bottom-color: var(--accent-yellow);">${t('admin.self_actions')}</h3>
-             <div class="admin-self-actions">
-                <label for="admin-add-coins-input">${t('admin.add_coins_label')}</label>
-                <div class="friends-search-container" style="margin-top: 0.5rem;">
-                    <input type="number" id="admin-add-coins-input" class="friends-search-input" placeholder="1000">
-                    <button id="admin-add-coins-btn" class="control-button">${t('admin.add_coins_button')}</button>
-                </div>
-            </div>
+            <h3>${t('admin.server_status')}</h3>
+            <p><strong>${t('admin.active_connections')}:</strong> ${totalConnections || 0}</p>
+            <br>
+            <h4>${t('admin.daily_access_log')}</h4>
+            ${dailyStatsHTML}
         </div>
         <div class="admin-section">
             <h3 style="color: var(--accent-yellow); border-bottom-color: var(--accent-yellow);">${t('admin.player_reports')}</h3>

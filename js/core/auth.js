@@ -32,7 +32,8 @@ export function initializeGoogleSignIn() {
             // The library is loaded, now we can initialize it.
             google.accounts.id.initialize({
                 client_id: "2701468714-udbjtea2v5d1vnr8sdsshi3lem60dvkn.apps.googleusercontent.com",
-                callback: handleCredentialResponse
+                callback: handleCredentialResponse,
+                ux_mode: 'popup' // Force popup flow to avoid FedCM issues
             });
             
             // Explicitly check login state to set visibility of login button vs profile display

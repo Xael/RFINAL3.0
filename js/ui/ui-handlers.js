@@ -1370,15 +1370,6 @@ export function initializeUiHandlers() {
             } else if (button.matches('.admin-dismiss-report-btn')) {
                 const reportId = button.dataset.reportId;
                 network.emitAdminResolveReport({ reportId });
-            } else if (button.matches('#admin-add-coins-btn')) {
-                const input = document.getElementById('admin-add-coins-input');
-                const amount = parseInt(input.value, 10);
-                if (amount && amount > 0) {
-                    network.emitAdminAddCoins({ amount });
-                    input.value = '';
-                } else {
-                    alert('Por favor, insira um número positivo.');
-                }
             }
         });
     }

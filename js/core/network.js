@@ -2,16 +2,15 @@
 import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver, showRoundSummaryModal, showTurnIndicator } from '../ui/ui-renderer.js';
-import { renderRanking, updateLobbyUi, renderRoomList, addLobbyChatMessage } from '../ui/lobby-renderer.js';
+import { renderRoomList, updateLobbyUi, addLobbyChatMessage } from '../ui/lobby-renderer.js';
 import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from '../ui/profile-renderer.js';
 import { showSplashScreen } from './splash-screen.js';
 import { updateLog } from './utils.js';
-import { updateGameTimer } from '../game-controller.js';
-import { showPvpDrawSequence } from '../game-logic/turn-manager.js';
+import { updateGameTimer, initializeGame } from '../game-controller.js';
+import { showPvpDrawSequence, advanceToNextPlayer } from '../game-logic/turn-manager.js';
 import { t } from './i18n.js';
 import { animateCardPlay } from '../ui/animations.js';
 import { showCoinRewardNotification } from '../ui/toast-renderer.js';
-import { playSoundEffect, announceEffect } from '../core/sound.js';
 import * as sound from './sound.js';
 import { renderShopAvatars, updateCoinVersusDisplay } from '../ui/shop-renderer.js';
 
@@ -95,10 +94,10 @@ export function connectToServer() {
     });
 
     socket.on('profileData', (profile) => {
-        const { userProfile } = getState();
+        const { userProfile: myProfile } = getState();
         // This check ensures we only update the main user's profile if it matches,
         // but it still allows viewing other profiles.
-        if (userProfile && profile.google_id === userProfile.google_id) {
+        if (myProfile && profile.google_id === myProfile.google_id) {
             updateState('userProfile', profile);
         }
         renderProfile(profile);
@@ -118,9 +117,9 @@ export function connectToServer() {
         renderAdminPanel(data);
     });
 
-    socket.on('adminActionSuccess', () => {
-        // This event signals that an admin action was successful and the panel should be refreshed
-        emitAdminGetData();
+    socket.on('adminActionSuccess', (message) => {
+        alert(message);
+        emitAdminGetData(); // Refresh panel
     });
 
     socket.on('newReport', () => {
@@ -377,7 +376,7 @@ export function emitGetRanking(page = 1) { const { socket } = getState(); if (so
 export function emitGetProfile() { const { socket } = getState(); if (socket) socket.emit('getProfile'); }
 export function emitViewProfile(googleId) { const { socket } = getState(); if (socket) socket.emit('viewProfile', { googleId }); }
 export function emitSetSelectedTitle(titleCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedTitle', { titleCode }); }
-export function emitSetSelectedAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('setSelectedAvatar', avatarCode); }
+export function emitSetSelectedAvatar(data) { const { socket } = getState(); if (socket) socket.emit('setSelectedAvatar', data); }
 export function emitClaimEventReward(titleCode) { const { socket } = getState(); if (socket) socket.emit('claimEventReward', { titleCode });}
 export function emitListRooms() { const { socket } = getState(); if (socket) socket.emit('listRooms'); }
 export function emitCreateRoom({ name, password, betAmount }) { const { socket } = getState(); if (socket) socket.emit('createRoom', { name, password, betAmount }); }
@@ -405,7 +404,7 @@ export function emitReportPlayer(reportedGoogleId, message) { const { socket } =
 export function emitClaimDailyLoginReward() { const { socket } = getState(); if(socket) socket.emit('claimDailyLoginReward'); }
 export function emitClaimChallengeReward(data) { const { socket } = getState(); if(socket) socket.emit('claimChallengeReward', data); }
 export function emitGrantAchievement(achievementId) { const { socket } = getState(); if (socket) socket.emit('grantAchievement', { achievementId }); }
-export function emitBuyAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('buyAvatar', { avatarCode }); }
+export function emitBuyAvatar(avatarCode) { const { socket } = getState(); if (socket) socket.emit('buyAvatar', avatarCode); }
 
 // --- Matchmaking Emitters ---
 export function emitJoinMatchmaking(mode) {
@@ -491,11 +490,6 @@ export function emitAdminUnbanUser(userId) {
 export function emitAdminRollbackUser(userId) {
     const { socket } = getState();
     if (socket) socket.emit('admin:rollbackUser', { userId });
-}
-
-export function emitAdminAddCoins(amount) {
-    const { socket } = getState();
-    if (socket) socket.emit('admin:addCoins', { amount });
 }
 
 export function emitAdminResolveReport(reportId) {
