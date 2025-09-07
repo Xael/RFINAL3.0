@@ -3,8 +3,8 @@ import { getState, updateState } from './state.js';
 import * as dom from './dom.js';
 import { renderAll, showGameOver, showRoundSummaryModal, showTurnIndicator } from '../ui/ui-renderer.js';
 import { renderRoomList, updateLobbyUi, addLobbyChatMessage } from '../ui/lobby-renderer.js';
-import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from '../ui/profile-renderer.js';
-import { showSplashScreen } from './splash-screen.js';
+import { renderProfile, renderFriendsList, renderSearchResults, addPrivateChatMessage, updateFriendStatusIndicator, renderFriendRequests, renderAdminPanel, renderOnlineFriendsForInvite } from './profile-renderer.js';
+import { showSplashScreen } from '../ui/splash-screen.js';
 import { updateLog } from './utils.js';
 import { updateGameTimer, initializeGame } from '../game-controller.js';
 import { showPvpDrawSequence, advanceToNextPlayer } from '../game-logic/turn-manager.js';
@@ -38,8 +38,11 @@ function setupPlayerPerspective() {
 
 
 export function connectToServer() {
-    const SERVER_URL = "https://reversus-node.dke42d.easypanel.host";
-    const socket = io(SERVER_URL, {
+    // The hardcoded server URL was causing connection errors (xhr poll error).
+    // By removing it, Socket.IO will automatically try to connect to the same host
+    // that served the page, which is the correct behavior when the server
+    // serves both the client files and the socket API.
+    const socket = io({
         reconnectionAttempts: 3,
         timeout: 10000,
     });
